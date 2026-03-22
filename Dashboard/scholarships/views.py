@@ -403,7 +403,7 @@ def register(request):
     else:
         form = UserCreationForm()
 
-    return render(request, "registration/register.html", {"form": form})
+    return render(request, "register.html", {"form": form})
 
 
 @staff_member_required
@@ -694,29 +694,7 @@ def create_scholarship(request):
 
 @staff_member_required
 def admin_scholarships(request):
-    auto_deactivate_expired_scholarships()
-    q = (request.GET.get("q") or "").strip()
-    status = (request.GET.get("status") or "").strip().lower()  # active/inactive/all
-
-    qs = Scholarship.objects.all()
-    if status == "active":
-        qs = qs.filter(is_active=True)
-    elif status == "inactive":
-        qs = qs.filter(is_active=False)
-
-    if q:
-        qs = qs.filter(Q(title__icontains=q) | Q(organization__icontains=q) | Q(country__icontains=q))
-
-    qs = qs.order_by("-created_at")
-    return render(
-        request,
-        "admin_scholarships.html",
-        {
-            "scholarships": qs[:200],
-            "q": q,
-            "status": status,
-        },
-    )
+    return redirect("admin_dashboard")
 
 
 @staff_member_required
@@ -726,11 +704,11 @@ def edit_scholarship(request, id: int):
         form = ScholarshipForm(request.POST, request.FILES, instance=scholarship)
         if form.is_valid():
             form.save()
-            return redirect("admin_scholarships")
+            return redirect("admin_dashboard")
     else:
         form = ScholarshipForm(instance=scholarship)
 
-    return render(request, "edit_scholarship.html", {"form": form, "scholarship": scholarship})
+    return render(request, "create_scholarship.html", {"form": form, "scholarship": scholarship})
 
 
 @staff_member_required
@@ -739,7 +717,7 @@ def toggle_scholarship_active(request, id: int):
     scholarship = get_object_or_404(Scholarship, id=id)
     scholarship.is_active = not scholarship.is_active
     scholarship.save(update_fields=["is_active"])
-    return redirect(request.POST.get("next") or "admin_scholarships")
+    return redirect(request.POST.get("next") or "admin_dashboard")
 
 
 @login_required

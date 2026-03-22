@@ -304,7 +304,7 @@
         {% if recommended_cards %}
           <div class="scholarship-grid scholarship-grid--featured">
             {% for item in recommended_cards %}
-              {% include "includes/student_scholarship_card.html" with item=item section="recommended" %}
+              {% include "student_scholarship_card.html" with item=item section="recommended" %}
             {% endfor %}
           </div>
         {% else %}
@@ -398,7 +398,7 @@
         {% if discover_cards %}
           <div class="scholarship-grid scholarship-grid--catalog" id="discoverGrid">
             {% for item in discover_cards %}
-              {% include "includes/student_scholarship_card.html" with item=item section="catalog" %}
+              {% include "student_scholarship_card.html" with item=item section="catalog" %}
             {% endfor %}
           </div>
           <div class="section-empty" id="catalogEmpty" hidden>
