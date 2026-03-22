@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>My Applications</title>
+<link rel="icon" type="image/svg+xml" sizes="any" href="{% static 'images/scholarhub-logo.svg' %}">
 <script>
   (function () {
     try {
@@ -28,7 +29,7 @@
   <aside class="student-sidebar" id="studentSidebar">
     <div class="student-sidebar__top sidebar-top">
       <a href="{% url 'student_dashboard' %}" class="student-brand" aria-label="ScholarHub dashboard">
-        <span class="student-brand__mark"><i class="bi bi-stars"></i></span>
+        <span class="student-brand__mark"><img src="{% static 'images/scholarhub-logo.svg' %}" alt="ScholarHub logo"></span>
         <span class="student-brand__copy">
           <strong>ScholarHub</strong>
           <small>Student Command Center</small>

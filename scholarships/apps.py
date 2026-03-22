@@ -31,6 +31,7 @@ def _patch_django_template_context_copy() -> None:
 
 
 class ScholarshipsConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
     name = "scholarships"
 
     def ready(self) -> None:

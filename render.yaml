@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: scholarship-dashboard
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    startCommand: gunicorn config.wsgi:application
+    disk:
+      name: media
+      mountPath: /opt/render/project/src/media
+      sizeGB: 1
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: scholarship-dashboard-db
+          property: connectionString
+      - key: SERVE_MEDIA_FILES
+        value: "true"
+
+databases:
+  - name: scholarship-dashboard-db
+    plan: free

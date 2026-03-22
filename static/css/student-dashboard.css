@@ -239,6 +239,12 @@ img {
   box-shadow: 0 16px 28px rgba(15, 23, 42, 0.16);
 }
 
+.student-brand__mark img {
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.22));
+}
+
 .student-brand__copy {
   display: grid;
   gap: 3px;
