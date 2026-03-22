@@ -32,6 +32,32 @@ class AdminDashboardTests(TestCase):
         assert "Example Scholarship" in body
 
 
+class LoginRedirectTests(TestCase):
+    def test_staff_login_redirects_to_admin_dashboard(self):
+        User = get_user_model()
+        User.objects.create_user(username="staff", password="pass", is_staff=True)
+
+        resp = self.client.post(
+            reverse("login"),
+            data={"username": "staff", "password": "pass"},
+        )
+
+        assert resp.status_code == 302
+        assert resp["Location"] == reverse("admin_dashboard")
+
+    def test_student_login_redirects_to_student_dashboard(self):
+        User = get_user_model()
+        User.objects.create_user(username="student", password="pass")
+
+        resp = self.client.post(
+            reverse("login"),
+            data={"username": "student", "password": "pass"},
+        )
+
+        assert resp.status_code == 302
+        assert resp["Location"] == reverse("student_dashboard")
+
+
 class StudentDashboardTests(TestCase):
     def test_requires_login(self):
         resp = self.client.get(reverse("student_dashboard"), follow=True)
