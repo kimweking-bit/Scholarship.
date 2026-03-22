@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create Scholarship</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="container mt-5" style="max-width: 860px">
+      <h2 class="mb-4">Add New Scholarship</h2>
+
+      <form method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
+        {% csrf_token %}
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.title.id_for_label }}">Title</label>
+          {{ form.title }}
+          {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.organization.id_for_label }}">Organization</label>
+          {{ form.organization }}
+          {% if form.organization.errors %}<div class="text-danger small">{{ form.organization.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.country.id_for_label }}">Country</label>
+          {{ form.country }}
+          {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors }}</div>{% endif %}
+        </div>
+
+        <div class="row g-3">
+          <div class="col-12 col-md-6">
+            <div class="mb-3">
+              <label class="form-label" for="{{ form.level.id_for_label }}">Level</label>
+              {{ form.level }}
+              {% if form.level.errors %}<div class="text-danger small">{{ form.level.errors }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="mb-3">
+              <label class="form-label" for="{{ form.category.id_for_label }}">Category</label>
+              {{ form.category }}
+              {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.amount_display.id_for_label }}">Amount</label>
+          {{ form.amount_display }}
+          {% if form.amount_display.errors %}<div class="text-danger small">{{ form.amount_display.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.deadline.id_for_label }}">Deadline</label>
+          {{ form.deadline }}
+          {% if form.deadline.errors %}<div class="text-danger small">{{ form.deadline.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.requirements.id_for_label }}">Requirements</label>
+          {{ form.requirements }}
+          {% if form.requirements.errors %}<div class="text-danger small">{{ form.requirements.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
+          {{ form.description }}
+          {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.image.id_for_label }}">Image (optional)</label>
+          {{ form.image }}
+          {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Create Scholarship</button>
+          <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>

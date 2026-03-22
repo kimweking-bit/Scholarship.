@@ -1,0 +1,91 @@
+<article
+  class="scholarship-cardx {% if section == 'recommended' %}scholarship-cardx--recommended{% endif %}{% if section == 'catalog' %} scholarship-cardx--catalog{% endif %}"
+  {% if section == 'catalog' %}data-catalog-card="true"{% endif %}
+  data-title="{{ item.scholarship.title|lower }}"
+  data-org="{{ item.scholarship.university|lower }}"
+  data-country="{{ item.scholarship.country|default:''|lower }}"
+  data-degree="{{ item.scholarship.level|default:''|lower }}"
+  data-funding="{{ item.funding_bucket|lower }}"
+  data-category="{{ item.scholarship.category|default:''|lower }}"
+  data-match-score="{{ item.match_score }}"
+>
+  <div class="scholarship-cardx__media">
+    {% if item.scholarship.image %}
+      <img src="{{ item.scholarship.image.url }}" class="scholarship-cardx__image" alt="{{ item.scholarship.title }}">
+    {% else %}
+      <div class="scholarship-cardx__placeholder">
+        <span class="scholarship-cardx__placeholder-mark"><i class="bi bi-stars"></i></span>
+        <strong>{{ item.level_label }}</strong>
+        <span>{{ item.scholarship.country|default:"Global opportunity" }}</span>
+      </div>
+    {% endif %}
+
+    <div class="scholarship-cardx__overlay">
+      <div class="scholarship-cardx__badges">
+        {% if section == 'catalog' %}
+          {% for badge in item.badges|slice:":2" %}
+            <span class="badge-pill badge-pill--{{ badge.tone }}"><i class="bi {{ badge.icon }}"></i>{{ badge.label }}</span>
+          {% endfor %}
+        {% else %}
+          {% for badge in item.badges %}
+            <span class="badge-pill badge-pill--{{ badge.tone }}"><i class="bi {{ badge.icon }}"></i>{{ badge.label }}</span>
+          {% endfor %}
+        {% endif %}
+      </div>
+      {% if section == 'recommended' %}
+        <div class="match-orb">
+          <strong>{{ item.match_score }}%</strong>
+          <span>Match</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="scholarship-cardx__body">
+    <div class="scholarship-cardx__meta-row">
+      <span><i class="bi bi-building"></i>{{ item.scholarship.university }}</span>
+      <span><i class="bi bi-globe2"></i>{{ item.scholarship.country|default:"Global" }}</span>
+    </div>
+
+    <h3>{{ item.scholarship.title }}</h3>
+    <p class="scholarship-cardx__summary">{{ item.summary }}</p>
+
+    <div class="scholarship-cardx__facts">
+      <span class="fact-chip"><i class="bi bi-mortarboard"></i>{{ item.level_label }}</span>
+      <span class="fact-chip"><i class="bi bi-cash-coin"></i>{{ item.funding_bucket }}</span>
+      <span class="fact-chip {% if item.days_left is not None and item.days_left <= 14 %}fact-chip--urgent{% endif %}">
+        <i class="bi bi-alarm"></i>{{ item.deadline_label }}
+      </span>
+    </div>
+
+    {% if section == 'recommended' %}
+      <div class="scholarship-cardx__reason">
+        <i class="bi bi-stars"></i>
+        <span>{{ item.ai_reason }}</span>
+      </div>
+    {% endif %}
+
+    <div class="scholarship-cardx__actions">
+      <a href="{% url 'apply_scholarship' item.scholarship.id %}" class="action-btn action-btn--primary">
+        <i class="bi bi-arrow-up-right-circle"></i>
+        <span>Apply</span>
+      </a>
+      <button
+        type="button"
+        class="action-btn action-btn--ghost js-save"
+        data-sch-id="{{ item.scholarship.id }}"
+        data-title="{{ item.scholarship.title }}"
+        data-org="{{ item.scholarship.university }}"
+        data-country="{{ item.scholarship.country|default:'Global' }}"
+        data-level="{{ item.level_label }}"
+        data-amount="{{ item.scholarship.funding }}"
+        data-summary="{{ item.summary }}"
+        data-deadline="{{ item.deadline_label }}"
+        data-apply-url="{% url 'apply_scholarship' item.scholarship.id %}"
+      >
+        <i class="bi bi-bookmark"></i>
+        <span>Save</span>
+      </button>
+    </div>
+  </div>
+</article>

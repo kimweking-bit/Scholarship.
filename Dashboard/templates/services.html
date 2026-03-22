@@ -1,0 +1,346 @@
+﻿<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Services | ScholarDash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+            colors: { brand: '#6366f1', brand2: '#8b5cf6' },
+            boxShadow: { glow: '0 20px 50px rgba(99,102,241,0.25)' },
+            keyframes: {
+              'fade-up': { '0%': { opacity: 0, transform: 'translateY(14px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } }
+            },
+            animation: { 'fade-up': 'fade-up 0.65s ease-out both' }
+          }
+        }
+      };
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      body { background: #f8fafc; color: #0f172a; }
+      /* Shared purple accents */
+      section h2, section h3 { position: relative; display: inline-block; }
+      section h2::after, section h3::after { content: ""; display: block; width: 56px; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); margin-top: 10px; border-radius: 9999px; }
+      .card-soft, .card-surface, .glass-card { position: relative; overflow: hidden; }
+      .card-soft::before, .card-surface::before, .glass-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 9999px; opacity: 0.9; }
+      .bg-gradient-to-r { box-shadow: 0 12px 30px rgba(99,102,241,0.20); transition: transform 150ms ease, box-shadow 150ms ease; }
+      .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans">
+   <!-- Navbar (exactly as about.html) -->
+    <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <div class="h-9 w-9 rounded-2xl bg-white/20 shadow-lg flex items-center justify-center text-white font-bold group-hover:bg-white/30 transition">SC</div>
+            <span class="text-lg font-semibold text-white group-hover:text-white transition">Scholar Connect</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-5 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+            </div>
+            <div class="flex items-center gap-4">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+          <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+            <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+            <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+            <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+            <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+            <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+            {% if request.user.is_authenticated %}
+              {% if request.user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% else %}
+                <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% endif %}
+              <form method="post" action="{% url 'logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+              <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="pt-16">
+      <!-- Hero -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(99,102,241,0.08),transparent_30%),radial-gradient(circle_at_82%_10%,rgba(139,92,246,0.06),transparent_34%)]"></div>
+        <div class="max-w-6xl mx-auto px-4 py-16 lg:py-20 text-slate-900">
+          <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div class="space-y-4">
+              <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">Services</p>
+              <h1 class="text-4xl lg:text-5xl font-bold leading-tight">A complete toolkit to find, apply, and win scholarships</h1>
+              <p class="text-slate-600 text-lg">Curated matches, guided applications, alerts, and tracking—built for serious applicants.</p>
+              <div class="flex flex-wrap gap-3">
+                <a href="{% url 'scholarships' %}" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Browse scholarships</a>
+                <a href="{% url 'register' %}" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-800 font-semibold hover:bg-slate-100 transition">Create free account</a>
+              </div>
+              <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                <span>3,400+ scholarships</span>
+                <span>82 countries</span>
+                <span>Verified only</span>
+                <span>18,000+ students helped</span>
+              </div>
+            </div>
+            <div class="bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Matches</p>
+                  <p class="text-2xl font-semibold text-slate-900">92%</p>
+                  <p class="text-slate-600">Average fit score</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Alerts</p>
+                  <p class="text-2xl font-semibold text-slate-900">Instant</p>
+                  <p class="text-slate-600">Deadline reminders</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Students</p>
+                  <p class="text-2xl font-semibold text-slate-900">18k+</p>
+                  <p class="text-slate-600">Helped so far</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 shadow-sm">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Listings</p>
+                  <p class="text-2xl font-semibold text-slate-900">3,400+</p>
+                  <p class="text-slate-600">Verified scholarships</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Services grid -->
+      <section class="max-w-6xl mx-auto px-4 py-14">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-purple-500">What you get</p>
+            <h2 class="text-3xl font-bold text-slate-900">Powerful tools, seamless experience</h2>
+            <p class="text-slate-600 mt-2">From discovery to submission, ScholarDash keeps you moving.</p>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">🔎</div>
+            <h3 class="text-lg font-semibold text-slate-900">Scholarship Search</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Search by country, level, deadline, or category.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">📝</div>
+            <h3 class="text-lg font-semibold text-slate-900">Online Application</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Apply directly and upload documents securely.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">⏰</div>
+            <h3 class="text-lg font-semibold text-slate-900">Alerts & Notifications</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Never miss a deadline with smart reminders.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">📊</div>
+            <h3 class="text-lg font-semibold text-slate-900">Application Tracking</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">See statuses: Pending, Approved, Rejected.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">✨</div>
+            <h3 class="text-lg font-semibold text-slate-900">Recommendations</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Personalized suggestions based on your profile.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">👤</div>
+            <h3 class="text-lg font-semibold text-slate-900">Profile Management</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Update info, CV, and preferences anytime.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">🗂</div>
+            <h3 class="text-lg font-semibold text-slate-900">Admin Management</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Admins add, edit, and manage scholarships.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm hover:shadow-glow hover:-translate-y-1 transition" data-animate>
+            <div class="text-2xl mb-3">⏳</div>
+            <h3 class="text-lg font-semibold text-slate-900">Auto Expiry</h3>
+            <p class="text-sm text-slate-600 mt-2 mb-4">Expired scholarships hide automatically.</p>
+            <a href="#" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Learn more →</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="max-w-6xl mx-auto px-4 py-12 bg-white rounded-3xl shadow-sm border border-slate-200" data-animate>
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-purple-500">How it works</p>
+            <h3 class="text-2xl font-bold text-slate-900">From signup to funded</h3>
+          </div>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition">
+            <p class="text-xs font-semibold text-indigo-600 mb-1">01 Create</p>
+            <p class="text-sm text-slate-700">Build your profile and goals.</p>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition">
+            <p class="text-xs font-semibold text-indigo-600 mb-1">02 Match</p>
+            <p class="text-sm text-slate-700">Get curated, verified scholarships.</p>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition">
+            <p class="text-xs font-semibold text-indigo-600 mb-1">03 Apply</p>
+            <p class="text-sm text-slate-700">Submit with guided checklists.</p>
+          </div>
+          <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50 hover:bg-white hover:shadow-md transition">
+            <p class="text-xs font-semibold text-indigo-600 mb-1">04 Track</p>
+            <p class="text-sm text-slate-700">Monitor status and deadlines.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats / Trust -->
+      <section class="max-w-6xl mx-auto px-4 py-12">
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4" data-animate>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
+            <p class="text-xs uppercase tracking-wide text-indigo-500 mb-1">Scholarships</p>
+            <p class="text-3xl font-bold text-slate-900">3,400+</p>
+            <p class="text-sm text-slate-600">Verified & current</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
+            <p class="text-xs uppercase tracking-wide text-indigo-500 mb-1">Countries</p>
+            <p class="text-3xl font-bold text-slate-900">82</p>
+            <p class="text-sm text-slate-600">Global coverage</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
+            <p class="text-xs uppercase tracking-wide text-indigo-500 mb-1">Students</p>
+            <p class="text-3xl font-bold text-slate-900">18k+</p>
+            <p class="text-sm text-slate-600">Helped to date</p>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm text-center">
+            <p class="text-xs uppercase tracking-wide text-indigo-500 mb-1">Alerts</p>
+            <p class="text-3xl font-bold text-slate-900">Instant</p>
+            <p class="text-sm text-slate-600">Deadline reminders</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Final CTA -->
+      <section class="max-w-6xl mx-auto px-4 py-12">
+        <div class="rounded-3xl bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white p-8 shadow-glow" data-animate>
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-white/80 mb-1">Ready?</p>
+              <h3 class="text-3xl font-semibold mb-2">Let’s get you funded</h3>
+              <p class="text-white/80">Create your profile and start receiving matched scholarships today.</p>
+            </div>
+            <div class="flex gap-3">
+              <a href="{% url 'register' %}" class="px-5 py-3 rounded-xl bg-white text-indigo-700 font-semibold shadow hover:-translate-y-0.5 transition">Create account</a>
+              <a href="{% url 'scholarships' %}" class="px-5 py-3 rounded-xl border border-white/30 text-white font-semibold hover:bg-white/10 transition">Browse scholarships</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer (from about.html) -->
+    <footer class="bg-slate-900 text-slate-200 pt-12 pb-8">
+      <div class="mx-auto max-w-6xl px-4 grid gap-10 md:grid-cols-4">
+        <div>
+          <h4 class="text-xl font-semibold text-white">ScholarDash</h4>
+          <p class="mt-3 text-sm text-slate-400">Helping students access global education opportunities.</p>
+          <div class="flex gap-3 mt-4 text-slate-300">
+            <a class="hover:text-white transition" href="#">LinkedIn</a>
+            <a class="hover:text-white transition" href="#">Twitter</a>
+            <a class="hover:text-white transition" href="#">YouTube</a>
+          </div>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Quick Links</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a class="hover:text-white transition" href="{% url 'home' %}">Home</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'scholarships' %}">Scholarships</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'services' %}">Services</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'contact' %}">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Contact</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li>Email: support@scholarhub.com</li>
+            <li>Phone: +1 (555) 123-4567</li>
+            <li>Nairobi · Remote-first</li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Newsletter</h5>
+          <form class="flex flex-col gap-3">
+            <input type="email" placeholder="you@example.com" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+            <button type="submit" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
+        © 2026 ScholarDash. All rights reserved.
+      </div>
+    </footer>
+
+    <!-- JS: nav toggle + animations -->
+    <script>
+      const toggle = document.getElementById('nav-toggle');
+      const mobile = document.getElementById('mobile-menu');
+      toggle?.addEventListener('click', () => mobile.classList.toggle('hidden'));
+
+      const animated = document.querySelectorAll('[data-animate]');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-up');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      animated.forEach(el => observer.observe(el));
+    </script>
+  </body>
+</html>

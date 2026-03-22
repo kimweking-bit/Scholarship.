@@ -1,0 +1,1770 @@
+﻿<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --s1:8px;
+  --s2:16px;
+  --s3:24px;
+  --s4:32px;
+  --s5:40px;
+  --s6:56px;
+  --sw:280px;
+  --swc:92px;
+  --r1:18px;
+  --r2:24px;
+  --content-max:1320px;
+  --bg-canvas:#ffffff;
+  --bg-subtle:#f6f7fb;
+  --surface-1:rgba(255,255,255,.94);
+  --surface-2:#ffffff;
+  --surface-3:#fafbff;
+  --surface-raised:#ffffff;
+  --surface-tint:rgba(124,92,255,.04);
+  --surface-tint-strong:rgba(124,92,255,.09);
+  --table-row:rgba(255,255,255,.98);
+  --table-row-hover:#faf7ff;
+  --border-subtle:rgba(15,23,42,.08);
+  --border-strong:rgba(15,23,42,.14);
+  --text-strong:#111827;
+  --text-muted:#5f6b7c;
+  --text-soft:#8b96a8;
+  --accent-700:#5a3cc2;
+  --accent-600:#6947df;
+  --accent-500:#7c5cff;
+  --accent-400:#9f8cff;
+  --accent-200:rgba(124,92,255,.18);
+  --accent-100:rgba(124,92,255,.12);
+  --success-600:#177b56;
+  --success-500:#1f9365;
+  --success-100:rgba(31,147,101,.12);
+  --warning-600:#a96c16;
+  --warning-500:#c1851d;
+  --warning-100:rgba(193,133,29,.14);
+  --error-600:#b8425e;
+  --error-500:#cf5570;
+  --error-100:rgba(207,85,112,.14);
+  --info-600:#2b63c6;
+  --info-500:#3778e0;
+  --info-100:rgba(55,120,224,.14);
+  --sidebar-bg:
+    radial-gradient(circle at top right,rgba(124,92,255,.1),transparent 28%),
+    radial-gradient(circle at top left,rgba(255,255,255,.88),transparent 34%),
+    linear-gradient(180deg,#f4f6fb 0%,#eef2f8 52%,#e9edf5 100%);
+  --sidebar-surface:rgba(255,255,255,.58);
+  --sidebar-surface-strong:rgba(255,255,255,.88);
+  --sidebar-border:rgba(100,116,139,.14);
+  --sidebar-text:#1a2236;
+  --sidebar-muted:rgba(26,34,54,.58);
+  --sidebar-soft:#243047;
+  --sidebar-hover:linear-gradient(135deg,rgba(124,92,255,.1),rgba(255,255,255,.84));
+  --sidebar-active:linear-gradient(135deg,rgba(124,92,255,.16),rgba(255,255,255,.92));
+  --shadow:0 18px 40px rgba(15,23,42,.08);
+  --shadow2:0 28px 72px rgba(15,23,42,.12);
+  --ring:0 0 0 4px rgba(124,92,255,.16);
+  --page:
+    radial-gradient(circle at top left,rgba(124,92,255,.08),transparent 28%),
+    radial-gradient(circle at 85% 12%,rgba(159,140,255,.06),transparent 18%),
+    linear-gradient(180deg,#ffffff 0%,#fcfbff 44%,#f7f8fd 100%);
+  --panel:var(--surface-1);
+  --panel2:var(--surface-2);
+  --bd:var(--border-subtle);
+  --txt:var(--text-strong);
+  --muted:var(--text-muted);
+  --soft:var(--text-soft);
+  --ok:var(--success-500);
+  --ok2:var(--success-600);
+  --bad:var(--error-500);
+  --warn:var(--warning-500);
+  --info:var(--info-500);
+}
+
+[data-theme="dark"], .dark{
+  --bg-canvas:#0d1320;
+  --bg-subtle:#111827;
+  --surface-1:rgba(20,27,41,.86);
+  --surface-2:#151c2b;
+  --surface-3:#101726;
+  --surface-raised:rgba(24,33,49,.94);
+  --surface-tint:rgba(156,136,255,.08);
+  --surface-tint-strong:rgba(156,136,255,.14);
+  --table-row:rgba(22,30,44,.9);
+  --table-row-hover:rgba(28,37,54,.96);
+  --border-subtle:rgba(148,163,184,.12);
+  --border-strong:rgba(148,163,184,.2);
+  --text-strong:#e6ebf3;
+  --text-muted:#98a4b6;
+  --text-soft:#718096;
+  --accent-700:#7a63f7;
+  --accent-600:#8b72ff;
+  --accent-500:#9c88ff;
+  --accent-400:#b7a7ff;
+  --accent-200:rgba(156,136,255,.22);
+  --accent-100:rgba(156,136,255,.14);
+  --success-600:#2b9f74;
+  --success-500:#38b07f;
+  --success-100:rgba(56,176,127,.14);
+  --warning-600:#c4913c;
+  --warning-500:#d7a857;
+  --warning-100:rgba(215,168,87,.16);
+  --error-600:#d36a7e;
+  --error-500:#e18395;
+  --error-100:rgba(225,131,149,.18);
+  --info-600:#5f8ff1;
+  --info-500:#74a2ff;
+  --info-100:rgba(116,162,255,.16);
+  --sidebar-bg:
+    radial-gradient(circle at top right,rgba(156,136,255,.18),transparent 26%),
+    radial-gradient(circle at top left,rgba(255,255,255,.04),transparent 34%),
+    linear-gradient(180deg,#121828 0%,#0f1523 52%,#0c111c 100%);
+  --sidebar-surface:rgba(255,255,255,.05);
+  --sidebar-surface-strong:rgba(255,255,255,.09);
+  --sidebar-border:rgba(255,255,255,.08);
+  --sidebar-text:#edf2f8;
+  --sidebar-muted:rgba(203,213,225,.62);
+  --sidebar-soft:rgba(226,232,240,.82);
+  --sidebar-hover:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.04));
+  --sidebar-active:linear-gradient(135deg,rgba(156,136,255,.2),rgba(255,255,255,.05));
+  --shadow:0 18px 42px rgba(2,6,23,.34);
+  --shadow2:0 28px 80px rgba(2,6,23,.46);
+  --ring:0 0 0 4px rgba(156,136,255,.18);
+  --page:
+    radial-gradient(circle at top left,rgba(156,136,255,.14),transparent 30%),
+    radial-gradient(circle at 82% 14%,rgba(116,162,255,.08),transparent 24%),
+    radial-gradient(circle at bottom right,rgba(156,136,255,.08),transparent 28%),
+    linear-gradient(180deg,#0b1020 0%,#12192a 100%);
+  --panel:var(--surface-1);
+  --panel2:var(--surface-2);
+  --bd:var(--border-subtle);
+  --txt:var(--text-strong);
+  --muted:var(--text-muted);
+  --soft:var(--text-soft);
+  --ok:var(--success-500);
+  --ok2:var(--success-600);
+  --bad:var(--error-500);
+  --warn:var(--warning-500);
+  --info:var(--info-500);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg-canvas);
+  color:var(--txt);
+  font-family:"Manrope",sans-serif;
+  position:relative;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 16% 0%,var(--surface-tint-strong),transparent 22%),
+    radial-gradient(circle at 84% 12%,var(--surface-tint),transparent 18%);
+  opacity:.62;
+}
+button,input,select,textarea{font:inherit}
+a{color:inherit}
+
+.shell{display:flex;min-height:100vh}
+.sidebar{
+  position:sticky;
+  top:0;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  width:var(--sw);
+  height:100vh;
+  padding:16px;
+  background:var(--sidebar-bg);
+  color:var(--sidebar-text);
+  box-shadow:var(--shadow2);
+  border-right:1px solid var(--sidebar-border);
+  transition:.2s ease;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:var(--sidebar-border) transparent;
+  z-index:20;
+}
+.sidebar::-webkit-scrollbar{width:8px}
+.sidebar::-webkit-scrollbar-thumb{
+  background:var(--sidebar-border);
+  border-radius:999px;
+}
+.sidebar::-webkit-scrollbar-track{background:transparent}
+.sidebar:before,
+.sidebar:after{
+  content:"";
+  position:absolute;
+  inset:auto;
+  pointer-events:none;
+}
+.sidebar:before{
+  top:-120px;
+  right:-80px;
+  width:220px;
+  height:220px;
+  border-radius:999px;
+  background:radial-gradient(circle,var(--accent-200),transparent 72%);
+}
+.sidebar:after{
+  bottom:-120px;
+  left:-100px;
+  width:260px;
+  height:260px;
+  border-radius:999px;
+  background:radial-gradient(circle,var(--info-100),transparent 74%);
+}
+.shell.collapsed .sidebar{
+  width:var(--swc);
+  padding-left:12px;
+  padding-right:12px;
+}
+.sidebar .copy,.shell.collapsed .hide-when-collapsed{display:block}
+.shell.collapsed .copy,.shell.collapsed .hide-when-collapsed{display:none}
+.sidebar-top{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:12px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:14px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--sidebar-surface-strong),var(--sidebar-surface));
+  border:1px solid var(--sidebar-border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.mark{
+  display:grid;
+  place-items:center;
+  width:54px;
+  height:54px;
+  border-radius:20px;
+  background:linear-gradient(135deg,var(--accent-200),var(--sidebar-surface));
+  border:1px solid var(--sidebar-border);
+  box-shadow:0 18px 32px rgba(2,6,23,.18);
+}
+.brand-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:6px;
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--sidebar-muted);
+}
+.brand-kicker:before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:var(--accent-400);
+  box-shadow:0 0 0 6px var(--accent-100);
+}
+.copy h1{margin:0;font-size:1rem;font-weight:800;letter-spacing:-.02em}
+.copy p{margin:4px 0 0;color:var(--sidebar-muted);font-size:.8rem;line-height:1.4}
+
+.nav-list{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:12px;
+}
+.nav-group{
+  display:grid;
+  gap:10px;
+  padding:12px;
+  border-radius:20px;
+  background:linear-gradient(180deg,var(--sidebar-surface-strong),var(--sidebar-surface));
+  border:1px solid var(--sidebar-border);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.nav-group-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.nav-head{
+  margin:0;
+  color:var(--sidebar-muted);
+  font-size:.76rem;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.nav-stack{display:grid;gap:10px}
+.nav-link,.nav-btn{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:48px;
+  padding:8px 10px;
+  border-radius:16px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--sidebar-soft);
+  text-decoration:none;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.nav-btn{width:100%;text-align:left}
+.nav-link:hover,.nav-link.active,.nav-btn:hover{
+  background:var(--sidebar-hover);
+  border-color:var(--sidebar-border);
+  transform:translateX(3px);
+  box-shadow:0 18px 28px rgba(2,6,23,.12);
+}
+.nav-link.active{
+  background:var(--sidebar-active);
+  border-color:var(--accent-200);
+}
+.nav-ico{
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  flex:0 0 36px;
+  border-radius:12px;
+  background:var(--sidebar-surface);
+  border:1px solid var(--sidebar-border);
+  color:var(--sidebar-text);
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.nav-link:hover .nav-ico,
+.nav-link.active .nav-ico,
+.nav-btn:hover .nav-ico{
+  transform:translateY(-1px);
+  background:var(--sidebar-surface-strong);
+  border-color:var(--sidebar-border);
+}
+.nav-copy{
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.nav-copy strong{
+  display:block;
+  font-size:.9rem;
+  font-weight:800;
+  letter-spacing:-.01em;
+}
+.nav-copy small{
+  display:none;
+}
+.nav-meta{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 9px;
+  border-radius:999px;
+  background:var(--sidebar-surface);
+  color:var(--sidebar-muted);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.shell.collapsed .nav-link,.shell.collapsed .nav-btn{
+  justify-content:center;
+  padding-left:0;
+  padding-right:0;
+}
+.shell.collapsed .brand{
+  justify-content:center;
+  padding:14px 10px;
+}
+.shell.collapsed .side-actions{
+  grid-template-columns:1fr;
+}
+
+.sidebar-footer{
+  position:relative;
+  z-index:1;
+  display:grid;
+  gap:12px;
+  margin-top:auto;
+  padding-top:4px;
+}
+.sidebar-logout{display:grid}
+.sidebar .side-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.shell.collapsed .sidebar .side-actions{
+  grid-template-columns:1fr;
+}
+
+.side-actions,.top-actions,.table-actions,.modal-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.icon-btn,.chip,.btnx,.modal-close{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:46px;
+  padding:0 16px;
+  border-radius:16px;
+  border:1px solid var(--bd);
+  background:rgba(255,255,255,.6);
+  color:var(--txt);
+  box-shadow:var(--shadow);
+  transition:.18s ease;
+  cursor:pointer;
+  text-decoration:none;
+}
+[data-theme="dark"] .icon-btn,
+[data-theme="dark"] .chip,
+[data-theme="dark"] .btnx,
+[data-theme="dark"] .modal-close{
+  background:var(--surface-1);
+}
+.icon-btn:hover,.chip:hover,.btnx:hover,.modal-close:hover{
+  transform:translateY(-1px);
+  box-shadow:var(--shadow2);
+}
+.sidebar .icon-btn{
+  width:100%;
+  min-height:40px;
+  padding:0 14px;
+  border-radius:14px;
+  background:var(--sidebar-surface);
+  border-color:var(--sidebar-border);
+  color:var(--sidebar-text);
+  box-shadow:none;
+}
+.sidebar .icon-btn:hover{
+  background:var(--sidebar-surface-strong);
+  border-color:var(--sidebar-border);
+  box-shadow:0 16px 28px rgba(2,6,23,.14);
+}
+.sidebar .btnx{
+  background:var(--sidebar-surface);
+  border-color:var(--sidebar-border);
+  color:var(--sidebar-text);
+  box-shadow:none;
+}
+.sidebar .btnx:hover{
+  background:var(--sidebar-surface-strong);
+  border-color:var(--sidebar-border);
+  box-shadow:0 16px 28px rgba(2,6,23,.14);
+}
+.chip.primary,.btnx.primary,.btnx.success,.btnx.warning,.btnx.danger{
+  color:#fff;
+  border-color:transparent;
+}
+.chip.primary,.btnx.primary{
+  background:linear-gradient(135deg,var(--accent-500),var(--accent-700));
+}
+.btnx.success{background:linear-gradient(135deg,var(--success-500),var(--success-600))}
+.btnx.warning{background:linear-gradient(135deg,var(--warning-500),var(--warning-600))}
+.btnx.danger{background:linear-gradient(135deg,var(--error-500),var(--error-600))}
+.btnx.small{
+  min-height:40px;
+  padding:0 14px;
+  border-radius:14px;
+  font-size:.88rem;
+}
+.icon-btn.loading,.btnx.loading,.chip.loading{
+  pointer-events:none;
+  opacity:.78;
+}
+
+.sp{
+  width:16px;
+  height:16px;
+  border:2px solid rgba(255,255,255,.34);
+  border-top-color:#fff;
+  border-radius:999px;
+  animation:spin .7s linear infinite;
+}
+
+.main{
+  flex:1;
+  min-width:0;
+  padding:var(--s4) 24px var(--s5);
+}
+.main-inner{
+  width:min(100%, var(--content-max));
+  margin:0 auto;
+  display:grid;
+  gap:var(--s5);
+  position:relative;
+}
+
+.topbar{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:var(--s4);
+  padding:28px 30px;
+  border-radius:30px;
+  background:
+    linear-gradient(135deg,var(--surface-raised),var(--surface-3) 56%,var(--surface-tint) 100%);
+  border:1px solid var(--accent-200);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.dashboard-hero{
+  background:
+    linear-gradient(135deg,var(--surface-raised),var(--surface-3) 62%,var(--accent-100) 100%);
+}
+[data-theme="dark"] .dashboard-hero, .dark .dashboard-hero{
+  background:
+    linear-gradient(135deg,var(--surface-raised),rgba(20,27,41,.92) 52%,var(--accent-100) 100%);
+}
+.topbar:before{
+  content:"";
+  position:absolute;
+  inset:auto -8% -96px auto;
+  width:220px;
+  height:220px;
+  border-radius:999px;
+  background:radial-gradient(circle,var(--surface-tint-strong),transparent 70%);
+  pointer-events:none;
+}
+.topbar > div:first-child,
+.topbar-actions{position:relative;z-index:1}
+.topbar-actions{
+  align-items:center;
+  padding:8px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--surface-2),var(--surface-3));
+  border:1px solid var(--accent-200);
+  box-shadow:0 14px 34px rgba(15,23,42,.08);
+}
+.topbar-actions .icon-btn,
+.topbar-actions .chip{
+  box-shadow:none;
+}
+.topbar-actions .icon-btn{
+  background:var(--surface-2);
+  border-color:var(--bd);
+}
+.topbar-actions .icon-btn:hover{
+  background:linear-gradient(135deg,var(--surface-2),var(--accent-100));
+}
+.topbar-actions .chip.primary{
+  box-shadow:0 16px 30px rgba(124,92,255,.18);
+}
+.eyebrow{
+  display:inline-flex;
+  gap:10px;
+  align-items:center;
+  padding:8px 14px;
+  border-radius:999px;
+  background:var(--accent-100);
+  border:1px solid var(--accent-200);
+  box-shadow:var(--shadow);
+  font-size:.82rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  color:var(--accent-700);
+  margin-bottom:18px;
+}
+[data-theme="dark"] .eyebrow, .dark .eyebrow{background:var(--accent-100)}
+.topbar h2{
+  margin:0;
+  font-size:clamp(1.85rem,2vw + 1rem,2.7rem);
+  font-weight:800;
+  letter-spacing:-.04em;
+  line-height:1.1;
+}
+.topbar p{
+  margin:14px 0 0;
+  color:var(--muted);
+  line-height:1.75;
+  max-width:720px;
+}
+
+.cardx{
+  position:relative;
+  overflow:hidden;
+  border:1px solid transparent;
+  border-radius:var(--r2);
+  background:
+    linear-gradient(180deg,var(--panel),var(--surface-2)) padding-box,
+    linear-gradient(135deg,rgba(124,92,255,.16),rgba(15,23,42,.04),rgba(124,92,255,.12)) border-box;
+  backdrop-filter:blur(18px);
+  box-shadow:var(--shadow);
+  transition:.18s ease;
+}
+.cardx:before{
+  content:"";
+  position:absolute;
+  inset:0 auto auto 0;
+  width:88px;
+  height:3px;
+  border-radius:0 0 999px 0;
+  background:linear-gradient(90deg,var(--accent-500),var(--accent-200));
+  pointer-events:none;
+}
+.cardx:hover{
+  transform:translateY(-3px);
+  box-shadow:var(--shadow2);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:24px;
+}
+.stat{
+  padding:32px;
+  min-height:196px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.stat-top{display:flex;justify-content:space-between;gap:var(--s3)}
+.stat-label{
+  margin:0;
+  color:var(--muted);
+  font-size:.88rem;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.stat-val{
+  margin:18px 0 10px;
+  font-size:clamp(2rem,2vw + 1rem,2.6rem);
+  font-weight:800;
+  letter-spacing:-.04em;
+}
+.stat-ico{
+  display:grid;
+  place-items:center;
+  width:52px;
+  height:52px;
+  border-radius:18px;
+  background:linear-gradient(135deg,var(--accent-100),rgba(255,255,255,.86));
+  border:1px solid var(--accent-200);
+  color:var(--accent-600);
+}
+[data-theme="dark"] .stat-ico{
+  background:linear-gradient(135deg,var(--accent-100),rgba(30,41,59,.72));
+  border-color:var(--accent-200);
+}
+.stat-foot{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:var(--s2);
+  font-size:.92rem;
+  color:var(--muted);
+  line-height:1.55;
+}
+.pill{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:999px;
+  background:var(--accent-100);
+  color:var(--accent-700);
+  font-size:.82rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.charts{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:24px;
+}
+.chart-card{padding:32px}
+.head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:var(--s3);
+  margin-bottom:24px;
+}
+.head h3{
+  margin:0;
+  font-size:1.2rem;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.head p{
+  margin:8px 0 0;
+  color:var(--muted);
+  line-height:1.7;
+  max-width:560px;
+}
+.mini{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+  white-space:nowrap;
+}
+.mini strong{font-size:1.55rem;font-weight:800}
+.mini span{font-size:.84rem;color:var(--muted)}
+.chart-wrap{position:relative;height:300px}
+
+.section{
+  padding:32px;
+  margin-bottom:0;
+}
+.data-section{
+  background:
+    linear-gradient(180deg,var(--surface-raised),var(--surface-2) 100%) padding-box,
+    linear-gradient(180deg,rgba(124,92,255,.14),rgba(15,23,42,.05)) border-box;
+  border-color:transparent;
+}
+[data-theme="dark"] .data-section, .dark .data-section{
+  background:
+    linear-gradient(180deg,var(--surface-raised),rgba(19,26,40,.94) 100%) padding-box,
+    linear-gradient(180deg,rgba(156,136,255,.16),rgba(148,163,184,.06)) border-box;
+}
+.section-head{
+  align-items:flex-end;
+  margin-bottom:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--bd);
+  position:relative;
+}
+.section-head:after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-1px;
+  width:92px;
+  height:2px;
+  background:linear-gradient(90deg,var(--accent-500),transparent);
+}
+.section-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 10px;
+  margin-bottom:12px;
+  border-radius:999px;
+  background:var(--accent-100);
+  color:var(--accent-700);
+  font-size:.74rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.section-kicker:before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:var(--accent-500);
+}
+.section-head h3{
+  font-size:1.28rem;
+}
+.section-head p{
+  max-width:560px;
+}
+.toolbar{
+  display:grid;
+  gap:16px;
+  margin:24px 0 28px;
+}
+.data-section .toolbar{
+  margin:0 0 22px;
+  padding:18px;
+  border-radius:22px;
+  background:linear-gradient(135deg,var(--surface-3),rgba(124,92,255,.03));
+  border:1px solid var(--accent-200);
+}
+.toolbar-row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.toolbar-row.search-row .field{
+  flex:1 1 100%;
+}
+.toolbar-row.control-row{
+  justify-content:space-between;
+}
+.toolbar-filters{
+  flex:1 1 420px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(180px,1fr));
+  gap:12px;
+}
+.toolbar-actions{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.field{position:relative}
+.field i{
+  position:absolute;
+  left:16px;
+  top:50%;
+  transform:translateY(-50%);
+  color:var(--soft);
+}
+.ctrl{
+  width:100%;
+  min-height:50px;
+  padding:0 16px;
+  border-radius:16px;
+  border:1px solid var(--bd);
+  background:var(--surface-raised);
+  color:var(--txt);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.26);
+}
+[data-theme="dark"] .ctrl, .dark .ctrl{
+  background:linear-gradient(135deg,var(--surface-raised),var(--surface-tint));
+}
+.ctrl:focus{
+  outline:none;
+  border-color:var(--accent-500);
+  box-shadow:var(--ring);
+}
+.field .ctrl{padding-left:46px}
+.subrow{
+  display:flex;
+  justify-content:space-between;
+  gap:var(--s2);
+  margin-bottom:18px;
+  color:var(--muted);
+  font-size:.92rem;
+}
+.data-section .subrow{
+  padding:0 4px;
+  margin-bottom:16px;
+}
+.subrow strong{color:var(--txt)}
+
+.table-wrap{
+  overflow:auto;
+  margin-top:10px;
+}
+.data-section .table-wrap{
+  margin-top:0;
+  padding:8px;
+  border-radius:24px;
+  background:linear-gradient(180deg,var(--surface-3),rgba(255,255,255,.96));
+  border:1px solid var(--bd);
+}
+[data-theme="dark"] .data-section .table-wrap, .dark .data-section .table-wrap{
+  background:linear-gradient(180deg,var(--surface-3),rgba(20,27,41,.92));
+}
+.tablex{
+  width:100%;
+  min-width:720px;
+  border-collapse:separate;
+  border-spacing:0 12px;
+}
+.data-section .tablex{
+  border-spacing:0 8px;
+}
+.tablex th{
+  padding:0 18px 8px;
+  color:var(--soft);
+  font-size:.76rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.data-section .tablex th{
+  padding:6px 18px 10px;
+}
+.tablex td{
+  padding:22px 18px;
+  vertical-align:middle;
+  background:var(--table-row);
+  border-top:1px solid var(--bd);
+  border-bottom:1px solid var(--bd);
+  transition:background-color .16s ease, box-shadow .16s ease;
+}
+.data-section .tablex td{
+  background:var(--surface-2);
+}
+[data-theme="dark"] .data-section .tablex td, .dark .data-section .tablex td{
+  background:rgba(20,27,41,.82);
+}
+.tablex td:first-child{
+  border-left:1px solid var(--bd);
+  border-top-left-radius:18px;
+  border-bottom-left-radius:18px;
+}
+.tablex td:last-child{
+  border-right:1px solid var(--bd);
+  border-top-right-radius:18px;
+  border-bottom-right-radius:18px;
+}
+.tablex tr{transition:.16s ease}
+.tablex tbody tr:hover{
+  transform:translateY(-1px);
+}
+.tablex tbody tr:hover td{
+  background:var(--table-row-hover);
+}
+.data-section .tablex tbody tr:hover td{
+  background:linear-gradient(135deg,var(--surface-2),var(--accent-100));
+}
+[data-theme="dark"] .data-section .tablex tbody tr:hover td, .dark .data-section .tablex tbody tr:hover td{
+  background:rgba(28,37,54,.94);
+}
+.data-section .tablex tbody tr:hover td:first-child{
+  border-left-color:var(--accent-400);
+}
+
+.pri{display:flex;flex-direction:column;gap:8px}
+.pri strong{
+  font-size:1rem;
+  font-weight:800;
+  line-height:1.35;
+}
+.meta{
+  color:var(--muted);
+  font-size:.86rem;
+  line-height:1.55;
+}
+.badge{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  padding:8px 12px;
+  border-radius:999px;
+  font-size:.82rem;
+  font-weight:700;
+  white-space:nowrap;
+}
+.badge:before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:999px;
+  background:currentColor;
+}
+.pending{color:var(--warning-600);background:var(--warning-100)}
+.approved,.activex{color:var(--success-600);background:var(--success-100)}
+.rejected,.inactivex,.expired{color:var(--error-600);background:var(--error-100)}
+
+.empty{
+  display:grid;
+  place-items:center;
+  gap:12px;
+  padding:44px 24px;
+  margin-top:18px;
+  border:1px dashed var(--bd);
+  border-radius:22px;
+  text-align:center;
+  background:linear-gradient(180deg,var(--surface-2),var(--surface-3));
+}
+.empty i{font-size:2rem;color:var(--soft)}
+.empty h4{margin:0;font-size:1.02rem;font-weight:800}
+.empty p{
+  margin:0;
+  max-width:440px;
+  color:var(--muted);
+  line-height:1.7;
+}
+
+.overlay{
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+  background:rgba(15,23,42,.42);
+  backdrop-filter:blur(10px);
+  z-index:60;
+}
+.overlay[hidden]{display:none}
+.modal-box{
+  width:min(760px,100%);
+  max-height:min(92vh,920px);
+  overflow:auto;
+  padding:32px;
+  border-radius:28px;
+  border:1px solid var(--bd);
+  background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.7));
+  box-shadow:var(--shadow2);
+}
+[data-theme="dark"] .modal-box{
+  background:linear-gradient(135deg,rgba(30,41,59,.95),rgba(15,23,42,.82));
+}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  gap:var(--s2);
+  margin-bottom:24px;
+}
+.modal-head h3{margin:0;font-size:1.3rem;font-weight:800}
+.modal-head p{margin:8px 0 0;color:var(--muted);line-height:1.7}
+.modal-close{width:42px;height:42px;padding:0}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.span2{grid-column:1/-1}
+.fblock{display:grid;gap:8px}
+.fblock label{font-size:.88rem;font-weight:800;color:var(--muted)}
+textarea.ctrl{min-height:116px;padding:14px 16px;resize:vertical}
+input[type=file].ctrl{padding:12px 16px;min-height:auto}
+.help{color:var(--soft);font-size:.82rem}
+
+.toasts{
+  position:fixed;
+  top:24px;
+  right:24px;
+  display:grid;
+  gap:12px;
+  width:min(360px,calc(100vw - 32px));
+  z-index:80;
+}
+.toastx{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:start;
+  padding:16px;
+  border-radius:18px;
+  border:1px solid var(--bd);
+  background:linear-gradient(135deg,rgba(255,255,255,.94),rgba(255,255,255,.7));
+  backdrop-filter:blur(16px);
+  box-shadow:var(--shadow2);
+}
+[data-theme="dark"] .toastx{
+  background:linear-gradient(135deg,rgba(30,41,59,.95),rgba(15,23,42,.82));
+}
+.toastx strong{display:block;font-size:.96rem;font-weight:800}
+.toastx p{margin:4px 0 0;color:var(--muted);font-size:.88rem;line-height:1.6}
+.toastx .dismiss{border:none;background:transparent;color:var(--soft);cursor:pointer}
+.success i{color:var(--ok)}
+.error i{color:var(--bad)}
+.info i{color:var(--info)}
+
+.sr{
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0,0,0,0);
+  white-space:nowrap;
+  border:0;
+}
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+@media (max-width:1199.98px){
+  .main{padding-inline:20px}
+}
+
+@media (max-width:991.98px){
+  .sidebar{
+    position:fixed;
+    inset:0 auto 0 0;
+    width:min(88vw,320px);
+    transform:translateX(-100%);
+    height:100vh;
+  }
+  .shell.open .sidebar{transform:translateX(0)}
+  .shell.collapsed .sidebar{
+    width:min(88vw,320px);
+    padding:var(--s3);
+  }
+  .shell.collapsed .copy,.shell.collapsed .hide-when-collapsed{display:block}
+  .shell.collapsed .nav-link,.shell.collapsed .nav-btn{
+    justify-content:flex-start;
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .sidebar-top,.nav-list,.sidebar-footer{z-index:2}
+  .main{padding:24px 20px 36px}
+  .topbar{flex-direction:column}
+}
+
+@media (max-width:767.98px){
+  .charts{grid-template-columns:1fr}
+  .stats,.form-grid{grid-template-columns:1fr}
+  .toolbar-filters{grid-template-columns:1fr}
+  .toolbar-row.control-row{flex-direction:column;align-items:stretch}
+  .toolbar-actions{width:100%;justify-content:flex-start}
+  .top-actions{justify-content:flex-start}
+  .tablex{min-width:620px}
+  .toasts{top:16px;right:16px}
+  .section,.chart-card,.stat,.modal-box{padding:24px}
+  .main-inner{gap:32px}
+}
+</style>
+</head>
+<body>
+<meta name="csrf-token" content="{{ csrf_token }}">
+<div class="shell" id="shell">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="brand">
+        <div class="mark"><i class="bi bi-grid-1x2-fill"></i></div>
+        <div class="copy">
+          <span class="brand-kicker">Scholarship Ops</span>
+          <h1>Admin Control</h1>
+          <p>Scholarship admin workspace.</p>
+        </div>
+      </div>
+      <div class="side-actions">
+        <button type="button" class="icon-btn" id="sidebarToggle" aria-label="Collapse sidebar"><i class="bi bi-layout-sidebar-inset"></i></button>
+        <button type="button" class="icon-btn d-lg-none" id="mobileNavToggle" aria-label="Open sidebar"><i class="bi bi-list"></i></button>
+      </div>
+    </div>
+    <div class="nav-list">
+      <div class="nav-group hide-when-collapsed">
+        <div class="nav-group-head">
+          <p class="nav-head">Overview</p>
+          <span class="nav-meta">Live</span>
+        </div>
+        <div class="nav-stack">
+          <a href="{% url 'admin_dashboard' %}" class="nav-link" data-route-link>
+            <span class="nav-ico"><i class="bi bi-speedometer2"></i></span>
+            <span class="nav-copy"><strong>Dashboard</strong></span>
+          </a>
+          <a href="#applications-panel" class="nav-link" data-section-link="applications-panel">
+            <span class="nav-ico"><i class="bi bi-file-earmark-text"></i></span>
+            <span class="nav-copy"><strong>Applications</strong></span>
+          </a>
+          <a href="#scholarships-panel" class="nav-link" data-section-link="scholarships-panel">
+            <span class="nav-ico"><i class="bi bi-mortarboard"></i></span>
+            <span class="nav-copy"><strong>Scholarships</strong></span>
+          </a>
+        </div>
+      </div>
+      <div class="nav-group hide-when-collapsed">
+        <div class="nav-group-head">
+          <p class="nav-head">Controls</p>
+          <span class="nav-meta">Quick</span>
+        </div>
+        <div class="nav-stack">
+          <button type="button" class="nav-btn" data-action="create">
+            <span class="nav-ico"><i class="bi bi-plus-circle"></i></span>
+            <span class="nav-copy"><strong>Create Scholarship</strong></span>
+          </button>
+          <button type="button" class="nav-btn" data-action="refresh">
+            <span class="nav-ico"><i class="bi bi-arrow-repeat"></i></span>
+            <span class="nav-copy"><strong>Sync Dashboard</strong></span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-footer hide-when-collapsed">
+      <form method="post" action="{% url 'logout' %}" class="sidebar-logout">
+        {% csrf_token %}
+        <button type="submit" class="btnx w-100"><i class="bi bi-box-arrow-right"></i><span>Logout</span></button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="main-inner">
+    <section class="topbar dashboard-hero">
+      <div>
+        <span class="eyebrow"><i class="bi bi-shield-check"></i>Admin only</span>
+        <h2>Operational dashboard for scholarship management</h2>
+        <p>Review activity, make decisions quickly, and manage scholarship listings from a cleaner internal workspace.</p>
+      </div>
+      <div class="top-actions topbar-actions">
+        <button type="button" class="icon-btn" id="themeToggle"><i class="bi bi-moon-stars"></i><span>Dark mode</span></button>
+        <button type="button" class="icon-btn d-lg-none" id="mobileMenuButton"><i class="bi bi-layout-sidebar"></i><span>Menu</span></button>
+        <button type="button" class="icon-btn" data-action="refresh"><i class="bi bi-arrow-clockwise"></i><span>Refresh</span></button>
+        <button type="button" class="chip primary" data-action="create"><i class="bi bi-plus-lg"></i><span>Add Scholarship</span></button>
+      </div>
+    </section>
+
+    <section class="stats" id="statsGrid">
+      <article class="cardx stat" data-stat-card="total-scholarships"><div class="stat-top"><div><p class="stat-label">Total Scholarships</p><div class="stat-val" data-stat>{{ total_scholarships|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-mortarboard-fill"></i></div></div><div class="stat-foot"><span>Published opportunities in the system</span><span class="pill"><i class="bi bi-lightning-charge-fill"></i>Live</span></div></article>
+      <article class="cardx stat" data-stat-card="total-students"><div class="stat-top"><div><p class="stat-label">Total Students</p><div class="stat-val" data-stat>{{ total_students|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-people-fill"></i></div></div><div class="stat-foot"><span>Student accounts available for review</span><span class="pill"><i class="bi bi-person-badge-fill"></i>Directory</span></div></article>
+      <article class="cardx stat" data-stat-card="total-applications"><div class="stat-top"><div><p class="stat-label">Applications</p><div class="stat-val" data-stat>{{ total_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-inboxes-fill"></i></div></div><div class="stat-foot"><span>Total submissions across all scholarships</span><span class="pill"><i class="bi bi-clock-history"></i>Tracked</span></div></article>
+      <article class="cardx stat" data-stat-card="approved-applications"><div class="stat-top"><div><p class="stat-label">Approved</p><div class="stat-val" data-stat>{{ approved_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-patch-check-fill"></i></div></div><div class="stat-foot"><span>Applications currently approved</span><span class="pill"><i class="bi bi-check2-circle"></i>Resolved</span></div></article>
+    </section>
+
+    <section class="charts">
+      <article class="cardx chart-card"><div class="head"><div><h3>Applications Overview</h3><p>Track monthly application volume across the last six months.</p></div><div class="mini"><strong>{{ total_applications|default:0 }}</strong><span>Total records</span></div></div><div class="chart-wrap"><canvas id="applicationsChart"></canvas></div></article>
+      <article class="cardx chart-card"><div class="head"><div><h3>Scholarships by Country</h3><p>See where active scholarship coverage is most concentrated.</p></div><div class="mini"><strong>{{ total_scholarships|default:0 }}</strong><span>Tracked listings</span></div></div><div class="chart-wrap"><canvas id="countryChart"></canvas></div></article>
+    </section>
+
+    <section class="cardx section data-section" id="applications-panel">
+      <div class="head section-head"><div><span class="section-kicker">Applications</span><h3>Recent Applications</h3><p>Filter the review queue and resolve decisions without leaving the page.</p></div></div>
+      <div class="toolbar">
+        <div class="toolbar-row search-row">
+          <div class="field"><i class="bi bi-search"></i><label class="sr" for="applicationSearch">Search applications</label><input id="applicationSearch" class="ctrl" type="search" placeholder="Search student, scholarship, or status"></div>
+        </div>
+        <div class="toolbar-row control-row">
+          <div class="toolbar-filters">
+            <div><label class="sr" for="applicationStatusFilter">Filter by status</label><select id="applicationStatusFilter" class="ctrl"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
+            <div><label class="sr" for="applicationDateSort">Sort by date</label><select id="applicationDateSort" class="ctrl"><option value="newest">Newest first</option><option value="oldest">Oldest first</option></select></div>
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btnx" data-clear="applications"><i class="bi bi-x-circle"></i><span>Clear filters</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="subrow"><span>Workflow queue</span><strong id="applicationsCount">0 visible</strong></div>
+      <div class="table-wrap">
+        <table class="tablex">
+          <thead><tr><th>Student</th><th>Scholarship</th><th>Status</th><th>Date</th><th class="text-end">Actions</th></tr></thead>
+          <tbody id="applicationsBody">
+            {% for application in recent_applications %}
+            <tr data-kind="application" data-id="{{ application.id }}" data-search="{{ application.student_name }} {{ application.scholarship.title }} {{ application.status }}" data-status="{{ application.status|lower }}" data-date="{% if application.date_applied %}{{ application.date_applied|date:'c' }}{% else %}{% now 'c' %}{% endif %}">
+              <td><div class="pri"><strong>{{ application.student_name }}</strong><span class="meta">{{ application.email|default:"No email provided" }}</span></div></td>
+              <td><div class="pri"><strong>{{ application.scholarship.title }}</strong><span class="meta">Application ID #{{ application.id }}</span></div></td>
+              <td data-app-status>{% if application.status == "Pending" %}<span class="badge pending">Pending</span>{% elif application.status == "Approved" %}<span class="badge approved">Approved</span>{% else %}<span class="badge rejected">Rejected</span>{% endif %}</td>
+              <td>{% if application.date_applied %}{{ application.date_applied|date:"d M Y" }}{% else %}-{% endif %}</td>
+              <td><div class="table-actions justify-content-end"><button type="button" class="btnx success small" data-action="approve" data-url="{% url 'approve_application' application.id %}"><i class="bi bi-check2"></i><span>Approve</span></button><button type="button" class="btnx danger small" data-action="reject" data-url="{% url 'reject_application' application.id %}"><i class="bi bi-x-lg"></i><span>Reject</span></button></div></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="empty" id="applicationsEmpty" hidden><i class="bi bi-search"></i><h4>No applications match the current view</h4><p>Try clearing the search and filters, or refresh the dashboard to pull in the latest submissions.</p></div>
+    </section>
+
+    <section class="cardx section data-section" id="scholarships-panel">
+      <div class="head section-head"><div><span class="section-kicker">Scholarships</span><h3>Recent Scholarships</h3><p>Manage listing details, visibility, and cleanup from one place.</p></div><button type="button" class="chip primary" data-action="create"><i class="bi bi-plus-lg"></i><span>New scholarship</span></button></div>
+      <div class="toolbar">
+        <div class="toolbar-row search-row">
+          <div class="field"><i class="bi bi-search"></i><label class="sr" for="scholarshipSearch">Search scholarships</label><input id="scholarshipSearch" class="ctrl" type="search" placeholder="Search title, organization, or country"></div>
+        </div>
+        <div class="toolbar-row control-row">
+          <div class="toolbar-filters">
+            <div><label class="sr" for="scholarshipStatusFilter">Filter scholarships</label><select id="scholarshipStatusFilter" class="ctrl"><option value="all">All states</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="expired">Expired</option></select></div>
+            <div><label class="sr" for="scholarshipSort">Sort by deadline</label><select id="scholarshipSort" class="ctrl"><option value="soonest">Soonest deadline</option><option value="latest">Latest deadline</option><option value="title">Title A-Z</option></select></div>
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btnx" data-clear="scholarships"><i class="bi bi-x-circle"></i><span>Clear filters</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="subrow"><span>Recent listings</span><strong id="scholarshipsCount">0 visible</strong></div>
+      <div class="table-wrap">
+        <table class="tablex">
+          <thead><tr><th>Scholarship</th><th>Country</th><th>Deadline</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+          <tbody id="scholarshipsBody">
+            {% for scholarship in recent_scholarships %}
+            <tr data-kind="scholarship" data-id="{{ scholarship.id }}" data-search="{{ scholarship.title }} {{ scholarship.organization }} {{ scholarship.country }}" data-title="{{ scholarship.title|escape }}" data-organization="{{ scholarship.organization|default_if_none:''|escape }}" data-country="{{ scholarship.country|default_if_none:''|escape }}" data-level="{{ scholarship.level|default_if_none:''|escape }}" data-category="{{ scholarship.category|default_if_none:''|escape }}" data-amount="{{ scholarship.amount_display|default_if_none:''|escape }}" data-deadline="{% if scholarship.deadline %}{{ scholarship.deadline|date:'Y-m-d' }}{% endif %}" data-requirements="{{ scholarship.requirements|default_if_none:''|escape }}" data-description="{{ scholarship.description|default_if_none:''|escape }}" data-active="{{ scholarship.is_active|yesno:'true,false' }}" data-expired="{{ scholarship.is_expired|yesno:'true,false' }}">
+              <td><div class="pri"><strong>{{ scholarship.title }}</strong><span class="meta">{{ scholarship.organization|default:"Organization not set" }}{% if scholarship.level %} | {{ scholarship.level }}{% endif %}</span></div></td>
+              <td>{{ scholarship.country|default:"-" }}</td>
+              <td>{% if scholarship.deadline %}{{ scholarship.deadline|date:"d M Y" }}{% else %}Open ended{% endif %}</td>
+              <td data-sch-status>{% if scholarship.is_expired %}<span class="badge expired">Expired</span>{% elif scholarship.is_active %}<span class="badge activex">Active</span>{% else %}<span class="badge inactivex">Inactive</span>{% endif %}</td>
+              <td><div class="table-actions justify-content-end"><button type="button" class="btnx small" data-action="edit" data-url="{% url 'edit_scholarship' scholarship.id %}"><i class="bi bi-pencil-square"></i><span>Edit</span></button><button type="button" class="btnx warning small" data-action="toggle" data-url="{% url 'toggle_scholarship_active' scholarship.id %}"><i class="bi bi-lightning-charge"></i><span>{% if scholarship.is_active %}Deactivate{% else %}Activate{% endif %}</span></button><button type="button" class="btnx danger small" data-action="delete" data-url="{% url 'delete_scholarship' scholarship.id %}"><i class="bi bi-trash3"></i><span>Delete</span></button></div></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="empty" id="scholarshipsEmpty" hidden><i class="bi bi-mortarboard"></i><h4>No scholarships match the current view</h4><p>Adjust the filters, or add a fresh scholarship from the button above to keep the listing pipeline moving.</p></div>
+    </section>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <div><h3 id="modalTitle">Modal</h3><p id="modalText">Modal copy.</p></div>
+      <button type="button" class="modal-close" id="modalClose" aria-label="Close modal"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div class="toasts" id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<template id="scholarshipFormTemplate">
+  <form id="scholarshipForm">
+    <div class="form-grid">
+      <div class="fblock span2"><label for="fTitle">Title</label><input class="ctrl" id="fTitle" name="title" type="text" required maxlength="200" placeholder="Enter scholarship title"></div>
+      <div class="fblock"><label for="fOrg">Organization</label><input class="ctrl" id="fOrg" name="organization" type="text" maxlength="200" placeholder="University or sponsor"></div>
+      <div class="fblock"><label for="fCountry">Country</label><input class="ctrl" id="fCountry" name="country" type="text" maxlength="100" placeholder="e.g. Canada, Germany"></div>
+      <div class="fblock"><label for="fLevel">Level</label><select class="ctrl" id="fLevel" name="level"><option value="">Select a level</option><option value="Undergraduate">Degree</option><option value="Masters">Masters</option><option value="PhD">PhD</option><option value="Diploma">Diploma</option><option value="Certificate">Certificate</option><option value="Postdoc">Postdoc</option><option value="Other">Other</option></select></div>
+      <div class="fblock"><label for="fCategory">Category</label><select class="ctrl" id="fCategory" name="category"><option value="">Select a category</option><option value="STEM">Engineering &amp; Tech</option><option value="Business">Business</option><option value="Arts &amp; Humanities">Arts &amp; Humanities</option><option value="Medicine &amp; Health">Medicine &amp; Health</option><option value="Social Sciences">Social Sciences</option><option value="Law">Law</option><option value="Education">Education</option><option value="Other">Other</option></select></div>
+      <div class="fblock"><label for="fAmount">Amount</label><input class="ctrl" id="fAmount" name="amount_display" type="text" maxlength="200" placeholder="Full scholarship or KES 150,000 per year"></div>
+      <div class="fblock"><label for="fDeadline">Deadline</label><input class="ctrl" id="fDeadline" name="deadline" type="date"></div>
+      <div class="fblock span2"><label for="fReq">Requirements</label><textarea class="ctrl" id="fReq" name="requirements" placeholder="Eligibility requirements, academic expectations, and key documents"></textarea></div>
+      <div class="fblock span2"><label for="fDesc">Description</label><textarea class="ctrl" id="fDesc" name="description" placeholder="Add a concise admin-facing description of the opportunity"></textarea></div>
+      <div class="fblock span2"><label for="fImage">Image</label><input class="ctrl" id="fImage" name="image" type="file" accept="image/*"><span class="help">Optional. Leave empty to keep the current image during edits.</span></div>
+    </div>
+    <div class="modal-actions" style="padding-top:8px">
+      <button type="button" class="btnx" data-modal-cancel><i class="bi bi-x-circle"></i><span>Cancel</span></button>
+      <button type="submit" class="btnx primary" id="scholarshipSubmit"><i class="bi bi-check2-circle"></i><span>Save scholarship</span></button>
+    </div>
+  </form>
+</template>
+
+{{ applications_chart|json_script:"applications-chart-data" }}
+{{ country_chart|json_script:"country-chart-data" }}
+<script id="dashboardScript">
+(function(){
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const dom = {
+    root: document.documentElement,
+    shell: $("#shell"),
+    sidebarToggle: $("#sidebarToggle"),
+    mobileNavToggle: $("#mobileNavToggle"),
+    mobileMenuButton: $("#mobileMenuButton"),
+    themeToggle: $("#themeToggle"),
+    overlay: $("#overlay"),
+    modalTitle: $("#modalTitle"),
+    modalText: $("#modalText"),
+    modalBody: $("#modalBody"),
+    modalClose: $("#modalClose"),
+    toasts: $("#toasts"),
+    statsGrid: $("#statsGrid"),
+    appsBody: $("#applicationsBody"),
+    appsSearch: $("#applicationSearch"),
+    appsStatus: $("#applicationStatusFilter"),
+    appsSort: $("#applicationDateSort"),
+    appsCount: $("#applicationsCount"),
+    appsEmpty: $("#applicationsEmpty"),
+    scholarshipsBody: $("#scholarshipsBody"),
+    scholarshipsSearch: $("#scholarshipSearch"),
+    scholarshipsStatus: $("#scholarshipStatusFilter"),
+    scholarshipsSort: $("#scholarshipSort"),
+    scholarshipsCount: $("#scholarshipsCount"),
+    scholarshipsEmpty: $("#scholarshipsEmpty"),
+    formTemplate: $("#scholarshipFormTemplate")
+  };
+  const state = { charts: {}, editRow: null, syncPromise: null };
+  const keys = { theme: "admin-dashboard-theme", sidebar: "admin-dashboard-sidebar" };
+
+  function csrf(){
+    const meta = $('meta[name="csrf-token"]')?.getAttribute("content");
+    if (meta && meta !== "NOTPROVIDED") return meta;
+    return document.cookie.split("; ").find((v) => v.startsWith("csrftoken="))?.split("=")[1] || "";
+  }
+  function json(id){ try { return JSON.parse(document.getElementById(id)?.textContent || '{"labels":[],"data":[]}'); } catch { return { labels: [], data: [] }; } }
+  function rgba(hex, alpha){
+    if (!hex || !hex.startsWith("#")) return `rgba(124,92,255,${alpha})`;
+    let v = hex.slice(1); if (v.length === 3) v = v.split("").map((c) => c + c).join("");
+    return `rgba(${parseInt(v.slice(0,2),16)},${parseInt(v.slice(2,4),16)},${parseInt(v.slice(4,6),16)},${alpha})`;
+  }
+  function themeVars(){
+    const s = getComputedStyle(dom.root);
+    return {
+      accent: s.getPropertyValue("--accent-500").trim(),
+      accentStrong: s.getPropertyValue("--accent-700").trim(),
+      success: s.getPropertyValue("--success-500").trim(),
+      txt: s.getPropertyValue("--txt").trim(),
+      muted: s.getPropertyValue("--muted").trim(),
+      bd: s.getPropertyValue("--bd").trim(),
+      panel: s.getPropertyValue("--panel2").trim(),
+      info: s.getPropertyValue("--info").trim(),
+      warn: s.getPropertyValue("--warn").trim()
+    };
+  }
+  function setLoading(btn, on, label){
+    if (!btn) return;
+    if (!btn.dataset.html) btn.dataset.html = btn.innerHTML;
+    btn.classList.toggle("loading", on);
+    btn.innerHTML = on ? `<span class="sp"></span><span>${label || "Working..."}</span>` : btn.dataset.html;
+  }
+  function toast(type, title, msg){
+    const icons = { success: "bi-check2-circle", error: "bi-exclamation-octagon", info: "bi-info-circle" };
+    const el = document.createElement("div");
+    el.className = `toastx ${type}`;
+    el.innerHTML = `<i class="bi ${icons[type] || icons.info}"></i><div><strong>${title}</strong><p>${msg}</p></div><button type="button" class="dismiss" aria-label="Dismiss"><i class="bi bi-x-lg"></i></button>`;
+    const remove = () => { el.style.opacity = "0"; el.style.transform = "translateX(18px)"; setTimeout(() => el.remove(), 180); };
+    $(".dismiss", el)?.addEventListener("click", remove);
+    dom.toasts.appendChild(el);
+    setTimeout(remove, 4200);
+  }
+  function openModal(title, text, node){
+    dom.modalTitle.textContent = title;
+    dom.modalText.textContent = text;
+    dom.modalBody.innerHTML = "";
+    dom.modalBody.appendChild(node);
+    dom.overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function closeModal(){
+    dom.overlay.hidden = true;
+    dom.modalBody.innerHTML = "";
+    document.body.style.overflow = "";
+    state.editRow = null;
+  }
+  function confirmModal(title, text, label, klass, fn){
+    const wrap = document.createElement("div");
+    wrap.innerHTML = `<div style="padding:8px 0 4px"><strong style="display:block;margin-bottom:8px">${title}</strong><p style="margin:0;color:var(--muted);line-height:1.75">${text}</p></div><div class="modal-actions"><button type="button" class="btnx" data-modal-cancel><i class="bi bi-arrow-left"></i><span>Cancel</span></button><button type="button" class="btnx ${klass || "danger"}" id="confirmButton"><i class="bi bi-check2-circle"></i><span>${label}</span></button></div>`;
+    openModal("Confirm action", "Please confirm before continuing.", wrap);
+    $('[data-modal-cancel]', wrap)?.addEventListener("click", closeModal);
+    $("#confirmButton", wrap)?.addEventListener("click", async (e) => {
+      setLoading(e.currentTarget, true, "Applying...");
+      try { await fn(); closeModal(); } catch {}
+    });
+  }
+
+  const centerPlugin = {
+    id: "centerLabel",
+    afterDraw(chart){
+      if (chart.config.type !== "doughnut") return;
+      const total = (chart.data.datasets[0]?.data || []).reduce((a, b) => a + Number(b || 0), 0);
+      const meta = chart.getDatasetMeta(0);
+      const x = meta?.data?.[0]?.x || chart.width / 2;
+      const y = meta?.data?.[0]?.y || chart.height / 2;
+      const t = themeVars(), ctx = chart.ctx;
+      ctx.save();
+      ctx.textAlign = "center";
+      ctx.fillStyle = t.txt;
+      ctx.font = "700 28px Manrope";
+      ctx.fillText(String(total), x, y - 2);
+      ctx.fillStyle = t.muted;
+      ctx.font = "600 12px Manrope";
+      ctx.fillText("Tracked listings", x, y + 18);
+      ctx.restore();
+    }
+  };
+  if (window.Chart) Chart.register(centerPlugin);
+  function renderCharts(){
+    if (!window.Chart) return;
+    const t = themeVars(), appData = json("applications-chart-data"), countryData = json("country-chart-data");
+    Object.values(state.charts).forEach((c) => c && c.destroy());
+    const appCtx = $("#applicationsChart")?.getContext("2d");
+    if (appCtx) {
+      const g = appCtx.createLinearGradient(0, 0, 0, 280);
+      g.addColorStop(0, rgba(t.accent, .28));
+      g.addColorStop(1, rgba(t.accent, .02));
+      state.charts.apps = new Chart(appCtx, {
+        type: "line",
+        data: { labels: appData.labels || [], datasets: [{ label: "Applications", data: appData.data || [], borderColor: t.accent, borderWidth: 3, pointRadius: 4, pointHoverRadius: 6, pointBackgroundColor: t.panel, pointBorderColor: t.accent, pointBorderWidth: 3, fill: true, backgroundColor: g, tension: .38 }] },
+        options: { responsive: true, maintainAspectRatio: false, animation: { duration: 900, easing: "easeOutQuart" }, plugins: { legend: { position: "top", align: "start", labels: { color: t.muted, usePointStyle: true, pointStyle: "circle", boxWidth: 10, padding: 18, font: { family: "Manrope", weight: 700 } } }, tooltip: { backgroundColor: t.panel, borderColor: t.bd, borderWidth: 1, titleColor: t.txt, bodyColor: t.muted, displayColors: false, titleFont: { family: "Manrope", weight: "800" }, bodyFont: { family: "Manrope", weight: "700" }, padding: 14 } }, scales: { x: { grid: { display: false }, ticks: { color: t.muted, font: { family: "Manrope", weight: 700 } } }, y: { beginAtZero: true, ticks: { precision: 0, color: t.muted, font: { family: "Manrope", weight: 700 } }, grid: { color: rgba(t.muted, .14), drawBorder: false } } } }
+      });
+    }
+    const countryCtx = $("#countryChart")?.getContext("2d");
+    if (countryCtx) {
+      state.charts.country = new Chart(countryCtx, {
+        type: "doughnut",
+        data: { labels: countryData.labels || [], datasets: [{ data: countryData.data || [], borderWidth: 0, hoverOffset: 8, backgroundColor: [t.accent, rgba(t.accentStrong, .84), t.info, t.warn, t.success, rgba(t.muted, .45)] }] },
+        options: { responsive: true, maintainAspectRatio: false, animation: { duration: 980, easing: "easeOutQuart" }, cutout: "68%", plugins: { legend: { position: "bottom", labels: { color: t.muted, usePointStyle: true, pointStyle: "circle", boxWidth: 10, padding: 18, font: { family: "Manrope", weight: 700 } } }, tooltip: { backgroundColor: t.panel, borderColor: t.bd, borderWidth: 1, titleColor: t.txt, bodyColor: t.muted, titleFont: { family: "Manrope", weight: "800" }, bodyFont: { family: "Manrope", weight: "700" }, padding: 14 } } }
+      });
+    }
+  }
+
+  function setTheme(theme){
+    dom.root.dataset.theme = theme;
+    localStorage.setItem(keys.theme, theme);
+    const icon = $("i", dom.themeToggle), label = $("span", dom.themeToggle);
+    if (icon) icon.className = `bi ${theme === "dark" ? "bi-sun-fill" : "bi-moon-stars"}`;
+    if (label) label.textContent = theme === "dark" ? "Light mode" : "Dark mode";
+    renderCharts();
+  }
+  function initTheme(){
+    const saved = localStorage.getItem(keys.theme);
+    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    setTheme(saved || (prefersDark ? "dark" : "light"));
+  }
+  function setCollapsed(on){
+    dom.shell.classList.toggle("collapsed", on);
+    localStorage.setItem(keys.sidebar, on ? "collapsed" : "expanded");
+  }
+  function initSidebar(){
+    if (window.innerWidth < 992) return;
+    setCollapsed(localStorage.getItem(keys.sidebar) === "collapsed");
+  }
+
+  function updateCount(el, n, one, many){ if (el) el.textContent = `${n} ${n === 1 ? one : many} visible`; }
+  function appRows(){ return $$('tr[data-kind="application"]', dom.appsBody); }
+  function scholarshipRows(){ return $$('tr[data-kind="scholarship"]', dom.scholarshipsBody); }
+  function applyAppFilters(){
+    const q = (dom.appsSearch.value || "").trim().toLowerCase(), status = dom.appsStatus.value, sort = dom.appsSort.value;
+    appRows().sort((a, b) => {
+      const x = new Date(a.dataset.date || 0).getTime(), y = new Date(b.dataset.date || 0).getTime();
+      return sort === "oldest" ? x - y : y - x;
+    }).forEach((row) => dom.appsBody.appendChild(row));
+    let c = 0;
+    appRows().forEach((row) => {
+      const show = (!q || (row.dataset.search || "").toLowerCase().includes(q)) && (status === "all" || row.dataset.status === status);
+      row.hidden = !show;
+      if (show) c += 1;
+    });
+    updateCount(dom.appsCount, c, "record", "records");
+    dom.appsEmpty.hidden = c !== 0;
+  }
+  function applyScholarshipFilters(){
+    const q = (dom.scholarshipsSearch.value || "").trim().toLowerCase(), status = dom.scholarshipsStatus.value, sort = dom.scholarshipsSort.value;
+    scholarshipRows().sort((a, b) => {
+      if (sort === "title") return (a.dataset.title || "").localeCompare(b.dataset.title || "");
+      const x = a.dataset.deadline ? new Date(a.dataset.deadline).getTime() : Number.MAX_SAFE_INTEGER;
+      const y = b.dataset.deadline ? new Date(b.dataset.deadline).getTime() : Number.MAX_SAFE_INTEGER;
+      return sort === "latest" ? y - x : x - y;
+    }).forEach((row) => dom.scholarshipsBody.appendChild(row));
+    let c = 0;
+    scholarshipRows().forEach((row) => {
+      const active = row.dataset.active === "true", expired = row.dataset.expired === "true";
+      const ok = (!q || (row.dataset.search || "").toLowerCase().includes(q))
+        && (status === "all" || (status === "active" && active && !expired) || (status === "inactive" && !active && !expired) || (status === "expired" && expired));
+      row.hidden = !ok;
+      if (ok) c += 1;
+    });
+    updateCount(dom.scholarshipsCount, c, "listing", "listings");
+    dom.scholarshipsEmpty.hidden = c !== 0;
+  }
+
+  async function post(url, body){
+    const opts = { method: "POST", credentials: "same-origin", headers: { "X-CSRFToken": csrf(), "X-Requested-With": "XMLHttpRequest" } };
+    if (body instanceof FormData) opts.body = body;
+    else if (body) { opts.body = new URLSearchParams(body); opts.headers["Content-Type"] = "application/x-www-form-urlencoded; charset=UTF-8"; }
+    const res = await fetch(url, opts), text = await res.text();
+    if (!res.ok) throw new Error(text || `Request failed with status ${res.status}`);
+    return { res, text };
+  }
+  async function sync(showError){
+    if (state.syncPromise) return state.syncPromise;
+    const url = new URL(window.location.href); url.searchParams.set("_sync", Date.now().toString());
+    state.syncPromise = fetch(url.toString(), { credentials: "same-origin", headers: { "X-Requested-With": "XMLHttpRequest" }, cache: "no-store" })
+      .then(async (res) => {
+        if (!res.ok) throw new Error(`Unable to refresh dashboard (${res.status})`);
+        const doc = new DOMParser().parseFromString(await res.text(), "text/html");
+        [["statsGrid", "statsGrid"], ["applicationsBody", "applicationsBody"], ["scholarshipsBody", "scholarshipsBody"]].forEach(([a, b]) => {
+          const local = document.getElementById(a), remote = doc.getElementById(b);
+          if (local && remote) local.innerHTML = remote.innerHTML;
+        });
+        const newApps = doc.getElementById("applications-chart-data"), newCountry = doc.getElementById("country-chart-data");
+        if (newApps) document.getElementById("applications-chart-data").textContent = newApps.textContent;
+        if (newCountry) document.getElementById("country-chart-data").textContent = newCountry.textContent;
+        applyAppFilters();
+        applyScholarshipFilters();
+        renderCharts();
+      })
+      .catch((e) => { if (showError) toast("error", "Refresh failed", "The dashboard could not be synchronized. Please try again."); throw e; })
+      .finally(() => { state.syncPromise = null; });
+    return state.syncPromise;
+  }
+
+  function extractErrors(markup){
+    const doc = new DOMParser().parseFromString(markup, "text/html");
+    return $$(".text-danger, .errorlist li", doc).map((n) => n.textContent.trim()).filter(Boolean);
+  }
+  function fmtDate(v){
+    if (!v) return "Open ended";
+    try { return new Intl.DateTimeFormat(undefined, { day: "2-digit", month: "short", year: "numeric" }).format(new Date(v)); } catch { return v; }
+  }
+  function setAppStatus(row, status){
+    row.dataset.status = status;
+    $('[data-app-status]', row).innerHTML = `<span class="badge ${status === "approved" ? "approved" : status === "rejected" ? "rejected" : "pending"}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+    $$('[data-action="approve"], [data-action="reject"]', row).forEach((btn) => {
+      const disabled = (btn.dataset.action === "approve" && status === "approved") || (btn.dataset.action === "reject" && status === "rejected");
+      btn.disabled = disabled;
+      btn.style.opacity = disabled ? ".55" : "1";
+    });
+  }
+  function setScholarshipStatus(row, active){
+    row.dataset.active = String(active);
+    const expired = row.dataset.expired === "true";
+    $('[data-sch-status]', row).innerHTML = `<span class="badge ${expired ? "expired" : active ? "activex" : "inactivex"}">${expired ? "Expired" : active ? "Active" : "Inactive"}</span>`;
+    $('button[data-action="toggle"] span', row).textContent = active ? "Deactivate" : "Activate";
+  }
+  function statDelta(key, delta){
+    const el = $(`[data-stat-card="${key}"] [data-stat]`, dom.statsGrid);
+    if (!el) return;
+    const cur = parseInt(el.textContent.replace(/[^\d-]/g, ""), 10) || 0;
+    el.textContent = Math.max(0, cur + delta);
+  }
+  function fillScholarshipForm(form, data){
+    form.title.value = data.title || "";
+    form.organization.value = data.organization || "";
+    form.country.value = data.country || "";
+    form.level.value = data.level || "";
+    form.category.value = data.category || "";
+    form.amount_display.value = data.amount || "";
+    form.deadline.value = data.deadline || "";
+    form.requirements.value = data.requirements || "";
+    form.description.value = data.description || "";
+  }
+  function openScholarshipForm(mode, row){
+    const frag = dom.formTemplate.content.cloneNode(true);
+    const form = $("#scholarshipForm", frag), submit = $("#scholarshipSubmit span", frag);
+    form.dataset.mode = mode;
+    form.dataset.url = mode === "edit" ? $('button[data-action="edit"]', row)?.dataset.url || "" : "{% url 'create_scholarship' %}";
+    if (mode === "edit" && row) {
+      state.editRow = row;
+      fillScholarshipForm(form, row.dataset);
+      submit.textContent = "Update scholarship";
+    } else {
+      submit.textContent = "Create scholarship";
+    }
+    $('[data-modal-cancel]', frag)?.addEventListener("click", closeModal);
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const btn = $("#scholarshipSubmit", form);
+      setLoading(btn, true, mode === "edit" ? "Updating..." : "Creating...");
+      try {
+        const { res, text } = await post(form.dataset.url, new FormData(form));
+        const ok = res.redirected || res.url.includes("{% url 'admin_dashboard' %}");
+        if (!ok) {
+          const errs = extractErrors(text);
+          toast("error", "Validation failed", errs[0] || "Please review the scholarship form and try again.");
+          setLoading(btn, false);
+          return;
+        }
+        if (mode === "edit" && state.editRow) {
+          const r = state.editRow;
+          Object.assign(r.dataset, {
+            title: form.title.value, organization: form.organization.value, country: form.country.value,
+            level: form.level.value, category: form.category.value, amount: form.amount_display.value,
+            deadline: form.deadline.value, requirements: form.requirements.value, description: form.description.value,
+            search: `${form.title.value} ${form.organization.value} ${form.country.value}`
+          });
+          r.children[0].innerHTML = `<div class="pri"><strong>${form.title.value || "Untitled scholarship"}</strong><span class="meta">${form.organization.value || "Organization not set"}${form.level.value ? ` | ${form.level.value}` : ""}</span></div>`;
+          r.children[1].textContent = form.country.value || "-";
+          r.children[2].textContent = fmtDate(form.deadline.value);
+          toast("success", "Scholarship updated", "The scholarship details were updated successfully.");
+        } else {
+          toast("success", "Scholarship created", "The new scholarship was added to the dashboard.");
+        }
+        closeModal();
+        await sync(false);
+      } catch {
+        toast("error", "Action failed", "The scholarship could not be saved right now.");
+      } finally {
+        setLoading(btn, false);
+      }
+    });
+    openModal(mode === "edit" ? "Edit scholarship" : "Create scholarship", mode === "edit" ? "Update scholarship details in a modal workflow and keep the dashboard in sync." : "Add a new scholarship without leaving the dashboard.", frag);
+  }
+
+  function initNav(){
+    $$("[data-route-link]").forEach((link) => link.classList.toggle("active", link.getAttribute("href") === window.location.pathname));
+    const links = $$("[data-section-link]");
+    if (!links.length) return;
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        links.forEach((link) => link.classList.toggle("active", link.dataset.sectionLink === entry.target.id));
+      });
+    }, { rootMargin: "-30% 0px -55% 0px", threshold: .1 });
+    links.forEach((link) => {
+      const target = document.getElementById(link.dataset.sectionLink);
+      if (target) obs.observe(target);
+    });
+  }
+
+  function bindEvents(){
+    dom.themeToggle?.addEventListener("click", () => setTheme(dom.root.dataset.theme === "dark" ? "light" : "dark"));
+    dom.sidebarToggle?.addEventListener("click", () => setCollapsed(!dom.shell.classList.contains("collapsed")));
+    dom.mobileNavToggle?.addEventListener("click", () => dom.shell.classList.toggle("open"));
+    dom.mobileMenuButton?.addEventListener("click", () => dom.shell.classList.add("open"));
+    dom.modalClose?.addEventListener("click", closeModal);
+    dom.overlay?.addEventListener("click", (e) => { if (e.target === dom.overlay) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !dom.overlay.hidden) closeModal(); });
+    dom.appsSearch?.addEventListener("input", applyAppFilters);
+    dom.appsStatus?.addEventListener("change", applyAppFilters);
+    dom.appsSort?.addEventListener("change", applyAppFilters);
+    dom.scholarshipsSearch?.addEventListener("input", applyScholarshipFilters);
+    dom.scholarshipsStatus?.addEventListener("change", applyScholarshipFilters);
+    dom.scholarshipsSort?.addEventListener("change", applyScholarshipFilters);
+
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-action],[data-clear],[data-modal-cancel]");
+      if (!el) return;
+      if (el.matches("[data-modal-cancel]")) { closeModal(); return; }
+      if (el.dataset.clear) {
+        if (el.dataset.clear === "applications") { dom.appsSearch.value = ""; dom.appsStatus.value = "all"; dom.appsSort.value = "newest"; applyAppFilters(); }
+        else { dom.scholarshipsSearch.value = ""; dom.scholarshipsStatus.value = "all"; dom.scholarshipsSort.value = "soonest"; applyScholarshipFilters(); }
+        return;
+      }
+      if (el.dataset.action === "create") { openScholarshipForm("create"); return; }
+      if (el.dataset.action === "refresh") {
+        setLoading(el, true, "Refreshing...");
+        sync(true).then(() => toast("info", "Dashboard refreshed", "The latest dashboard snapshot has been loaded.")).finally(() => setLoading(el, false));
+        return;
+      }
+      if (el.dataset.action === "approve") {
+        const row = el.closest("tr"), prev = row.dataset.status;
+        setLoading(el, true, "Approving...");
+        post(el.dataset.url).then(async () => {
+          setAppStatus(row, "approved");
+          if (prev !== "approved") statDelta("approved-applications", 1);
+          toast("success", "Application approved", "The application status was updated to approved.");
+          applyAppFilters();
+          await sync(false);
+        }).catch(() => toast("error", "Update failed", "The application status could not be changed.")).finally(() => setLoading(el, false));
+        return;
+      }
+      if (el.dataset.action === "reject") {
+        confirmModal("Reject application", "Rejecting this application updates the decision immediately. You can still change it later if needed.", "Reject application", "danger", async () => {
+          const row = el.closest("tr"), prev = row.dataset.status;
+          await post(el.dataset.url);
+          setAppStatus(row, "rejected");
+          if (prev === "approved") statDelta("approved-applications", -1);
+          toast("success", "Application rejected", "The application status was updated to rejected.");
+          applyAppFilters();
+          await sync(false);
+        });
+        return;
+      }
+      if (el.dataset.action === "edit") { openScholarshipForm("edit", el.closest("tr")); return; }
+      if (el.dataset.action === "toggle") {
+        const row = el.closest("tr"), active = row.dataset.active === "true";
+        const run = async () => {
+          setLoading(el, true, active ? "Deactivating..." : "Activating...");
+          try {
+            await post(el.dataset.url, { next: window.location.pathname });
+            setScholarshipStatus(row, !active);
+            toast("success", active ? "Deactivate scholarship" : "Activate scholarship", active ? "The scholarship is now inactive." : "The scholarship is now active.");
+            applyScholarshipFilters();
+            await sync(false);
+          } catch {
+            toast("error", "Action failed", "The scholarship status could not be changed.");
+          } finally {
+            setLoading(el, false);
+          }
+        };
+        if (active) confirmModal("Deactivate scholarship", "Deactivated scholarships stop appearing as active listings. You can reactivate this later.", "Deactivate", "warning", run);
+        else run();
+        return;
+      }
+      if (el.dataset.action === "delete") {
+        confirmModal("Delete scholarship", "This will remove the scholarship listing from the system. Continue only if you are sure this listing should no longer exist.", "Delete scholarship", "danger", async () => {
+          const row = el.closest("tr");
+          await post(el.dataset.url);
+          row?.remove();
+          statDelta("total-scholarships", -1);
+          applyScholarshipFilters();
+          toast("success", "Scholarship deleted", "The scholarship was removed successfully.");
+          await sync(false);
+        });
+      }
+    });
+    $$("[data-section-link]").forEach((link) => link.addEventListener("click", () => { if (window.innerWidth < 992) dom.shell.classList.remove("open"); }));
+  }
+
+  initTheme();
+  initSidebar();
+  initNav();
+  applyAppFilters();
+  applyScholarshipFilters();
+  renderCharts();
+  bindEvents();
+})();
+</script>
+</body>
+</html>

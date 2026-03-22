@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scholarship Command Center</title>
+<script>
+  (function () {
+    try {
+      var savedTheme = localStorage.getItem("student-dashboard-theme");
+      var systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = savedTheme || (systemDark ? "dark" : "light");
+    } catch (e) {
+      document.documentElement.dataset.theme = "light";
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'css/student-dashboard.css' %}">
+</head>
+<body class="student-page">
+<div class="student-shell" id="studentShell">
+  <aside class="student-sidebar" id="studentSidebar">
+    <div class="student-sidebar__top sidebar-top">
+      <a href="{% url 'student_dashboard' %}" class="student-brand" aria-label="ScholarHub dashboard">
+        <span class="student-brand__mark"><i class="bi bi-stars"></i></span>
+        <span class="student-brand__copy">
+          <strong>ScholarHub</strong>
+          <small>Student Command Center</small>
+        </span>
+      </a>
+
+      <nav class="nav-list" aria-label="Student navigation">
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Overview</p>
+            <span class="nav-meta">Live</span>
+          </div>
+          <div class="nav-stack">
+            <a href="#overview" class="nav-link" data-section-link="overview">
+              <span class="nav-ico"><i class="bi bi-grid-1x2"></i></span>
+              <span class="nav-copy"><strong>Overview</strong></span>
+            </a>
+            <a href="#recommended-panel" class="nav-link" data-section-link="recommended-panel">
+              <span class="nav-ico"><i class="bi bi-stars"></i></span>
+              <span class="nav-copy"><strong>AI Matches</strong></span>
+            </a>
+            <a href="#discover" class="nav-link" data-section-link="discover">
+              <span class="nav-ico"><i class="bi bi-search"></i></span>
+              <span class="nav-copy"><strong>Discover</strong></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Tracking</p>
+            <span class="nav-meta">Focus</span>
+          </div>
+          <div class="nav-stack">
+            <a href="{% url 'my_applications' %}" class="nav-link" data-route-link>
+              <span class="nav-ico"><i class="bi bi-journal-check"></i></span>
+              <span class="nav-copy"><strong>My Applications</strong></span>
+            </a>
+            <a href="#signals-panel" class="nav-link" data-section-link="signals-panel">
+              <span class="nav-ico"><i class="bi bi-bell"></i></span>
+              <span class="nav-copy"><strong>Updates</strong></span>
+            </a>
+            <a href="#saved" class="nav-link" data-section-link="saved">
+              <span class="nav-ico"><i class="bi bi-bookmark-heart"></i></span>
+              <span class="nav-copy"><strong>Shortlist</strong></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Support</p>
+            <span class="nav-meta">Help</span>
+          </div>
+          <div class="nav-stack">
+            <a href="{% url 'contact' %}" class="nav-link" data-route-link>
+              <span class="nav-ico"><i class="bi bi-envelope-paper"></i></span>
+              <span class="nav-copy"><strong>Contact</strong></span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="student-sidebar__footer sidebar-footer">
+      <button type="button" class="sidebar-action" data-theme-toggle aria-label="Toggle theme" aria-pressed="false">
+        <i class="bi bi-moon-stars"></i>
+        <span>Dark mode</span>
+      </button>
+
+      <form method="post" action="{% url 'logout' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="sidebar-action sidebar-action--ghost w-100">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <button type="button" class="sidebar-overlay" id="sidebarOverlay" aria-label="Close sidebar" hidden></button>
+
+  <main class="student-main">
+    <header class="student-topbar">
+      <div class="topbar-start">
+        <button type="button" class="mobile-nav-toggle" id="sidebarOpen" aria-label="Open menu">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="topbar-copy">
+          <span class="topbar-kicker">Today</span>
+          <strong>Scholarship dashboard</strong>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="{% url 'my_applications' %}" class="topbar-link">
+          <i class="bi bi-journal-richtext"></i>
+          <span>View Applications</span>
+        </a>
+
+        <button type="button" class="topbar-action" data-theme-toggle aria-label="Toggle theme" aria-pressed="false">
+          <i class="bi bi-moon-stars"></i>
+          <span>Dark mode</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="student-main__inner">
+      <section class="hero-grid" id="overview">
+        <article class="hero-card hero-card--primary">
+          <span class="section-label">Scholarship Command Center</span>
+          <h1>
+            Welcome back,
+            {% if request.user.first_name %}
+              {{ request.user.first_name }}
+            {% else %}
+              {{ request.user.username }}
+            {% endif %}
+            <span aria-hidden="true">&#128075;</span>
+          </h1>
+          <p>Here are the best opportunities for you today, along with the next actions that move you closer to a strong application pipeline.</p>
+
+          <div class="hero-signals">
+            <span class="hero-chip"><i class="bi bi-stars"></i>{{ recommended_cards|length }} AI picks ready now</span>
+            <span class="hero-chip"><i class="bi bi-bell"></i>{{ unread_notifications }} unread updates</span>
+            <span class="hero-chip"><i class="bi bi-bookmark-check"></i><span id="heroSavedCount">0</span> saved</span>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#discover" class="action-btn action-btn--primary">
+              <i class="bi bi-search"></i>
+              <span>Explore Catalog</span>
+            </a>
+            <a href="{% url 'my_applications' %}" class="action-btn action-btn--secondary">
+              <i class="bi bi-journal-check"></i>
+              <span>My Applications</span>
+            </a>
+          </div>
+
+          {% if profile and profile.preferred_country or profile and profile.preferred_level or profile and profile.course %}
+            <div class="profile-context">
+              <strong>Personalized from your profile</strong>
+              <div class="profile-context__chips">
+                {% if profile.preferred_country %}<span>{{ profile.preferred_country }}</span>{% endif %}
+                {% if profile.preferred_level %}<span>{{ profile.preferred_level }}</span>{% endif %}
+                {% if profile.course %}<span>{{ profile.course }}</span>{% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="profile-context">
+              <strong>Tip</strong>
+              <p>Complete your profile to unlock sharper AI recommendations and better-fit scholarships.</p>
+            </div>
+          {% endif %}
+        </article>
+
+        <article class="hero-card hero-card--assistant">
+          <div class="hero-card__head">
+            <div>
+              <span class="section-label section-label--soft">AI Brief</span>
+              <h2>Focus today</h2>
+            </div>
+            <span class="soft-badge">{{ approval_rate }}% success rate</span>
+          </div>
+
+          <div class="brief-metrics">
+            <div class="brief-metric">
+              <strong>{{ unread_notifications }}</strong>
+              <span>Signals waiting</span>
+            </div>
+            <div class="brief-metric">
+              <strong>
+                {% if next_deadline_days is not None %}
+                  {{ next_deadline_days }}d
+                {% else %}
+                  Live
+                {% endif %}
+              </strong>
+              <span>Next deadline</span>
+            </div>
+            <div class="brief-metric">
+              <strong>{{ journey_percent }}%</strong>
+              <span>Journey progress</span>
+            </div>
+          </div>
+
+          <div class="journey-track" aria-hidden="true">
+            <span style="width: {{ journey_percent }}%"></span>
+          </div>
+
+          <ul class="focus-list">
+            <li>
+              <i class="bi bi-lightning-charge"></i>
+              <span>
+                {% if recommended_cards %}
+                  {{ recommended_cards.0.ai_reason }}
+                {% else %}
+                  Fresh recommendations will appear here as new scholarships open.
+                {% endif %}
+              </span>
+            </li>
+            <li>
+              <i class="bi bi-calendar2-check"></i>
+              <span>
+                {% if next_deadline %}
+                  {{ next_deadline.title }} is your nearest open opportunity.
+                {% else %}
+                  Rolling deadlines are currently the best place to start.
+                {% endif %}
+              </span>
+            </li>
+            <li>
+              <i class="bi bi-graph-up-arrow"></i>
+              <span>{{ approved_this_month }} approvals captured in the last 30 days.</span>
+            </li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="insight-grid" id="progress">
+        <article class="insight-card">
+          <div class="insight-card__icon insight-card__icon--primary"><i class="bi bi-compass"></i></div>
+          <div class="insight-card__body">
+            <span class="insight-card__eyebrow">Open Opportunities</span>
+            <strong class="counter-value" data-end="{{ total_scholarships|default:0 }}">0</strong>
+            <span class="delta positive">+{{ new_scholarships_week }} this week</span>
+            <p>Fresh scholarships added to your active search pool.</p>
+          </div>
+        </article>
+
+        <article class="insight-card">
+          <div class="insight-card__icon insight-card__icon--accent"><i class="bi bi-send-check"></i></div>
+          <div class="insight-card__body">
+            <span class="insight-card__eyebrow">Applications Sent</span>
+            <strong class="counter-value" data-end="{{ applied_count|default:0 }}">0</strong>
+            <span class="delta positive">+{{ applied_this_week }} this week</span>
+            <p>Momentum in your application pipeline over the last seven days.</p>
+          </div>
+        </article>
+
+        <article class="insight-card">
+          <div class="insight-card__icon insight-card__icon--warning"><i class="bi bi-hourglass-split"></i></div>
+          <div class="insight-card__body">
+            <span class="insight-card__eyebrow">Awaiting Review</span>
+            <strong class="counter-value" data-end="{{ pending_count|default:0 }}">0</strong>
+            <span class="delta neutral">{{ pending_count }} currently in review</span>
+            <p>These applications are active and worth monitoring closely.</p>
+          </div>
+        </article>
+
+        <article class="insight-card">
+          <div class="insight-card__icon insight-card__icon--success"><i class="bi bi-patch-check"></i></div>
+          <div class="insight-card__body">
+            <span class="insight-card__eyebrow">Approved</span>
+            <strong class="counter-value" data-end="{{ approved_count|default:0 }}">0</strong>
+            <span class="delta positive">{{ approval_rate }}% overall success rate</span>
+            <p>Proof that your shortlist strategy is converting into wins.</p>
+          </div>
+        </article>
+      </section>
+
+      <section class="showcase-panel showcase-panel--ai" id="recommended-panel">
+        <div class="section-head">
+          <div>
+            <span class="section-label">AI Recommended</span>
+            <h2>Best matches for you right now</h2>
+            <p>These are prioritized using your profile, your current activity, and scholarship fit signals.</p>
+          </div>
+          <span class="soft-badge">{{ recommended_cards|length }} curated picks</span>
+        </div>
+
+        {% if recommended_cards %}
+          <div class="scholarship-grid scholarship-grid--featured">
+            {% for item in recommended_cards %}
+              {% include "includes/student_scholarship_card.html" with item=item section="recommended" %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="section-empty">
+            <span class="section-empty__icon"><i class="bi bi-stars"></i></span>
+            <h3>No AI recommendations yet</h3>
+            <p>As soon as new scholarships align with your profile and activity, we will surface them here first.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="showcase-panel showcase-panel--catalog catalog-workspace" id="discover">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Discover</span>
+            <h2>Search the right scholarships faster</h2>
+            <p>Use the smart filters to scan a cleaner catalog and move quickly from browsing to action.</p>
+          </div>
+          <div class="catalog-head-actions">
+            <span class="soft-badge">Live catalog</span>
+            <button type="button" class="mini-action" id="clearFilters">
+              <i class="bi bi-arrow-counterclockwise"></i>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="catalog-toolbar">
+          <div class="filters-shell">
+            <label class="search-field" for="scholarshipSearch">
+              <i class="bi bi-search"></i>
+              <input id="scholarshipSearch" type="search" placeholder="Search by title, university, country, or category">
+            </label>
+
+            <div class="filter-grid">
+              <label class="filter-control">
+                <span>Country</span>
+                <select id="countryFilter">
+                  <option value="">All countries</option>
+                  {% for country in country_options %}
+                    <option value="{{ country|lower }}">{{ country }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+
+              <label class="filter-control">
+                <span>Degree</span>
+                <select id="degreeFilter">
+                  <option value="">All levels</option>
+                  {% for level in level_options %}
+                    <option value="{{ level|lower }}">{{ level }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+
+              <label class="filter-control">
+                <span>Funding</span>
+                <select id="fundingFilter">
+                  <option value="">Any funding</option>
+                  {% for funding in funding_options %}
+                    <option value="{{ funding|lower }}">{{ funding }}</option>
+                  {% endfor %}
+                </select>
+              </label>
+            </div>
+
+            {% if quick_filters %}
+              <div class="chip-row" aria-label="Quick filters">
+                {% for chip in quick_filters %}
+                  <button
+                    type="button"
+                    class="filter-chip"
+                    data-filter-chip
+                    data-filter-type="{{ chip.type }}"
+                    data-filter-value="{{ chip.value|lower }}"
+                  >
+                    <i class="bi {{ chip.icon }}"></i>
+                    <span>{{ chip.label }}</span>
+                  </button>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <div class="results-bar">
+              <strong id="catalogResultsCount">Showing {{ discover_cards|length }} scholarships</strong>
+              <span>Results update instantly as you type or refine the filters.</span>
+            </div>
+          </div>
+        </div>
+
+        {% if discover_cards %}
+          <div class="scholarship-grid scholarship-grid--catalog" id="discoverGrid">
+            {% for item in discover_cards %}
+              {% include "includes/student_scholarship_card.html" with item=item section="catalog" %}
+            {% endfor %}
+          </div>
+          <div class="section-empty" id="catalogEmpty" hidden>
+            <span class="section-empty__icon"><i class="bi bi-search-heart"></i></span>
+            <h3>No scholarships match these filters</h3>
+            <p>Try widening the country, funding, or degree filters to reveal more opportunities.</p>
+          </div>
+        {% else %}
+          <div class="section-empty">
+            <span class="section-empty__icon"><i class="bi bi-compass"></i></span>
+            <h3>No scholarships available right now</h3>
+            <p>New opportunities will appear here as soon as they are published.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="utility-panel utility-panel--timeline" id="applications-panel">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Application Radar</span>
+            <h2>Your latest moves</h2>
+            <p>Keep the applications you have already submitted in a cleaner follow-up view.</p>
+          </div>
+          <a href="{% url 'my_applications' %}" class="mini-link">Open page</a>
+        </div>
+
+        {% if applications %}
+          <div class="timeline-list">
+            {% for application in applications %}
+              <article class="timeline-item">
+                <div class="timeline-item__icon"><i class="bi bi-send"></i></div>
+                <div class="timeline-item__body">
+                  <strong>{{ application.scholarship.title }}</strong>
+                  <span>{{ application.date_applied|date:"M j, Y" }}</span>
+                </div>
+                <span class="status-pill status-pill--{{ application.status|lower }}">{{ application.status }}</span>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="panel-empty">
+            <i class="bi bi-journal-plus"></i>
+            <p>You have not applied yet. Start with one strong match from the AI section above.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="utility-panel utility-panel--signals" id="signals-panel">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Signals</span>
+            <h2>Recent notifications</h2>
+            <p>Deadline reminders, saved updates, and recommendation signals appear here first.</p>
+          </div>
+          <span class="soft-badge">{{ unread_notifications }} unread</span>
+        </div>
+
+        <div class="utility-frame utility-frame--signals">
+          {% if recent_notifications %}
+            <div class="notification-list">
+              {% for notification in recent_notifications %}
+                <a
+                  href="{% if notification.url %}{{ notification.url }}{% else %}#{% endif %}"
+                  class="notification-item {% if not notification.is_read %}notification-item--new{% endif %}"
+                >
+                  <span class="notification-item__icon"><i class="bi bi-bell"></i></span>
+                  <span class="notification-item__copy">
+                    <strong>{{ notification.title }}</strong>
+                    <small>{{ notification.created_at|timesince }} ago</small>
+                    {% if notification.message %}<em>{{ notification.message|truncatewords:14 }}</em>{% endif %}
+                  </span>
+                </a>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="panel-empty">
+              <i class="bi bi-bell-slash"></i>
+              <p>No fresh alerts yet. We will surface deadline reminders and recommendation updates here.</p>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <section class="utility-panel utility-panel--saved" id="saved">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Saved</span>
+            <h2>Your shortlist</h2>
+            <p>Keep your strongest opportunities together so you can return and act faster later.</p>
+          </div>
+          <div class="saved-panel__actions">
+            <span class="soft-badge" id="savedCount">0 saved</span>
+            <button type="button" class="mini-action" id="clearSaved">
+              <i class="bi bi-x-circle"></i>
+              <span>Clear</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="utility-frame utility-frame--saved">
+          <div class="saved-skeletons" id="savedSkeleton">
+            <div class="skeleton-card"></div>
+            <div class="skeleton-card"></div>
+          </div>
+
+          <div class="section-empty section-empty--compact" id="savedEmpty" hidden>
+            <span class="section-empty__icon"><i class="bi bi-bookmark-heart"></i></span>
+            <h3>No saved scholarships yet</h3>
+            <p>Save strong opportunities to build a shortlist you can return to later.</p>
+          </div>
+
+          <div class="saved-grid" id="savedList"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+<script src="{% static 'js/student-dashboard.js' %}"></script>
+</body>
+</html>

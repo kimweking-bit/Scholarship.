@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register</title>
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+            keyframes: {
+              'gradient-x': {
+                '0%, 100%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' }
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-12px)' }
+              },
+              'fade-up': {
+                '0%': { opacity: 0, transform: 'translateY(18px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' }
+              },
+              'pulse-soft': {
+                '0%, 100%': { opacity: 0.65 },
+                '50%': { opacity: 1 }
+              }
+            },
+            animation: {
+              'gradient-x': 'gradient-x 9s ease infinite',
+              float: 'float 12s ease-in-out infinite',
+              'fade-up': 'fade-up 0.9s ease-out both',
+              'pulse-soft': 'pulse-soft 7s ease-in-out infinite'
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+      .glass-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 18px 50px rgba(99, 102, 241, 0.12);
+        transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+      }
+      .glass-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 24px 70px rgba(76, 29, 149, 0.16);
+        border-color: rgba(129, 140, 248, 0.5);
+      }
+      .floating-input:focus + label,
+      .floating-input:not(:placeholder-shown) + label {
+        transform: translateY(-12px) scale(0.9);
+        color: #7c3aed;
+        opacity: 0.95;
+      }
+      .floating-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.18);
+        border-color: rgba(124, 58, 237, 0.55);
+      }
+      .floating-input {
+        transition: box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white text-slate-900 relative overflow-hidden">
+    <!-- Navbar (exactly as about.html) -->
+    <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <div class="h-9 w-9 rounded-2xl bg-white/20 shadow-lg flex items-center justify-center text-white font-bold group-hover:bg-white/30 transition">SC</div>
+            <span class="text-lg font-semibold text-white group-hover:text-white transition">Scholar Connect</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-5 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+            </div>
+            <div class="flex items-center gap-4">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+          <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+            <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+            <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+            <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+            <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+            <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+            {% if request.user.is_authenticated %}
+              {% if request.user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% else %}
+                <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% endif %}
+              <form method="post" action="{% url 'logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+              <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Soft background accents -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden">
+      <div class="absolute -top-24 -left-24 w-72 h-72 bg-indigo-200/50 blur-3xl rounded-full"></div>
+      <div class="absolute -bottom-32 right-[-6rem] w-96 h-96 bg-purple-200/50 blur-3xl rounded-full"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(99,102,241,0.08),transparent_40%),radial-gradient(circle_at_80%_10%,rgba(168,85,247,0.08),transparent_38%)]"></div>
+    </div>
+
+    <!-- Main -->
+    <main class="flex-1 relative px-4 pt-24 pb-6 flex items-center justify-center">
+      <div class="mx-auto max-w-6xl grid lg:grid-cols-2 gap-10 items-center w-full">
+        <!-- Info column -->
+        <div class="space-y-4 animate-fade-up">
+          <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">ScholarDash</p>
+          <h2 class="text-3xl font-semibold text-slate-900">Create your account</h2>
+          <p class="text-slate-600 max-w-xl">Unlock tailored scholarship matches, save your progress, and manage applications in one place.</p>
+          <ul class="space-y-2 text-slate-700">
+            <li class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-indigo-500"></span> Personalized scholarship recommendations.</li>
+            <li class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-indigo-500"></span> Deadline alerts and status tracking.</li>
+            <li class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-indigo-500"></span> Secure profile and document storage.</li>
+          </ul>
+          <div class="relative h-48 w-full max-w-md overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-100 via-purple-100 to-white shadow-xl">
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(79,70,229,0.25),transparent_35%),radial-gradient(circle_at_80%_0%,rgba(168,85,247,0.25),transparent_30%)] animate-float"></div>
+            <div class="absolute inset-6 rounded-2xl border border-indigo-200/70 bg-white/70 backdrop-blur flex items-center justify-center text-indigo-700 font-semibold">
+              Join thousands finding funding.
+            </div>
+          </div>
+        </div>
+
+        <!-- Form -->
+        <div class="glass-card rounded-2xl p-8 md:p-10 animate-fade-up w-full">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <p class="text-sm uppercase tracking-[0.2em] text-indigo-500">Join us</p>
+              <h1 class="text-3xl font-semibold text-slate-900 mt-1">Create account</h1>
+            </div>
+            <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500/90 via-purple-500 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/40 animate-float">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" d="M16 11V7a4 4 0 1 0-8 0v4m-2 0h12m-9 4h6" />
+              </svg>
+            </div>
+          </div>
+          <p class="text-slate-600 mb-6">Set up your credentials to access the scholarship dashboard.</p>
+
+          {% if form.errors %}
+            <div class="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 shadow-inner animate-fade-up" style="animation-delay: 0.05s;">
+              Please fix the errors below and try again.
+            </div>
+          {% endif %}
+
+          <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div class="relative">
+              <span class="pointer-events-none absolute left-4 top-3.5 text-slate-400 transition duration-200 peer-focus:text-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M12 12c2.485 0 4.5-2.015 4.5-4.5S14.485 3 12 3 7.5 5.015 7.5 7.5 9.515 12 12 12Zm0 0c-3.59 0-6.5 2.91-6.5 6.5V19a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-.5c0-3.59-2.91-6.5-6.5-6.5Z" />
+                </svg>
+              </span>
+              <input
+                class="floating-input peer w-full rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-transparent py-3 pl-12 pr-4 focus:bg-white"
+                type="text"
+                name="username"
+                id="id_username"
+                placeholder="Username"
+                maxlength="150"
+                autocapitalize="none"
+                autocomplete="username"
+                required
+                value="{{ form.username.value|default:'' }}"
+              />
+              <label class="pointer-events-none absolute left-12 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Username
+              </label>
+              {% if form.username.errors %}
+                <div class="mt-2 text-sm text-red-500">{{ form.username.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <div class="relative">
+              <span class="pointer-events-none absolute left-4 top-3.5 text-slate-400 transition duration-200 peer-focus:text-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M16.5 10.5V8a4.5 4.5 0 1 0-9 0v2.5M7.5 10.5h9a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18v-6a1.5 1.5 0 0 1 1.5-1.5Z" />
+                </svg>
+              </span>
+              <input
+                class="floating-input peer w-full rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-transparent py-3 pl-12 pr-4 focus:bg-white"
+                type="password"
+                name="password1"
+                id="id_password1"
+                placeholder="Password"
+                autocomplete="new-password"
+                required
+              />
+              <label class="pointer-events-none absolute left-12 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Password
+              </label>
+              {% if form.password1.errors %}
+                <div class="mt-2 text-sm text-red-500">{{ form.password1.errors|striptags }}</div>
+              {% endif %}
+              {% if form.password1.help_text %}
+                <div class="mt-2 text-xs text-slate-500 leading-relaxed">{{ form.password1.help_text|safe }}</div>
+              {% endif %}
+            </div>
+
+            <div class="relative">
+              <span class="pointer-events-none absolute left-4 top-3.5 text-slate-400 transition duration-200 peer-focus:text-indigo-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M9 10.5a3 3 0 1 1 6 0M7.5 10.5h9A1.5 1.5 0 0 1 18 12v6a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 18v-6a1.5 1.5 0 0 1 1.5-1.5Z" />
+                </svg>
+              </span>
+              <input
+                class="floating-input peer w-full rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-transparent py-3 pl-12 pr-4 focus:bg-white"
+                type="password"
+                name="password2"
+                id="id_password2"
+                placeholder="Confirm password"
+                autocomplete="new-password"
+                required
+              />
+              <label class="pointer-events-none absolute left-12 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Confirm password
+              </label>
+              {% if form.password2.errors %}
+                <div class="mt-2 text-sm text-red-500">{{ form.password2.errors|striptags }}</div>
+              {% endif %}
+            </div>
+
+            <button
+              type="submit"
+              class="w-full h-12 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/35 transition duration-200 hover:-translate-y-0.5 hover:shadow-indigo-500/55 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 animate-gradient-x"
+            >
+              Create account
+            </button>
+
+            <div class="mt-2 flex items-center justify-between text-sm text-slate-500">
+              <span class="flex items-center gap-2">
+                <span class="inline-block h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+                Secure signup enabled
+              </span>
+              <a class="text-indigo-600 hover:text-indigo-800 transition-colors" href="{% url 'login' %}">Already registered? Login</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // Mobile menu toggle
+      const toggle = document.getElementById('nav-toggle');
+      const mobile = document.getElementById('mobile-menu');
+      if (toggle && mobile) {
+        toggle.addEventListener('click', () => mobile.classList.toggle('hidden'));
+      }
+
+      // Optional subtle parallax on the glass card
+      const card = document.querySelector('.glass-card');
+      const reset = () => {
+        card.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      };
+      if (card) {
+        card.addEventListener('mousemove', (e) => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          const rotateX = (-y / rect.height) * 6;
+          const rotateY = (x / rect.width) * 6;
+          card.style.transform = `translateY(-4px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+        card.addEventListener('mouseleave', reset);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,956 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scholarships</title>
+    <!-- Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+            keyframes: {
+              'fade-up': {
+                '0%': { opacity: 0, transform: 'translateY(14px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' }
+              },
+              'gradient-x': {
+                '0%, 100%': { backgroundPosition: '0% 50%' },
+                '50%': { backgroundPosition: '100% 50%' }
+              }
+            },
+            animation: {
+              'fade-up': 'fade-up 0.75s ease-out both',
+              'gradient-x': 'gradient-x 8s ease infinite'
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+      }
+      .card-surface {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 14px 40px rgba(15, 23, 42, 0.12);
+        transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+      }
+      .card-surface:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.16);
+        border-color: rgba(99, 102, 241, 0.3);
+      }
+      .navbar-blur {
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      }
+      .floating-input:focus + label,
+      .floating-input:not(:placeholder-shown) + label {
+        transform: translateY(-10px) scale(0.9);
+        color: #6366f1;
+        opacity: 0.95;
+      }
+      .floating-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+        border-color: rgba(99, 102, 241, 0.6);
+      }
+      .floating-input {
+        transition: box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+      }
+      .skeleton {
+        background: linear-gradient(90deg, rgba(226, 232, 240, 0.5) 25%, rgba(203, 213, 225, 0.8) 37%, rgba(226, 232, 240, 0.5) 63%);
+        background-size: 400% 100%;
+        animation: shimmer 1.4s ease infinite;
+      }
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      /* Shared purple accents */
+      section h2, section h3 { position: relative; display: inline-block; }
+      section h2::after, section h3::after { content: ""; display: block; width: 56px; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); margin-top: 10px; border-radius: 9999px; }
+      .card-soft, .card-surface, .glass-card { position: relative; overflow: hidden; }
+      .card-soft::before, .card-surface::before, .glass-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 9999px; opacity: 0.9; }
+      .bg-gradient-to-r { box-shadow: 0 12px 30px rgba(99,102,241,0.20); transition: transform 150ms ease, box-shadow 150ms ease; }
+      .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white text-slate-900 relative overflow-x-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(99,102,241,0.08),transparent_32%),radial-gradient(circle_at_82%_10%,rgba(168,85,247,0.08),transparent_30%),linear-gradient(135deg,#eef2ff,#f8fafc_60%,#ffffff)]"></div>
+      <div class="absolute inset-0 bg-[linear-gradient(120deg,rgba(15,23,42,0.05)_1px,transparent_1px)] bg-[size:34px_34px] opacity-35"></div>
+    </div>
+
+    <!-- Navbar (reused from about.html) -->
+    <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <div class="h-9 w-9 rounded-2xl bg-white/20 shadow-lg flex items-center justify-center text-white font-bold group-hover:bg-white/30 transition">SC</div>
+            <span class="text-lg font-semibold text-white group-hover:text-white transition">Scholar Connect</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-4 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+            </div>
+            <div class="flex items-center gap-3">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+        <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+          <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+          <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+          <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+          <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+          <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff %}
+              <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% else %}
+              <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+            <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="relative flex-1 pt-28 pb-16">
+      <!-- Hero -->
+      <section class="mx-auto max-w-6xl px-4 animate-fade-up">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div class="max-w-2xl space-y-3">
+            <p class="text-xs uppercase tracking-[0.25em] text-slate-500">Scholarships</p>
+            <h1 class="text-4xl sm:text-5xl font-semibold text-slate-900 leading-tight">Browse and Apply for Scholarships</h1>
+            <p class="text-slate-600 text-base sm:text-lg">
+              Find opportunities by country, level, category, or deadline—tailored for students looking to make the next big move.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <form method="get" action="{% url 'scholarships' %}" class="flex-1 flex gap-2">
+                <div class="relative flex-1">
+                  <input
+                    class="floating-input w-full rounded-xl bg-white border border-slate-200 text-slate-900 placeholder-transparent py-3 pl-11 pr-4 focus:bg-white"
+                    type="search"
+                    name="q"
+                    id="hero-search"
+                    placeholder="Search scholarships..."
+                    value="{{ q|default:'' }}"
+                  />
+                  <label class="pointer-events-none absolute left-11 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                    Search scholarships...
+                  </label>
+                  <span class="pointer-events-none absolute left-4 top-3.5 text-slate-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5a6 6 0 1 0 0 12 6 6 0 0 0 0-12Zm8 14-3.5-3.5" />
+                    </svg>
+                  </span>
+                </div>
+                <button
+                  class="h-12 px-5 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/30 transition hover:-translate-y-0.5 hover:shadow-indigo-500/50 animate-gradient-x"
+                  type="submit"
+                >
+                  Search
+                </button>
+              </form>
+              <a
+                class="h-12 px-5 inline-flex items-center justify-center rounded-xl border border-slate-200 text-slate-800 bg-white hover:bg-slate-50 transition"
+                href="{% url 'scholarships' %}"
+              >
+                Browse All
+              </a>
+            </div>
+          </div>
+          <div class="card-surface rounded-2xl p-5 w-full max-w-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 flex items-center justify-center text-white font-semibold shadow-lg shadow-indigo-500/30">∞</div>
+              <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-500">Quick stats</p>
+                <p class="text-lg font-semibold text-slate-900">Opportunities updated weekly</p>
+              </div>
+            </div>
+            <ul class="space-y-2 text-sm text-slate-600">
+              <li>• Filter by country, level, category, deadline</li>
+              <li>• Smart image fallbacks keep cards fresh</li>
+              <li>• Responsive, student-friendly grid</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Filters (sticky) -->
+      <section class="mx-auto max-w-6xl px-4 mt-8 animate-fade-up" style="animation-delay:0.05s;">
+        <div class="rounded-2xl bg-white text-slate-900 shadow-xl border border-slate-200 p-6">
+          <form method="get" action="{% url 'scholarships' %}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="relative">
+              <input
+                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-transparent py-3 px-4 focus:bg-white"
+                type="text"
+                name="country"
+                id="country"
+                placeholder="Country"
+                value="{{ country|default:'' }}"
+              />
+              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Country
+              </label>
+            </div>
+
+            <div class="relative">
+              <select
+                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 py-3 px-4 focus:bg-white"
+                name="level"
+                id="level"
+              >
+                <option value="" class="bg-white text-slate-900">All levels</option>
+                {% for value,label in level_options %}
+                  <option value="{{ value }}" {% if level == value %}selected{% endif %} class="bg-white text-slate-900">{{ label }}</option>
+                {% endfor %}
+              </select>
+              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Level
+              </label>
+            </div>
+
+            <div class="relative">
+              <select
+                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 py-3 px-4 focus:bg-white"
+                name="category"
+                id="category"
+              >
+                <option value="" class="bg-white text-slate-900">All categories</option>
+                {% for value,label in category_options %}
+                  <option value="{{ value }}" {% if category == value %}selected{% endif %} class="bg-white text-slate-900">{{ label }}</option>
+                {% endfor %}
+              </select>
+              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Category
+              </label>
+            </div>
+
+            <div class="relative">
+              <input
+                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-transparent py-3 px-4 focus:bg-white"
+                type="date"
+                name="deadline_before"
+                id="deadline_before"
+                value="{{ deadline_before|default:'' }}"
+              />
+              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
+                Deadline on/before
+              </label>
+            </div>
+
+            <div class="md:col-span-2 lg:col-span-4 flex gap-3">
+              <button
+                class="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/35 transition duration-200 hover:-translate-y-0.5 hover:shadow-indigo-500/55 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 animate-gradient-x"
+                type="submit"
+              >
+                Apply Filters
+              </button>
+              <a
+                class="h-12 px-4 inline-flex items-center justify-center rounded-xl border border-slate-200 text-slate-800 bg-white hover:bg-slate-50 transition"
+                href="{% url 'scholarships' %}"
+              >
+                Reset
+              </a>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Featured Scholarships Carousel -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.2em] text-indigo-500">Highlights</p>
+            <h2 class="text-2xl font-semibold text-slate-900">Top 5 scholarships this month</h2>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" id="feat-prev" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow hover:bg-slate-50">‹</button>
+            <button type="button" id="feat-next" class="h-10 w-10 rounded-full bg-white border border-slate-200 shadow hover:bg-slate-50">›</button>
+          </div>
+        </div>
+        <div id="feat-track" class="flex gap-4 overflow-x-auto scroll-smooth pb-2">
+          {% if featured_scholarships %}
+            {% for fs in featured_scholarships|slice:":5" %}
+              <article class="card-surface min-w-[260px] max-w-[280px] rounded-2xl overflow-hidden flex-shrink-0">
+                <div class="relative h-40 overflow-hidden">
+                  {% if fs.image %}
+                    <img src="{{ fs.image.url }}" alt="{{ fs.title }}" class="w-full h-full object-cover">
+                  {% else %}
+                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="{{ fs.title }}" class="w-full h-full object-cover">
+                  {% endif %}
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/35 to-transparent"></div>
+                  <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold bg-white/85 text-slate-900 shadow">{{ fs.organization|default:"TBA" }}</div>
+                </div>
+                <div class="p-4 space-y-2">
+                  <h3 class="text-lg font-semibold text-slate-900 line-clamp-2">{{ fs.title }}</h3>
+                  <p class="text-sm text-slate-600 line-clamp-2">{{ fs.description|default:"Explore this featured opportunity."|truncatewords:22 }}</p>
+                  <div class="flex justify-between items-center text-xs text-slate-500">
+                    <span>{{ fs.country|default:"Global" }}</span>
+                    {% if fs.deadline %}<span class="font-semibold text-indigo-600">Deadline: {{ fs.deadline }}</span>{% endif %}
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          {% elif scholarships %}
+            {% for fs in scholarships|slice:":5" %}
+          <article class="card-surface min-w-[260px] max-w-[280px] rounded-2xl overflow-hidden flex-shrink-0">
+            <div class="relative h-40 overflow-hidden">
+              {% if fs.image %}
+                <img src="{{ fs.image.url }}" alt="{{ fs.title }}" class="w-full h-full object-cover">
+              {% else %}
+                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="{{ fs.title }}" class="w-full h-full object-cover">
+              {% endif %}
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/35 to-transparent"></div>
+              <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold bg-white/85 text-slate-900 shadow">{{ fs.organization|default:"TBA" }}</div>
+            </div>
+            <div class="p-4 space-y-2">
+              <h3 class="text-lg font-semibold text-slate-900 line-clamp-2">{{ fs.title }}</h3>
+              <p class="text-sm text-slate-600 line-clamp-2">{{ fs.description|default:"Explore this featured opportunity."|truncatewords:22 }}</p>
+              <div class="flex justify-between items-center text-xs text-slate-500">
+                <span>{{ fs.country|default:"Global" }}</span>
+                {% if fs.deadline %}<span class="font-semibold text-indigo-600">Deadline: {{ fs.deadline }}</span>{% endif %}
+              </div>
+            </div>
+          </article>
+            {% endfor %}
+          {% else %}
+            <p class="text-sm text-slate-600">No featured scholarships yet.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Category Quick Links -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-3 animate-fade-up">
+        <p class="text-xs uppercase tracking-[0.2em] text-indigo-500">Quick filters</p>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <button type="button" data-quick-cat="undergraduate" class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">Undergraduate</button>
+          <button type="button" data-quick-cat="postgraduate"  class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">Postgraduate</button>
+          <button type="button" data-quick-cat="masters"       class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">Masters</button>
+          <button type="button" data-quick-cat="phd"            class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">PhD</button>
+          <button type="button" data-quick-cat="fellowship"     class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">Fellowship</button>
+          <button type="button" data-quick-cat="grant"          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 transition shadow-sm">Grant</button>
+        </div>
+      </section>
+
+      <!-- Upcoming Deadlines -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-slate-900">Upcoming deadlines</h2>
+          <span class="text-sm text-slate-500">Soonest first</span>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {% if upcoming_deadlines %}
+            {% for up in upcoming_deadlines|slice:":6" %}
+            <div class="card-surface rounded-2xl p-4 flex items-start gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center font-semibold shadow">
+                {{ up.deadline|default:"?"|date:"d" }}
+              </div>
+              <div class="space-y-1">
+                <p class="text-sm uppercase tracking-wide text-slate-500">{{ up.deadline|date:"M Y"|default:"TBA" }}</p>
+                <h3 class="text-base font-semibold text-slate-900 line-clamp-2">{{ up.title }}</h3>
+                <p class="text-sm text-slate-600 line-clamp-2">{{ up.organization|default:"TBA" }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          {% elif scholarships %}
+            {% for up in scholarships|slice:":6" %}
+            <div class="card-surface rounded-2xl p-4 flex items-start gap-3">
+              <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center font-semibold shadow">
+                {{ up.deadline|default:"?"|date:"d" }}
+              </div>
+              <div class="space-y-1">
+                <p class="text-sm uppercase tracking-wide text-slate-500">{{ up.deadline|date:"M Y"|default:"TBA" }}</p>
+                <h3 class="text-base font-semibold text-slate-900 line-clamp-2">{{ up.title }}</h3>
+                <p class="text-sm text-slate-600 line-clamp-2">{{ up.organization|default:"TBA" }}</p>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <p class="text-sm text-slate-600">No upcoming deadlines listed.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Student Testimonials -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-slate-900">Student success stories</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {% if testimonials %}
+            {% for t in testimonials %}
+              <article class="card-surface rounded-2xl p-5 space-y-3">
+                <p class="text-sm text-slate-700 italic leading-relaxed">“{{ t.quote }}”</p>
+                <div class="flex items-center gap-3">
+                  <div class="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center font-semibold">
+                    {{ t.name|first|default:"S" }}
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-slate-900">{{ t.name }}</p>
+                    <p class="text-xs text-slate-500">{{ t.country|default:"Global" }}</p>
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          {% else %}
+            <p class="text-sm text-slate-600">Testimonials coming soon.</p>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Mini Dashboard / Stats -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">At a glance</p>
+            <h2 class="text-2xl font-semibold text-slate-900">Scholarship insights</h2>
+          </div>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm">Live data</span>
+        </div>
+        <div class="grid gap-4 lg:grid-cols-3">
+          <div class="card-surface rounded-2xl p-4 border-t-4 border-t-indigo-400">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-800">Top Countries</h3>
+              <span class="text-xs text-slate-500">Distribution</span>
+            </div>
+            <canvas id="chartCountry" height="160" aria-label="Scholarships per country" role="img"></canvas>
+            <div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-600">
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-indigo-500"></span>Kenya</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-purple-500"></span>USA</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-violet-500"></span>UK</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-sky-400"></span>Canada</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-rose-400"></span>Germany</span>
+            </div>
+          </div>
+          <div class="card-surface rounded-2xl p-4 border-t-4 border-t-purple-400">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-800">By Level</h3>
+              <span class="text-xs text-slate-500">Mix</span>
+            </div>
+            <canvas id="chartLevel" height="160" aria-label="Scholarships by level" role="img"></canvas>
+            <div class="mt-3 grid grid-cols-2 gap-2 text-xs text-slate-600">
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-indigo-500"></span>Undergrad</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-purple-500"></span>Masters</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-violet-500"></span>PhD</span>
+              <span class="flex items-center gap-2"><span class="h-3 w-3 rounded-full bg-cyan-400"></span>Fellowship</span>
+            </div>
+          </div>
+          <div class="card-surface rounded-2xl p-4 border-t-4 border-t-emerald-400 flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-slate-800">Status</h3>
+              <span class="text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">Realtime</span>
+            </div>
+            <canvas id="chartStatus" height="120" aria-label="Active vs expired scholarships" role="img"></canvas>
+            <div class="grid grid-cols-2 gap-2 text-xs text-slate-600">
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-emerald-500"></span> Active
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="h-3 w-3 rounded-full bg-rose-500"></span> Expired
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up" id="faq">
+        <h2 class="text-2xl font-semibold text-slate-900">FAQ</h2>
+        <div class="space-y-3">
+          {% if faq_items %}
+            {% for q in faq_items %}
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>{{ q }}</span>
+                <span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">
+                We provide step-by-step guidance inside each scholarship detail page. Use your dashboard to manage submissions and reminders.
+              </p>
+            </details>
+            {% endfor %}
+          {% else %}
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>How do I apply?</span><span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">Browse matches, open a scholarship detail page, and follow the application instructions.</p>
+            </details>
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>How do I track my application?</span><span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">Use your dashboard to monitor status, deadlines, and reminders.</p>
+            </details>
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>What documents are needed?</span><span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">Common items include transcripts, recommendation letters, ID, and statements of purpose.</p>
+            </details>
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>Can I save favorites?</span><span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">Yes—bookmark scholarships in your dashboard to revisit later.</p>
+            </details>
+            <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow">
+              <summary class="cursor-pointer text-sm font-semibold text-slate-900 flex items-center justify-between">
+                <span>Do I get deadline reminders?</span><span class="text-slate-500">+</span>
+              </summary>
+              <p class="mt-2 text-sm text-slate-600">Enable notifications in your profile to get reminder emails ahead of deadlines.</p>
+            </details>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- Blog / Tips -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-4 animate-fade-up">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-semibold text-slate-900">Tips & Articles</h2>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {% for article in articles %}
+          <article class="card-surface rounded-2xl p-5 space-y-2">
+            <p class="text-xs uppercase tracking-wide text-indigo-500">{{ article.tag|default:"Guide" }}</p>
+            <h3 class="text-lg font-semibold text-slate-900 line-clamp-2">{{ article.title|default:"How to write a winning scholarship essay" }}</h3>
+            <p class="text-sm text-slate-600 line-clamp-3">{{ article.excerpt|default:"Actionable tips to help you stand out when applying." }}</p>
+            <a href="{{ article.url|default:'#' }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold inline-flex items-center gap-1">
+              Read more <span aria-hidden="true">→</span>
+            </a>
+          </article>
+          {% empty %}
+          <article class="card-surface rounded-2xl p-5 space-y-2">
+            <p class="text-xs uppercase tracking-wide text-indigo-500">Guide</p>
+            <h3 class="text-lg font-semibold text-slate-900">How to write a winning scholarship essay</h3>
+            <p class="text-sm text-slate-600">Actionable tips to help you stand out when applying.</p>
+            <a href="https://www.scholarships.com/financial-aid/college-scholarships/scholarship-application-strategies/essay-tips/" target="_blank" rel="noopener" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold inline-flex items-center gap-1">Read more →</a>
+          </article>
+          <article class="card-surface rounded-2xl p-5 space-y-2">
+            <p class="text-xs uppercase tracking-wide text-indigo-500">Checklist</p>
+            <h3 class="text-lg font-semibold text-slate-900">Scholarship application checklist</h3>
+            <p class="text-sm text-slate-600">Documents, deadlines, and reviewer expectations in one list.</p>
+            <a href="https://thescholarshipwhizz.org/the-scholarship-application-checklist-everything-you-need-to-succeed/" target="_blank" rel="noopener" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold inline-flex items-center gap-1">Read more →</a>
+          </article>
+          <article class="card-surface rounded-2xl p-5 space-y-2">
+            <p class="text-xs uppercase tracking-wide text-indigo-500">Strategy</p>
+            <h3 class="text-lg font-semibold text-slate-900">Stand out with recommendation letters</h3>
+            <p class="text-sm text-slate-600">How to brief referees and pick the right stories.</p>
+            <a href="https://www.indeed.com/career-advice/career-development/recommendation-letter-for-scholarship" target="_blank" rel="noopener" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold inline-flex items-center gap-1">Read more →</a>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Cards -->
+      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-8">
+        {% if scholarships %}
+          {# Scholarship cards grid #}
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {% for scholarship in scholarships %}
+              <article
+                class="card-surface rounded-2xl overflow-hidden flex flex-col animate-fade-up hover:-translate-y-1 hover:shadow-2xl transition"
+                style="animation-delay: {{ forloop.counter0|add:'0' }}0ms;"
+                data-card-category="{{ scholarship.category|default:'general' }}"
+              >
+                {# Image with overlay; fallback image injected by JS if missing #}
+                <div class="relative h-48 overflow-hidden group">
+                  {% if scholarship.image %}
+                    <img
+                      src="{{ scholarship.image.url }}"
+                      alt="{{ scholarship.title }}"
+                      class="w-full h-full object-cover transition duration-500 ease-out group-hover:scale-105"
+                      data-card-image
+                    />
+                  {% else %}
+                    <img
+                      src=""
+                      alt="{{ scholarship.title }}"
+                      class="w-full h-full object-cover transition duration-500 ease-out group-hover:scale-105"
+                      data-card-image
+                      data-use-fallback="true"
+                    />
+                  {% endif %}
+                  <div class="absolute inset-0 bg-gradient-to-t from-slate-900/75 via-slate-900/45 to-transparent"></div>
+
+                  {# Badges top-left: country and category #}
+                  <div class="absolute top-4 left-4 flex flex-wrap gap-2">
+                    <span class="rounded-full px-3 py-1 text-xs font-medium text-emerald-800 bg-emerald-100 border border-emerald-200">
+                      {% if scholarship.country %}{{ scholarship.country }}{% else %}Global{% endif %}
+                    </span>
+                    {% if scholarship.category %}
+                      <span class="rounded-full px-3 py-1 text-xs font-medium text-indigo-800 bg-indigo-100 border border-indigo-200">
+                        {{ scholarship.get_category_display }}
+                      </span>
+                    {% endif %}
+                  </div>
+
+                  {# Deadline pill bottom-right #}
+                  {% if scholarship.deadline %}
+                    <div class="absolute bottom-3 right-3 rounded-full px-3 py-1 text-xs font-semibold text-slate-900 bg-white/95 border border-slate-200 shadow">
+                      Deadline: {{ scholarship.deadline }}
+                    </div>
+                  {% endif %}
+                </div>
+
+                {# Body #}
+                <div class="p-5 flex flex-col gap-3">
+                  <div>
+                    <h3 class="text-lg font-semibold text-slate-900">{{ scholarship.title }}</h3>
+                    <p class="text-sm text-slate-600">
+                      {% if scholarship.organization %}{{ scholarship.organization }}{% else %}TBA{% endif %}
+                    </p>
+                  </div>
+
+                  {# Quick facts row #}
+                  <div class="grid grid-cols-2 gap-3 text-sm text-slate-700">
+                    <div>
+                      <span class="text-slate-500 block text-xs uppercase tracking-wide">Amount</span>
+                      {% if scholarship.amount_display %}
+                        {{ scholarship.amount_display }}
+                      {% elif scholarship.amount %}
+                        {{ scholarship.amount }}
+                      {% else %}
+                        TBA
+                      {% endif %}
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block text-xs uppercase tracking-wide">Level</span>
+                      {% if scholarship.level %}
+                        {{ scholarship.get_level_display|default:scholarship.level }}
+                      {% else %}
+                        TBA
+                      {% endif %}
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block text-xs uppercase tracking-wide">Region</span>
+                      {% if scholarship.country %}{{ scholarship.country }}{% else %}Global{% endif %}
+                    </div>
+                    <div>
+                      <span class="text-slate-500 block text-xs uppercase tracking-wide">Category</span>
+                      {% if scholarship.category %}{{ scholarship.get_category_display }}{% else %}TBA{% endif %}
+                    </div>
+                  </div>
+
+                  {# Short description #}
+                  {% if scholarship.description %}
+                    <p class="text-sm text-slate-600 line-clamp-2">
+                      {{ scholarship.description|truncatewords:28 }}
+                    </p>
+                  {% endif %}
+
+                  {# Actions #}
+                  <div class="mt-auto flex gap-2">
+                    {% if request.user.is_authenticated %}
+                      <a
+                        href="{% url 'apply_scholarship' scholarship.id %}"
+                        class="flex-1 h-11 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/35 transition duration-200 hover:-translate-y-0.5 hover:shadow-indigo-500/55 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 animate-gradient-x"
+                      >
+                        Apply
+                      </a>
+                    {% else %}
+                      <a
+                        href="{% url 'login' %}?next={% url 'apply_scholarship' scholarship.id %}"
+                        class="flex-1 h-11 inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/35 transition duration-200 hover:-translate-y-0.5 hover:shadow-indigo-500/55 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 animate-gradient-x"
+                      >
+                        Apply
+                      </a>
+                    {% endif %}
+                  </div>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card-surface rounded-2xl p-6 text-slate-100 animate-fade-up">
+            No scholarships found{% if q %} for <strong class="font-semibold text-white">{{ q }}</strong>{% endif %}.
+          </div>
+        {% endif %}
+
+        {# Pagination: modern, responsive, preserves filters/search #}
+        {% if scholarships.has_other_pages %}
+          <div class="mt-8 bg-indigo-50 border border-indigo-100 rounded-xl p-4 shadow-lg shadow-indigo-500/20">
+            <div class="flex flex-wrap items-center justify-center gap-2 overflow-x-auto">
+              {# Prev button (only when a previous page exists) #}
+              {% if scholarships.has_previous %}
+                <a
+                  href="?page={{ scholarships.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                  class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white text-sm font-medium hover:from-indigo-500 hover:to-purple-500 transition shadow-sm"
+                >
+                  <span class="text-xs">‹</span> Prev
+                </a>
+              {% endif %}
+
+              {# Page numbers: show current ±2 (max 5 total), always using Page object #}
+              {% for num in scholarships.paginator.page_range %}
+                {% if num >= scholarships.number|add:'-2' and num <= scholarships.number|add:'2' %}
+                  {% if num == scholarships.number %}
+                    <span class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white text-sm font-semibold shadow-sm border border-indigo-200">
+                      {{ num }}
+                    </span>
+                  {% else %}
+                    <a
+                      href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                      class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white text-indigo-800 text-sm hover:bg-indigo-50 transition border border-indigo-100"
+                    >
+                      {{ num }}
+                    </a>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+
+              {# Next button (only when a next page exists) #}
+              {% if scholarships.has_next %}
+                <a
+                  href="?page={{ scholarships.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                  class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white text-sm font-medium hover:from-indigo-500 hover:to-purple-500 transition shadow-sm"
+                >
+                  Next <span class="text-xs">›</span>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <!-- Tips -->
+        <div class="grid gap-4 md:grid-cols-3 animate-fade-up" style="animation-delay:0.08s;">
+          <div class="card-surface rounded-xl p-4">
+            <p class="text-sm text-slate-500">Pro tip</p>
+            <p class="text-lg font-semibold text-slate-900 mt-1">Use multiple filters</p>
+            <p class="text-sm text-slate-600 mt-1">Combine country + deadline to see the most relevant opportunities first.</p>
+          </div>
+          <div class="card-surface rounded-xl p-4">
+            <p class="text-sm text-slate-500">Stay ahead</p>
+            <p class="text-lg font-semibold text-slate-900 mt-1">Set reminders</p>
+            <p class="text-sm text-slate-600 mt-1">Deadlines creep up—apply early and keep documents handy.</p>
+          </div>
+          <div class="card-surface rounded-xl p-4">
+            <p class="text-sm text-slate-500">Need guidance?</p>
+            <p class="text-lg font-semibold text-slate-900 mt-1">Visit resources</p>
+            <p class="text-sm text-slate-600 mt-1">Check FAQs or reach out to your advisor for shortlisting help.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Reusable Footer from about.html -->
+    <footer class="bg-slate-900 text-slate-200 pt-12 pb-8">
+      <div class="mx-auto max-w-6xl px-4 grid gap-10 md:grid-cols-4">
+        <div>
+          <h3 class="text-xl font-semibold text-white">ScholarDash</h3>
+          <p class="mt-3 text-sm text-slate-400">Helping students access global education opportunities.</p>
+          <div class="flex items-center gap-3 mt-4 text-slate-300">
+            <a class="hover:text-white transition" href="#">LinkedIn</a>
+            <a class="hover:text-white transition" href="#">Twitter</a>
+            <a class="hover:text-white transition" href="#">YouTube</a>
+          </div>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">Quick Links</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a class="hover:text-white transition" href="{% url 'home' %}">Home</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'scholarships' %}">Scholarships</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'services' %}">Services</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'contact' %}">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">Contact</h4>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li>Email: support@scholardash.com</li>
+            <li>Phone: +1 (555) 123-4567</li>
+            <li>Nairobi · Remote-first</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-semibold text-white mb-3">Newsletter</h4>
+          <form class="flex flex-col gap-3">
+            <input type="email" placeholder="you@example.com" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+            <button type="submit" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
+        © 2026 ScholarDash. All rights reserved.
+      </div>
+    </footer>
+
+    <!-- Skeleton loader (hidden once DOM ready) -->
+    <div id="skeleton-layer" class="fixed inset-0 z-40 bg-white flex items-center justify-center">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl w-full px-6">
+        <div class="h-60 rounded-xl skeleton"></div>
+        <div class="h-60 rounded-xl skeleton"></div>
+        <div class="h-60 rounded-xl skeleton"></div>
+      </div>
+    </div>
+
+    <script>
+      // Chart.js + carousel + quick filters
+      // (charts use sample data; replace with real stats in context)
+      // Mobile menu toggle
+      const toggle = document.getElementById('nav-toggle');
+      const mobile = document.getElementById('mobile-menu');
+      if (toggle && mobile) toggle.addEventListener('click', () => mobile.classList.toggle('hidden'));
+
+      // Featured carousel buttons
+      const featTrack = document.getElementById('feat-track');
+      document.getElementById('feat-prev')?.addEventListener('click', () => featTrack?.scrollBy({ left: -280, behavior: 'smooth' }));
+      document.getElementById('feat-next')?.addEventListener('click', () => featTrack?.scrollBy({ left: 280, behavior: 'smooth' }));
+
+      // Quick category buttons -> set select + scroll to cards
+      const catSelect = document.getElementById('category');
+      const cardsAnchor = document.querySelector('[data-card-category]')?.closest('section');
+      document.querySelectorAll('[data-quick-cat]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (catSelect) catSelect.value = btn.dataset.quickCat;
+          if (cardsAnchor) cardsAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      // Navbar blur/shadow on scroll
+      const navbar = document.getElementById('navbar');
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 8) {
+          navbar.classList.add('backdrop-blur', 'bg-white/80', 'shadow-lg', 'border-b', 'border-slate-200');
+        } else {
+          navbar.classList.remove('backdrop-blur', 'bg-white/80', 'shadow-lg', 'border-b', 'border-slate-200');
+        }
+      });
+
+      // Hide skeleton once content is ready (with fallbacks)
+      (() => {
+        const hideSkeleton = () => {
+          const skeleton = document.getElementById('skeleton-layer');
+          if (!skeleton) return;
+          skeleton.classList.add('opacity-0', 'pointer-events-none', 'transition', 'duration-500');
+          setTimeout(() => skeleton?.remove(), 600);
+        };
+        document.addEventListener('DOMContentLoaded', hideSkeleton);
+        window.addEventListener('load', hideSkeleton);
+        // Fallback timeout in case load events don't fire
+        setTimeout(hideSkeleton, 1800);
+      })();
+
+      // Category-based rotating fallback images
+      const imagePools = {
+        undergraduate: [
+          'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80'
+        ],
+        postgraduate: [
+          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80'
+        ],
+        masters: [
+          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1509099836639-18ba02e2e1ba?auto=format&fit=crop&w=1400&q=80'
+        ],
+        phd: [
+          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+        ],
+        fellowship: [
+          'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+        ],
+        grant: [
+          'https://images.unsplash.com/photo-1509099836639-18ba02e2e1ba?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80'
+        ],
+        scholarship: [
+          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80'
+        ],
+        default: [
+          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80',
+          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+        ]
+      };
+
+      document.querySelectorAll('[data-card-category]').forEach((card) => {
+        const cat = (card.dataset.cardCategory || 'default').toLowerCase();
+        const pool = imagePools[cat] || imagePools.default;
+        const chosen = pool[Math.floor(Math.random() * pool.length)];
+        const img = card.querySelector('[data-card-image]');
+        if (img && (img.dataset.useFallback === 'true' || !img.getAttribute('src'))) {
+          img.src = chosen;
+        }
+      });
+
+      // Simple charts (sample data)
+      const makeChart = (id, type, labels, data, colors) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        new Chart(el, {
+          type,
+          data: { labels, datasets: [{ data, backgroundColor: colors, borderWidth: 0 }] },
+          options: { plugins: { legend: { display: false } }, scales: type === 'bar' ? { y: { beginAtZero: true } } : {} }
+        });
+      };
+      makeChart('chartCountry', 'bar', ['Kenya','USA','UK','Canada','Germany'], [12,18,9,7,5],
+        ['#6366f1','#a855f7','#8b5cf6','#38bdf8','#fb7185']);
+      makeChart('chartLevel', 'doughnut', ['Undergrad','Masters','PhD','Fellowship'], [35,25,18,12],
+        ['#6366f1','#a855f7','#8b5cf6','#22d3ee']);
+      makeChart('chartStatus', 'doughnut', ['Active','Expired'], [78,22],
+        ['#22c55e','#e11d48']);
+    </script>
+  </body>
+</html>

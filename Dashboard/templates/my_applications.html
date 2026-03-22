@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Applications</title>
+<script>
+  (function () {
+    try {
+      var savedTheme = localStorage.getItem("student-dashboard-theme");
+      var systemDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.dataset.theme = savedTheme || (systemDark ? "dark" : "light");
+    } catch (e) {
+      document.documentElement.dataset.theme = "light";
+    }
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'css/student-dashboard.css' %}">
+</head>
+<body class="student-page">
+<div class="student-shell" id="studentShell">
+  <aside class="student-sidebar" id="studentSidebar">
+    <div class="student-sidebar__top sidebar-top">
+      <a href="{% url 'student_dashboard' %}" class="student-brand" aria-label="ScholarHub dashboard">
+        <span class="student-brand__mark"><i class="bi bi-stars"></i></span>
+        <span class="student-brand__copy">
+          <strong>ScholarHub</strong>
+          <small>Student Command Center</small>
+        </span>
+      </a>
+
+      <nav class="nav-list" aria-label="Student navigation">
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Overview</p>
+            <span class="nav-meta">Live</span>
+          </div>
+          <div class="nav-stack">
+            <a href="{% url 'student_dashboard' %}" class="nav-link" data-route-link>
+              <span class="nav-ico"><i class="bi bi-grid-1x2"></i></span>
+              <span class="nav-copy"><strong>Dashboard</strong></span>
+            </a>
+            <a href="{% url 'student_dashboard' %}#recommended-panel" class="nav-link">
+              <span class="nav-ico"><i class="bi bi-stars"></i></span>
+              <span class="nav-copy"><strong>AI Matches</strong></span>
+            </a>
+            <a href="{% url 'student_dashboard' %}#discover" class="nav-link">
+              <span class="nav-ico"><i class="bi bi-search"></i></span>
+              <span class="nav-copy"><strong>Discover</strong></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Tracking</p>
+            <span class="nav-meta">Focus</span>
+          </div>
+          <div class="nav-stack">
+            <a href="{% url 'my_applications' %}" class="nav-link is-active" data-route-link>
+              <span class="nav-ico"><i class="bi bi-journal-check"></i></span>
+              <span class="nav-copy"><strong>My Applications</strong></span>
+            </a>
+            <a href="{% url 'student_dashboard' %}#signals-panel" class="nav-link">
+              <span class="nav-ico"><i class="bi bi-bell"></i></span>
+              <span class="nav-copy"><strong>Updates</strong></span>
+            </a>
+            <a href="{% url 'student_dashboard' %}#saved" class="nav-link">
+              <span class="nav-ico"><i class="bi bi-bookmark-heart"></i></span>
+              <span class="nav-copy"><strong>Shortlist</strong></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="nav-group">
+          <div class="nav-group-head">
+            <p class="nav-head">Support</p>
+            <span class="nav-meta">Help</span>
+          </div>
+          <div class="nav-stack">
+            <a href="{% url 'contact' %}" class="nav-link" data-route-link>
+              <span class="nav-ico"><i class="bi bi-envelope-paper"></i></span>
+              <span class="nav-copy"><strong>Contact</strong></span>
+            </a>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <div class="student-sidebar__footer sidebar-footer">
+      <button type="button" class="sidebar-action" data-theme-toggle aria-label="Toggle theme" aria-pressed="false">
+        <i class="bi bi-moon-stars"></i>
+        <span>Dark mode</span>
+      </button>
+
+      <form method="post" action="{% url 'logout' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="sidebar-action sidebar-action--ghost w-100">
+          <i class="bi bi-box-arrow-right"></i>
+          <span>Logout</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <button type="button" class="sidebar-overlay" id="sidebarOverlay" aria-label="Close sidebar" hidden></button>
+
+  <main class="student-main">
+    <header class="student-topbar">
+      <div class="topbar-start">
+        <button type="button" class="mobile-nav-toggle" id="sidebarOpen" aria-label="Open menu">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <div class="topbar-copy">
+          <span class="topbar-kicker">Tracking</span>
+          <strong>My applications</strong>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <a href="{% url 'student_dashboard' %}" class="topbar-link">
+          <i class="bi bi-arrow-left-circle"></i>
+          <span>Back to Dashboard</span>
+        </a>
+
+        <button type="button" class="topbar-action" data-theme-toggle aria-label="Toggle theme" aria-pressed="false">
+          <i class="bi bi-moon-stars"></i>
+          <span>Dark mode</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="student-main__inner student-main__inner--applications">
+      <section class="hero-grid hero-grid--single">
+        <article class="hero-card hero-card--primary">
+          <span class="section-label">Application Tracker</span>
+          <h1>Keep every submission organized</h1>
+          <p>Review statuses, revisit scholarship details, and jump back into discovery whenever you are ready for your next application.</p>
+
+          <div class="hero-signals">
+            <span class="hero-chip"><i class="bi bi-journal-check"></i>{{ applications|length }} submitted</span>
+            <span class="hero-chip"><i class="bi bi-stars"></i>Linked with your dashboard</span>
+          </div>
+
+          <div class="hero-actions">
+            <a href="{% url 'student_dashboard' %}#discover" class="action-btn action-btn--primary">
+              <i class="bi bi-search"></i>
+              <span>Discover More</span>
+            </a>
+            <a href="{% url 'student_dashboard' %}#saved" class="action-btn action-btn--secondary">
+              <i class="bi bi-bookmark-heart"></i>
+              <span>Open Shortlist</span>
+            </a>
+          </div>
+        </article>
+      </section>
+
+      <section class="showcase-panel applications-page-panel">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Applications</span>
+            <h2>All scholarship submissions</h2>
+            <p>Everything you have already applied for, in one clean and easy-to-scan view.</p>
+          </div>
+          <a href="{% url 'student_dashboard' %}#discover" class="mini-link">Find more scholarships</a>
+        </div>
+
+        {% if applications %}
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Scholarship</th>
+                  <th>Organization</th>
+                  <th>Status</th>
+                  <th>Applied</th>
+                  <th class="text-end">Next Move</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for application in applications %}
+                  <tr>
+                    <td>
+                      <div class="table-primary">
+                        <strong>{{ application.scholarship.title }}</strong>
+                        <span class="table-meta">
+                          {% if application.scholarship.country %}{{ application.scholarship.country }}{% else %}Global opportunity{% endif %}
+                        </span>
+                      </div>
+                    </td>
+                    <td class="table-meta">
+                      {% if application.scholarship.organization %}
+                        {{ application.scholarship.organization }}
+                      {% elif application.scholarship.university %}
+                        {{ application.scholarship.university }}
+                      {% else %}
+                        -
+                      {% endif %}
+                    </td>
+                    <td>
+                      <span class="status-pill status-pill--{{ application.status|lower }}">{{ application.status }}</span>
+                    </td>
+                    <td class="table-meta">
+                      {% if application.date_applied %}{{ application.date_applied|date:"d M Y" }}{% else %}-{% endif %}
+                    </td>
+                    <td class="table-actions-cell">
+                      <a href="{% url 'student_dashboard' %}#discover" class="mini-link">Find similar</a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="section-empty">
+            <span class="section-empty__icon"><i class="bi bi-journal-plus"></i></span>
+            <h3>No applications yet</h3>
+            <p>Your submitted scholarships will appear here as soon as you start applying.</p>
+            <div class="hero-actions">
+              <a href="{% url 'student_dashboard' %}#recommended-panel" class="action-btn action-btn--primary">
+                <i class="bi bi-stars"></i>
+                <span>Browse AI Matches</span>
+              </a>
+              <a href="{% url 'student_dashboard' %}#discover" class="action-btn action-btn--secondary">
+                <i class="bi bi-search"></i>
+                <span>Explore Catalog</span>
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  </main>
+</div>
+
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+<script src="{% static 'js/student-dashboard.js' %}"></script>
+</body>
+</html>

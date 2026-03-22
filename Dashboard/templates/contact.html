@@ -1,0 +1,440 @@
+<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact | ScholarDash</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+            colors: { brand: '#6366f1', brand2: '#8b5cf6' },
+            boxShadow: { glow: '0 20px 50px rgba(99,102,241,0.22)' },
+            keyframes: {
+              'fade-up': { '0%': { opacity: 0, transform: 'translateY(14px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } }
+            },
+            animation: { 'fade-up': 'fade-up 0.7s ease-out both' }
+          }
+        }
+      };
+    </script>
+    <style>
+      .glass-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 18px 50px rgba(99, 102, 241, 0.12);
+        transition: transform 200ms ease, box-shadow 200ms ease, border-color 200ms ease;
+      }
+      .glass-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 22px 60px rgba(76, 29, 149, 0.14);
+        border-color: rgba(129, 140, 248, 0.45);
+      }
+      .floating-input:focus + label,
+      .floating-input:not(:placeholder-shown) + label {
+        transform: translateY(-12px) scale(0.9);
+        color: #6366f1;
+        opacity: 0.95;
+      }
+      .floating-input:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.16);
+        border-color: rgba(99, 102, 241, 0.55);
+      }
+      .floating-input {
+        transition: box-shadow 160ms ease, border-color 160ms ease, background-color 160ms ease;
+      }
+      /* Shared purple accents */
+      section h2, section h3 { position: relative; display: inline-block; }
+      section h2::after, section h3::after { content: ""; display: block; width: 56px; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); margin-top: 10px; border-radius: 9999px; }
+      .card-soft, .card-surface, .glass-card { position: relative; overflow: hidden; }
+      .card-soft::before, .card-surface::before, .glass-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 9999px; opacity: 0.9; }
+      .bg-gradient-to-r { box-shadow: 0 12px 30px rgba(99,102,241,0.20); transition: transform 150ms ease, box-shadow 150ms ease; }
+      .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
+    <!-- Navbar (exactly as about.html) -->
+    <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <div class="h-9 w-9 rounded-2xl bg-white/20 shadow-lg flex items-center justify-center text-white font-bold group-hover:bg-white/30 transition">SC</div>
+            <span class="text-lg font-semibold text-white group-hover:text-white transition">Scholar Connect</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-5 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+            </div>
+            <div class="flex items-center gap-4">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+          <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+            <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+            <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+            <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+            <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+            <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+            {% if request.user.is_authenticated %}
+              {% if request.user.is_staff %}
+                <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% else %}
+                <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              {% endif %}
+              <form method="post" action="{% url 'logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+              </form>
+            {% else %}
+              <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+              <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </nav>
+
+
+    <main class="flex-1 pt-16">
+      <!-- Hero -->
+      <section class="relative overflow-hidden bg-gradient-to-b from-slate-50 via-white to-white">
+        <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(99,102,241,0.08),transparent_30%),radial-gradient(circle_at_78%_10%,rgba(139,92,246,0.06),transparent_34%)]"></div>
+        <div class="max-w-6xl mx-auto px-4 py-16 lg:py-20 relative">
+          <div class="grid lg:grid-cols-2 gap-10 items-center">
+            <div class="space-y-4 animate-fade-up">
+              <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">Contact us</p>
+              <h1 class="text-4xl lg:text-5xl font-bold leading-tight text-slate-900">We’re here to help you get funded</h1>
+              <p class="text-lg text-slate-600 max-w-2xl">Questions about scholarships, deadlines, or your dashboard? Reach out and we’ll respond within 24 hours.</p>
+              <div class="flex flex-wrap gap-3">
+                <a href="#contact-form" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg hover:-translate-y-0.5 hover:shadow-xl transition">Talk to support</a>
+                <a href="{% url 'scholarships' %}" class="px-5 py-3 rounded-xl border border-slate-300 text-slate-800 font-semibold hover:bg-slate-100 transition">Browse scholarships</a>
+              </div>
+              <div class="flex flex-wrap gap-4 text-sm text-slate-500">
+                <span>3,400+ scholarships</span>
+                <span>82 countries</span>
+                <span>Verified only</span>
+                <span>18,000+ students helped</span>
+              </div>
+            </div>
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 space-y-4 animate-fade-up" style="animation-delay:0.05s">
+              <div class="flex items-start gap-3">
+                <div class="h-10 w-10 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center shadow">ℹ️</div>
+                <div>
+                  <p class="text-xs uppercase tracking-wide text-indigo-600 mb-1">Contact info</p>
+                  <h3 class="text-xl font-semibold text-slate-900">Reach us anytime</h3>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3 text-sm text-slate-700">
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600">Email</p>
+                  <p class="font-semibold text-slate-900">support@scholarhub.com</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600">Phone</p>
+                  <p class="font-semibold text-slate-900">+1 (555) 123-4567</p>
+                </div>
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 col-span-2">
+                  <p class="text-xs uppercase tracking-wide text-indigo-600">Hours</p>
+                  <p class="font-semibold text-slate-900">Mon–Fri 8am-6pm · Sat 9am-2pm · Sun Closed</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact + Form -->
+      <section class="max-w-6xl mx-auto px-4 py-14 grid lg:grid-cols-3 gap-8">
+        <div class="p-6 rounded-3xl glass-card h-fit space-y-4" data-animate>
+          <div class="flex items-center gap-3">
+            <div class="h-11 w-11 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center shadow">🤝</div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-purple-500">Get in touch</p>
+              <h3 class="text-2xl font-semibold text-slate-900 leading-tight">Talk to a real person</h3>
+            </div>
+          </div>
+          <p class="text-slate-600">Ask about eligibility, documents, timelines, or platform help. We reply fast.</p>
+          <div class="space-y-3 text-slate-700 text-sm">
+            <div class="flex gap-3 items-start">
+              <span class="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">📍</span>
+              <div>
+                <p class="font-semibold mb-0">Nairobi, Kenya · Remote-first</p>
+                <p class="text-slate-500 mb-0">Serving students worldwide</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span class="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">✉️</span>
+              <div>
+                <p class="font-semibold mb-0">support@scholarhub.com</p>
+                <p class="text-slate-500 mb-0">We respond within 24 hours</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span class="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shadow-sm">📞</span>
+              <div>
+                <p class="font-semibold mb-0">+1 (555) 123-4567</p>
+                <p class="text-slate-500 mb-0">Mon–Fri business hours</p>
+              </div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-2 pt-2">
+            <span class="px-3 py-2 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-100 text-xs font-semibold">Response in &lt;24h</span>
+            <span class="px-3 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-semibold">Student-first support</span>
+          </div>
+        </div>
+        <div class="lg:col-span-2">
+          <div class="p-6 rounded-3xl glass-card" id="contact-form" data-animate>
+            <h3 class="text-xl font-semibold text-slate-900 mb-1">Send us a message</h3>
+            <p class="text-sm text-slate-600 mb-4">All fields are required.</p>
+
+            {% if success %}
+              <div class="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700 flex items-center gap-2">
+                ✅ <span>Your message was sent successfully!</span>
+              </div>
+            {% endif %}
+            {% if error %}
+              <div class="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 flex items-center gap-2">
+                ⚠️ <span>Please fill in your name, email, subject, and message.</span>
+              </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'contact' %}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {% csrf_token %}
+              <div class="relative">
+                <span class="pointer-events-none absolute left-3 top-3.5 text-slate-400">👤</span>
+                <input type="text" name="name" id="name" placeholder=" " value="{{ name|default:'' }}" required class="floating-input peer w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-3 text-slate-900 placeholder-transparent">
+                <label for="name" class="pointer-events-none absolute left-10 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">Your Name</label>
+              </div>
+              <div class="relative">
+                <span class="pointer-events-none absolute left-3 top-3.5 text-slate-400">✉️</span>
+                <input type="email" name="email" id="email" placeholder=" " value="{{ email|default:'' }}" required class="floating-input peer w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-3 text-slate-900 placeholder-transparent">
+                <label for="email" class="pointer-events-none absolute left-10 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">Your Email</label>
+              </div>
+              <div class="md:col-span-2 relative">
+                <span class="pointer-events-none absolute left-3 top-3.5 text-slate-400">📝</span>
+                <input type="text" name="subject" id="subject" placeholder=" " value="{{ subject|default:'' }}" required class="floating-input peer w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-3 text-slate-900 placeholder-transparent">
+                <label for="subject" class="pointer-events-none absolute left-10 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">Subject</label>
+              </div>
+              <div class="md:col-span-2 relative">
+                <span class="pointer-events-none absolute left-3 top-9 text-slate-400">💬</span>
+                <textarea name="message" id="message" rows="5" placeholder=" " required class="floating-input peer w-full rounded-xl border border-slate-200 bg-white pl-10 pr-3 py-3 text-slate-900 placeholder-transparent"></textarea>
+                <label for="message" class="pointer-events-none absolute left-10 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">Your Message</label>
+              </div>
+              {% if next %}
+                <input type="hidden" name="next" value="{{ next }}" />
+              {% endif %}
+              <div class="md:col-span-2">
+                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg hover:opacity-90 transition">Send message</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- Office Hours -->
+      <section class="bg-slate-50 py-12" data-animate>
+        <div class="mx-auto max-w-6xl px-4">
+          <div class="rounded-3xl bg-white border border-slate-200 shadow-sm p-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-indigo-500 mb-1">Support hours</p>
+              <h3 class="text-xl font-semibold text-slate-900">We’re online when you need us</h3>
+              <p class="text-slate-600 mb-0">Mon–Fri: 8:00 AM - 6:00 PM · Sat: 9:00 AM - 2:00 PM · Sun: Closed</p>
+            </div>
+            <a href="#contact-form" class="px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Book a consultation</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Map -->
+      <section class="max-w-6xl mx-auto px-4 pb-12" data-animate>
+        <div class="rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+          <iframe
+            title="Office location"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.859865908057!2d36.82194611525945!3d-1.2920659990588103!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d3f0149b7d%3A0xafd34a8988e85b2b!2sNairobi!5e0!3m2!1sen!2ske!4v1700000000000!5m2!1sen!2ske"
+            width="100%" height="320" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </section>
+
+      <!-- Social + Newsletter -->
+      <section class="max-w-6xl mx-auto px-4 pb-12" data-animate>
+        <div class="rounded-3xl p-6 border border-slate-200 shadow-sm bg-gradient-to-r from-indigo-50 via-white to-purple-50">
+          <div class="grid lg:grid-cols-2 gap-6 items-center">
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-indigo-500 mb-1">Stay updated</p>
+              <h3 class="text-xl font-semibold text-slate-900">Follow us & join our newsletter</h3>
+              <p class="text-sm text-slate-600 mb-3">New scholarships, deadlines, and tips delivered weekly.</p>
+              <div class="flex flex-wrap gap-2">
+                <a href="https://www.facebook.com/" target="_blank" rel="noopener" class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-indigo-50 transition">Facebook</a>
+                <a href="https://x.com/" target="_blank" rel="noopener" class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-indigo-50 transition">Twitter/X</a>
+                <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-indigo-50 transition">Instagram</a>
+                <a href="https://www.linkedin.com/" target="_blank" rel="noopener" class="px-3 py-2 rounded-lg border border-slate-200 bg-white text-slate-800 hover:bg-indigo-50 transition">LinkedIn</a>
+              </div>
+            </div>
+            <div>
+              <form class="flex flex-col sm:flex-row gap-3">
+                <input type="email" required placeholder="you@example.com" class="flex-1 rounded-lg border border-slate-200 px-4 py-3 bg-white text-slate-900 focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-400">
+                <button type="submit" class="px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="max-w-6xl mx-auto px-4 pb-12" data-animate>
+        <div class="text-center mb-6">
+          <p class="text-xs uppercase tracking-[0.25em] text-indigo-500 mb-2">FAQ</p>
+          <h3 class="text-2xl font-semibold text-slate-900">Common questions</h3>
+        </div>
+        <div class="grid md:grid-cols-2 gap-3">
+          <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition">
+            <summary class="cursor-pointer flex items-center justify-between text-sm font-semibold text-slate-900">How long to get a response?<span class="text-slate-400">+</span></summary>
+            <p class="mt-2 text-sm text-slate-600">We reply within 24 hours, often sooner on weekdays.</p>
+          </details>
+          <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition">
+            <summary class="cursor-pointer flex items-center justify-between text-sm font-semibold text-slate-900">Can you help me find scholarships for my country?<span class="text-slate-400">+</span></summary>
+            <p class="mt-2 text-sm text-slate-600">Yes—use filters by country and level, or ask support for guidance.</p>
+          </details>
+          <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition">
+            <summary class="cursor-pointer flex items-center justify-between text-sm font-semibold text-slate-900">Do you send deadline reminders?<span class="text-slate-400">+</span></summary>
+            <p class="mt-2 text-sm text-slate-600">Enable notifications in your profile to get reminders ahead of deadlines.</p>
+          </details>
+          <details class="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm hover:shadow-md transition">
+            <summary class="cursor-pointer flex items-center justify-between text-sm font-semibold text-slate-900">Is my data secure?<span class="text-slate-400">+</span></summary>
+            <p class="mt-2 text-sm text-slate-600">We use industry-standard encryption and never share your data without consent.</p>
+          </details>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section class="max-w-6xl mx-auto px-4 pb-14" data-animate>
+        <div class="text-center mb-6">
+          <p class="text-xs uppercase tracking-[0.25em] text-indigo-500 mb-2">Testimonials</p>
+          <h3 class="text-2xl font-semibold text-slate-900">Students we’ve helped</h3>
+        </div>
+        <div class="grid md:grid-cols-3 gap-4">
+          {% if testimonials %}
+            {% for t in testimonials %}
+              <article class="glass-card rounded-2xl p-4 h-full bg-white border border-slate-200 shadow-sm">
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="h-12 w-12 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-violet-500 text-white flex items-center justify-center font-semibold">
+                    {{ t.name|first|default:"S" }}
+                  </div>
+                  <div>
+                    <p class="font-semibold mb-0">{{ t.name }}</p>
+                    <p class="text-xs text-slate-500 mb-0">{{ t.country|default:"Global" }}</p>
+                  </div>
+                </div>
+                <p class="text-sm text-slate-700">“{{ t.quote }}”</p>
+              </article>
+            {% endfor %}
+          {% else %}
+            <article class="glass-card rounded-2xl p-4 bg-white border border-slate-200 shadow-sm">
+              <p class="text-sm text-slate-700 mb-1">“I found two fully funded options thanks to the portal’s filters.”</p>
+              <p class="text-xs text-slate-500">— Amina, Kenya</p>
+            </article>
+            <article class="glass-card rounded-2xl p-4 bg-white border border-slate-200 shadow-sm">
+              <p class="text-sm text-slate-700 mb-1">“Smart alerts meant I never missed a deadline.”</p>
+              <p class="text-xs text-slate-500">— Jorge, Mexico</p>
+            </article>
+            <article class="glass-card rounded-2xl p-4 bg-white border border-slate-200 shadow-sm">
+              <p class="text-sm text-slate-700 mb-1">“Application tracking made the whole process calm and clear.”</p>
+              <p class="text-xs text-slate-500">— Linh, Vietnam</p>
+            </article>
+          {% endif %}
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer (from about.html) -->
+    <footer class="bg-slate-900 text-slate-200 pt-12 pb-8">
+      <div class="mx-auto max-w-6xl px-4 grid gap-10 md:grid-cols-4">
+        <div>
+          <h4 class="text-xl font-semibold text-white">ScholarDash</h4>
+          <p class="mt-3 text-sm text-slate-400">Helping students access global education opportunities.</p>
+          <div class="flex gap-3 mt-4 text-slate-300">
+            <a class="hover:text-white transition" href="#">LinkedIn</a>
+            <a class="hover:text-white transition" href="#">Twitter</a>
+            <a class="hover:text-white transition" href="#">YouTube</a>
+          </div>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Quick Links</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li><a class="hover:text-white transition" href="{% url 'home' %}">Home</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'scholarships' %}">Scholarships</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'services' %}">Services</a></li>
+            <li><a class="hover:text-white transition" href="{% url 'contact' %}">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Contact</h5>
+          <ul class="space-y-2 text-sm text-slate-300">
+            <li>Email: support@scholarhub.com</li>
+            <li>Phone: +1 (555) 123-4567</li>
+            <li>Nairobi · Remote-first</li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="font-semibold text-white mb-3">Newsletter</h5>
+          <form class="flex flex-col gap-3">
+            <input type="email" placeholder="you@example.com" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+            <button type="submit" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
+        © 2026 ScholarDash. All rights reserved.
+      </div>
+    </footer>
+
+    <script>
+      // Mobile menu toggle
+      const toggle = document.getElementById('nav-toggle');
+      const mobile = document.getElementById('mobile-menu');
+      toggle?.addEventListener('click', () => mobile.classList.toggle('hidden'));
+
+      // Intersection Observer animations
+      const animated = document.querySelectorAll('[data-animate]');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-up');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+      animated.forEach(el => observer.observe(el));
+    </script>
+  </body>
+</html>

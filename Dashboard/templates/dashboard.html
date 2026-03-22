@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Student Dashboard</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body{
+      background: linear-gradient(135deg,#ff7b00,#1db954);
+      min-height:100vh;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    /* Sidebar */
+    .sidebar{
+      width:250px;
+      height:100vh;
+      background:#0f5132;
+      position:fixed;
+      padding-top:30px;
+      overflow-y:auto;
+    }
+
+    .sidebar h3{
+      color:white;
+      text-align:center;
+      margin-bottom:30px;
+    }
+
+    .sidebar a{
+      display:block;
+      color:white;
+      padding:15px;
+      text-decoration:none;
+      font-weight:500;
+    }
+
+    .sidebar a:hover{
+      background:#ff7b00;
+      border-radius:5px;
+    }
+
+    /* Content */
+    .content{
+      margin-left:260px;
+      padding:30px;
+    }
+
+    /* Cards */
+    .dashboard-card{
+      border:none;
+      border-radius:15px;
+      color:white;
+      padding:20px;
+      transition:0.3s;
+    }
+
+    .dashboard-card:hover{
+      transform:scale(1.05);
+    }
+
+    .orange{
+      background:#ff7b00;
+    }
+
+    .green{
+      background:#198754;
+    }
+
+    /* Table */
+    .table-container{
+      background:white;
+      padding:20px;
+      border-radius:15px;
+      box-shadow:0px 5px 20px rgba(0,0,0,0.2);
+    }
+
+    @media (max-width: 767.98px){
+      .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+        border-radius:0 0 12px 12px;
+      }
+      .content{
+        margin-left:0;
+        padding:20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>🎓 ScholarHub</h3>
+
+    <a href="{% url 'student_dashboard' %}">Dashboard</a>
+    <a href="{% url 'scholarships' %}">Browse Scholarships</a>
+    <a href="{% url 'my_applications' %}">My Applications</a>
+    <a href="{% url 'contact' %}">Contact</a>
+
+    <div class="px-3 mt-2">
+      <form method="post" action="{% url 'logout' %}" class="m-0">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-outline-light w-100">Logout</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content">
+    <h2 class="text-white mb-4">
+      Welcome,
+      {% if request.user.first_name %}
+        {{ request.user.first_name }}
+      {% else %}
+        {{ request.user.username }}
+      {% endif %}
+    </h2>
+
+    <div class="row g-3">
+      <div class="col-12 col-md-3">
+        <div class="dashboard-card orange">
+          <h4>{{ total_scholarships|default:0 }}</h4>
+          <p class="mb-0">Total Scholarships</p>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <div class="dashboard-card green">
+          <h4>{{ applied_count|default:0 }}</h4>
+          <p class="mb-0">Applications Submitted</p>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <div class="dashboard-card orange">
+          <h4>{{ pending_count|default:0 }}</h4>
+          <p class="mb-0">Pending</p>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-3">
+        <div class="dashboard-card green">
+          <h4>{{ approved_count|default:0 }}</h4>
+          <p class="mb-0">Approved</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="my-4"></div>
+
+    <!-- Applications Table -->
+    <div class="table-container">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h4 class="mb-0">My Applications</h4>
+        <a class="btn btn-sm btn-outline-success" href="{% url 'my_applications' %}">View All</a>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Scholarship</th>
+              <th>Date Applied</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for application in applications %}
+              <tr>
+                <td>{{ application.scholarship.title }}</td>
+                <td>{{ application.date_applied|date:"j F Y" }}</td>
+                <td>
+                  {% if application.status == "Approved" %}
+                    <span class="badge bg-success">{{ application.status }}</span>
+                  {% elif application.status == "Rejected" %}
+                    <span class="badge bg-danger">{{ application.status }}</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">{{ application.status }}</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="3" class="text-center text-secondary py-4">
+                  You have not applied for any scholarships yet.
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

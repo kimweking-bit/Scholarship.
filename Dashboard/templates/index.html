@@ -1,0 +1,605 @@
+﻿<!doctype html>
+{% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Discover scholarships that match you. Search, filter, and apply in minutes." />
+    <title>ScholarHub | Find Your Perfect Scholarship</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+            colors: { primary: '#6366f1', accent: '#8b5cf6' },
+            keyframes: {
+              'fade-up': { '0%': { opacity: 0, transform: 'translateY(16px)' }, '100%': { opacity: 1, transform: 'translateY(0)' } },
+            },
+            animation: { 'fade-up': 'fade-up 0.75s ease-out both' }
+          }
+        }
+      };
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #0f172a; }
+      .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.45); box-shadow: 0 20px 60px rgba(15,23,42,0.15); border-radius: 18px; }
+      .card-soft { background:#fff; border:1px solid #e2e8f0; border-radius:18px; box-shadow:0 14px 40px rgba(15,23,42,0.12); transition:transform 200ms ease, box-shadow 200ms ease; }
+      .card-soft:hover { transform: translateY(-6px); box-shadow:0 20px 55px rgba(15,23,42,0.16); }
+      .hover-rise { transition: transform 180ms ease, box-shadow 180ms ease; }
+      .hover-rise:hover { transform: translateY(-6px); box-shadow:0 16px 36px rgba(0,0,0,0.14); }
+      .hero-img { height: 520px; object-fit: cover; }
+      .stat-dot { width:10px; height:10px; border-radius:9999px; display:inline-block; }
+      .map-holder { position: relative; overflow: hidden; border-radius: 20px; }
+      .timeline-dot { width:12px; height:12px; border-radius:9999px; background: linear-gradient(135deg,#6366f1,#8b5cf6); box-shadow:0 0 0 6px rgba(99,102,241,0.18); }
+      .chat-window { width: 320px; height: 420px; }
+      .bg-gradient-primary { background: linear-gradient(120deg,#6366f1,#8b5cf6); }
+      /* Shared purple accents */
+      section h2, section h3 { position: relative; display: inline-block; }
+      section h2::after, section h3::after { content: ""; display: block; width: 56px; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); margin-top: 10px; border-radius: 9999px; }
+      .card-soft, .card-surface, .glass { position: relative; overflow: hidden; }
+      .card-soft::before, .card-surface::before, .glass::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 9999px; opacity: 0.9; }
+      .bg-gradient-to-r { box-shadow: 0 12px 30px rgba(99,102,241,0.20); transition: transform 150ms ease, box-shadow 150ms ease; }
+      .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
+    </style>
+  </head>
+  <body class="min-h-screen flex flex-col bg-white" id="top">
+<!-- Navbar (reused from about.html) -->
+    <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <div class="h-9 w-9 rounded-2xl bg-white/20 shadow-lg flex items-center justify-center text-white font-bold group-hover:bg-white/30 transition">SC</div>
+            <span class="text-lg font-semibold text-white group-hover:text-white transition">Scholar Connect</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16"/>
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-4 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+            </div>
+            <div class="flex items-center gap-3">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+        <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+          <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+          <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+          <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+          <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+          <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff %}
+              <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% else %}
+              <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+            <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+
+
+    <main class="flex-1 pt-16"> <!-- hero needs top padding to clear navbar -->
+      <!-- Hero (clean, product-grade) -->
+      <section class="bg-gradient-to-b from-slate-50 to-white py-20">
+        <div class="container max-w-6xl mx-auto px-4">
+          <div class="row g-5 align-items-center">
+            <!-- Left column -->
+            <div class="col-lg-7">
+              <p class="text-sm fw-semibold text-purple-500 tracking-wide text-uppercase mb-3">Personalized discovery</p>
+              <h1 class="fw-bold text-slate-900" style="font-size: clamp(2.6rem,4vw,3.4rem); line-height:1.1;">Find Fully Funded Scholarships You Actually Qualify For</h1>
+              <p class="text-lg text-slate-600 mt-3 mb-4" style="max-width: 32rem;">Get matched in seconds, stay ahead of deadlines, and increase your success rate with vetted, high-fit opportunities tailored to you.</p>
+              <div class="d-flex flex-wrap gap-3 mb-4">
+                <a href="{% url 'scholarships' %}" class="inline-flex align-items-center px-4 px-lg-5 py-3 rounded-xl text-white fw-semibold transition shadow-sm bg-gradient-primary hover:opacity-90">Get Matched Now</a>
+                <a href="#smart-match" class="inline-flex align-items-center px-4 px-lg-5 py-3 rounded-xl border border-purple-200 text-purple-700 fw-semibold hover:bg-purple-50 transition">Explore Scholarships</a>
+              </div>
+              <div class="d-flex flex-wrap gap-4 text-sm text-slate-500">
+                <span>3,400+ scholarships</span>
+                <span>82 countries</span>
+                <span>Verified only</span>
+                <span>Live: <span id="live-count" class="fw-semibold text-slate-700">1,240</span></span>
+              </div>
+            </div>
+            <!-- Right column: calm onboarding card -->
+            <div class="col-lg-5">
+              <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm h-100 d-flex flex-column gap-3">
+                <div>
+                  <p class="text-xs text-slate-500 mb-1">Start in 60 seconds</p>
+                  <h5 class="fw-semibold text-slate-900 mb-1">Stay organized and ahead</h5>
+                  <p class="text-sm text-slate-600 mb-0">Create your profile, get tailored matches, and track deadlines in one place.</p>
+                </div>
+                <div class="d-flex flex-column gap-3">
+                  <div class="d-flex align-items-center gap-2 text-slate-700">
+                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
+                    Create your profile and goals
+                  </div>
+                  <div class="d-flex align-items-center gap-2 text-slate-700">
+                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
+                    Receive high-fit matches weekly
+                  </div>
+                  <div class="d-flex align-items-center gap-2 text-slate-700">
+                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
+                    Track deadlines with reminders
+                  </div>
+                </div>
+                <div class="d-grid gap-2 mt-2">
+                  <a href="{% url 'register' %}" class="btn rounded-xl text-white fw-semibold bg-gradient-primary hover:opacity-90">Create free account</a>
+                  <a href="#smart-match" class="btn rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 fw-semibold">See how it works</a>
+                </div>
+                <div class="d-flex align-items-center gap-2 text-xs text-slate-500">
+                  <span class="h-2 w-2 rounded-circle bg-emerald-400 d-inline-block"></span>
+                  No spam, cancel anytime.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="border-top border-slate-200 mt-12"></div>
+      </section>
+
+      <!-- User Journey Flow -->
+      <section class="py-16 bg-white">
+        <div class="container">
+          <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+            <div>
+              <p class="text-xs text-purple-500 fw-semibold tracking-wide text-uppercase mb-1">How it works</p>
+              <h3 class="fw-bold text-slate-900 mb-1">Your journey to funding</h3>
+              <p class="text-sm text-slate-600 mb-0">Five simple steps to move from profile to funded offer.</p>
+            </div>
+            <div class="d-none d-md-flex align-items-center gap-2 text-xs text-slate-500">
+              <span class="badge bg-emerald-100 text-emerald-700 border border-emerald-200">Live</span>
+              Auto-saves your progress
+            </div>
+          </div>
+          <div class="row g-4">
+            <div class="col-md-6 col-lg-2">
+              <div class="h-100 p-4 rounded-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition text-center">
+                <div class="h-12 w-12 mx-auto mb-3 rounded-2xl bg-gradient-primary text-white d-flex align-items-center justify-content-center fw-bold">1</div>
+                <p class="fw-semibold text-slate-900 mb-1">Create Profile</p>
+                <p class="text-sm text-slate-600 mb-0">Add goals, level, country preference.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-2">
+              <div class="h-100 p-4 rounded-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition text-center">
+                <div class="h-12 w-12 mx-auto mb-3 rounded-2xl bg-gradient-primary text-white d-flex align-items-center justify-content-center fw-bold">2</div>
+                <p class="fw-semibold text-slate-900 mb-1">Get Matches</p>
+                <p class="text-sm text-slate-600 mb-0">Receive tailored, verified options.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-2">
+              <div class="h-100 p-4 rounded-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition text-center">
+                <div class="h-12 w-12 mx-auto mb-3 rounded-2xl bg-gradient-primary text-white d-flex align-items-center justify-content-center fw-bold">3</div>
+                <p class="fw-semibold text-slate-900 mb-1">Apply</p>
+                <p class="text-sm text-slate-600 mb-0">Use checklists and save progress.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-2">
+              <div class="h-100 p-4 rounded-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition text-center">
+                <div class="h-12 w-12 mx-auto mb-3 rounded-2xl bg-gradient-primary text-white d-flex align-items-center justify-content-center fw-bold">4</div>
+                <p class="fw-semibold text-slate-900 mb-1">Track Progress</p>
+                <p class="text-sm text-slate-600 mb-0">Deadlines, reminders, statuses.</p>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-2">
+              <div class="h-100 p-4 rounded-3 border border-slate-200 bg-white shadow-sm hover:shadow-md transition text-center">
+                <div class="h-12 w-12 mx-auto mb-3 rounded-2xl bg-gradient-primary text-white d-flex align-items-center justify-content-center fw-bold">5</div>
+                <p class="fw-semibold text-slate-900 mb-1">Get Funded</p>
+                <p class="text-sm text-slate-600 mb-0">Accept offers and confirm awards.</p>
+              </div>
+            </div>
+            <div class="col-12 col-lg-2 d-flex align-items-center justify-content-center">
+              <div class="d-grid gap-2 w-100">
+                <a href="{% url 'register' %}" class="btn rounded-xl text-white fw-semibold bg-gradient-primary hover:opacity-90">Start your journey</a>
+                <a href="{% url 'scholarships' %}" class="btn rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 fw-semibold">Browse scholarships</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Live Stats -->
+      <section class="py-10">
+        <div class="container">
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card-soft p-4 text-center">
+                <p class="small text-muted mb-1">Total scholarships</p>
+                <h2 class="fw-bold text-indigo-600" id="stat-total">3,400+</h2>
+                <p class="text-muted mb-0">Updated daily</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card-soft p-4 text-center">
+                <p class="small text-muted mb-1">Countries covered</p>
+                <h2 class="fw-bold text-purple-500" id="stat-countries">82</h2>
+                <p class="text-muted mb-0">Global reach</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card-soft p-4 text-center">
+                <p class="small text-muted mb-1">Students funded</p>
+                <h2 class="fw-bold text-indigo-600" id="stat-funded">18,000+</h2>
+                <p class="text-muted mb-0">Community impact</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+     
+
+      <!-- Student Stories Carousel -->
+      <section class="pb-10 bg-slate-50">
+        <div class="container">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fw-bold mb-0">Student Stories</h3>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-light btn-sm" id="stories-prev">Prev</button>
+              <button class="btn btn-sm text-white" id="stories-next" style="background:linear-gradient(120deg,#6366f1,#8b5cf6);">Next</button>
+            </div>
+          </div>
+          <div class="overflow-hidden" id="stories-track">
+            <div class="d-flex gap-3 flex-nowrap justify-content-center" style="scroll-behavior:smooth;">
+              <div class="card-soft p-0 shadow-sm hover:shadow-xl transition overflow-hidden h-100" style="min-width:300px; max-width:320px;">
+                <div class="position-relative">
+                  <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=800&q=80" alt="Amina portrait" class="w-100" style="height:170px; object-fit:cover; object-position:center;">
+                  <span class="position-absolute top-2 end-2 badge bg-emerald-500 text-white">Full ride</span>
+                </div>
+                <div class="p-4">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <img src="https://images.unsplash.com/photo-1544723795-3fb6469f5b39?auto=format&fit=crop&w=200&q=80" alt="Amina avatar" class="rounded-circle" style="width:44px;height:44px;object-fit:cover;">
+                    <div>
+                      <p class="fw-semibold mb-0">Amina · Kenya</p>
+                      <small class="text-muted">Masters · STEM</small>
+                    </div>
+                    <div class="ms-auto text-amber-400 small">★★★★★</div>
+                  </div>
+                  <p class="text-slate-700 mb-2">“Secured a fully funded option after deadline alerts and tailored matches.”</p>
+                  <div class="d-flex gap-2 text-xs text-slate-500">
+                    <span>Match 92%</span>·<span>Applied in 20 mins</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-soft p-0 shadow-sm hover:shadow-xl transition overflow-hidden h-100" style="min-width:300px; max-width:320px;">
+                <div class="position-relative">
+                  <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=facearea&facepad=2&w=900&h=170&q=80" alt="Jorge portrait" class="w-100" style="height:170px; object-fit:cover; object-position:center;">
+                  <span class="position-absolute top-2 end-2 badge bg-indigo-500 text-white">Verified</span>
+                </div>
+                <div class="p-4">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=facearea&facepad=2&w=200&h=200&q=80" alt="Jorge avatar" class="rounded-circle" style="width:44px;height:44px;object-fit:cover; object-position:center;">
+                    <div>
+                      <p class="fw-semibold mb-0">Jorge · Mexico</p>
+                      <small class="text-muted">Undergrad · Business</small>
+                    </div>
+                    <div class="ms-auto text-amber-400 small">★★★★☆</div>
+                  </div>
+                  <p class="text-slate-700 mb-2">“Only high-fit programs showed up. Applying felt straightforward for the first time.”</p>
+                  <div class="d-flex gap-2 text-xs text-slate-500">
+                    <span>Match 88%</span>·<span>Competitive</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card-soft p-0 shadow-sm hover:shadow-xl transition overflow-hidden h-100" style="min-width:300px; max-width:320px;">
+                <div class="position-relative">
+                  <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=800&q=80" alt="Linh portrait" class="w-100" style="height:170px; object-fit:cover; object-position:center;">
+                  <span class="position-absolute top-2 end-2 badge bg-purple-500 text-white">Fellowship</span>
+                </div>
+                <div class="p-4">
+                  <div class="d-flex align-items-center gap-3 mb-2">
+                    <img src="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=200&q=80" alt="Linh avatar" class="rounded-circle" style="width:44px;height:44px;object-fit:cover;">
+                    <div>
+                      <p class="fw-semibold mb-0">Linh · Vietnam</p>
+                      <small class="text-muted">PhD · Research</small>
+                    </div>
+                    <div class="ms-auto text-amber-400 small">★★★★★</div>
+                  </div>
+                  <p class="text-slate-700 mb-2">“Verified opportunities kept me safe. Landed a research fellowship with full stipend.”</p>
+                  <div class="d-flex gap-2 text-xs text-slate-500">
+                    <span>Match 90%</span>·<span>Deadline safe</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Latest scholarships grid -->
+      <section class="py-10">
+        <div class="container">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <h3 class="fw-bold mb-0">Latest Scholarships</h3>
+            <a href="{% url 'scholarships' %}" class="text-indigo-600">View all</a>
+          </div>
+          <div class="row g-4">
+            {% if scholarships %}
+              {% for s in scholarships|slice:':6' %}
+              <div class="col-md-4">
+                <div class="card-soft h-100 p-4 transform transition duration-200 hover:scale-105 hover:shadow-2xl relative overflow-hidden">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/10 via-white/60 to-white/90 pointer-events-none"></div>
+                  <div class="d-flex justify-content-between align-items-center mb-2 position-relative">
+                    <div class="d-flex gap-2 flex-wrap">
+                      <span class="badge bg-gradient-primary text-white">{{ s.level|default:"Level" }}</span>
+                      <span class="badge {% if s.deadline %}bg-danger{% else %}bg-success{% endif %} text-white">{% if s.deadline %}Closing Soon{% else %}Open{% endif %}</span>
+                      <span class="badge bg-emerald-100 text-emerald-700 border border-emerald-200">{{ s.funding_type|default:"Fully Funded" }}</span>
+                    </div>
+                    <button class="btn btn-sm bg-white border text-rose-500 hover:shadow" type="button" aria-label="Save scholarship">❤️</button>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between position-relative">
+                    <small class="text-muted d-flex align-items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4" d="M17.657 16.657 13.414 12l4.243-4.243m-11.314 0L10.586 12l-4.243 4.243" /></svg>
+                      {{ s.country|default:"Global" }}
+                    </small>
+                    <small class="text-muted">Time to apply: {{ s.time_to_apply|default:"15 mins" }}</small>
+                  </div>
+                  <h6 class="fw-semibold mb-1 position-relative mt-2">{{ s.title }}</h6>
+                  <p class="text-muted small mb-2 position-relative">{{ s.organization|default:"Organization" }}</p>
+                  <p class="text-muted small mb-3 position-relative">{{ s.description|default:"Scholarship opportunity."|truncatewords:18 }}</p>
+                  <div class="row g-2 position-relative mb-3">
+                    <div class="col-6">
+                      <small class="text-muted d-block">Match Score</small>
+                      <div class="progress" style="height:8px;">
+                        <div class="progress-bar bg-gradient-primary" role="progressbar" style="width: {{ s.match_score|default:'92' }}%;"></div>
+                      </div>
+                      <small class="fw-semibold">{{ s.match_score|default:"92" }}%</small>
+                    </div>
+                    <div class="col-6">
+                      <small class="text-muted d-block">Difficulty</small>
+                      <span class="badge bg-slate-100 text-slate-700 border">{{ s.difficulty|default:"Moderate" }}</span>
+                    </div>
+                  </div>
+                  {% if request.user.is_authenticated %}
+                    <a href="{% url 'apply_scholarship' s.id %}" class="btn text-white w-100 rounded-xl py-2 fw-semibold shadow-lg hover:shadow-xl" style="background:linear-gradient(120deg,#6366f1,#8b5cf6); transform:translateZ(0); transition:transform .15s ease, box-shadow .15s ease;">Apply Now</a>
+                  {% else %}
+                    <a href="{% url 'login' %}?next={% url 'apply_scholarship' s.id %}" class="btn text-white w-100 rounded-xl py-2 fw-semibold shadow-lg hover:shadow-xl" style="background:linear-gradient(120deg,#6366f1,#8b5cf6); transform:translateZ(0); transition:transform .15s ease, box-shadow .15s ease;">Apply Now</a>
+                  {% endif %}
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="col-12 text-muted">No scholarships available yet.</div>
+            {% endif %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Partners -->
+      <section class="py-10">
+        <div class="container text-center">
+          <h3 class="fw-bold mb-3">Trusted by partners</h3>
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <div class="glass px-4 py-2">University A</div>
+            <div class="glass px-4 py-2">Foundation B</div>
+            <div class="glass px-4 py-2">Global Fund</div>
+            <div class="glass px-4 py-2">Tech Fellowship</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="py-12 bg-slate-50">
+        <div class="container">
+          <div class="text-center mb-6">
+            <p class="text-xs text-indigo-500 fw-semibold tracking-[0.25em] text-uppercase mb-2">FAQ</p>
+            <h3 class="fw-bold text-3xl text-slate-900 mb-2">Common questions</h3>
+            <p class="text-sm text-slate-600">Clear answers on matching, applying, and staying on top of deadlines.</p>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <details class="rounded-3 bg-white border border-slate-200 shadow-sm p-4 hover:shadow-md transition mb-3">
+                <summary class="cursor-pointer d-flex justify-content-between align-items-center fw-semibold text-slate-900">
+                  <span>How do I apply?</span>
+                  <span class="text-slate-400">+</span>
+                </summary>
+                <p class="mt-2 mb-0 text-sm text-slate-600">Open a scholarship, click Apply, and follow the checklist. Progress auto-saves so you can return anytime.</p>
+              </details>
+              <details class="rounded-3 bg-white border border-slate-200 shadow-sm p-4 hover:shadow-md transition mb-3">
+                <summary class="cursor-pointer d-flex justify-content-between align-items-center fw-semibold text-slate-900">
+                  <span>Is ScholarHub free?</span>
+                  <span class="text-slate-400">+</span>
+                </summary>
+                <p class="mt-2 mb-0 text-sm text-slate-600">Yes—browsing, saving, and applying through ScholarHub is free for students.</p>
+              </details>
+            </div>
+            <div class="col-md-6">
+              <details class="rounded-3 bg-white border border-slate-200 shadow-sm p-4 hover:shadow-md transition mb-3">
+                <summary class="cursor-pointer d-flex justify-content-between align-items-center fw-semibold text-slate-900">
+                  <span>Do you send reminders?</span>
+                  <span class="text-slate-400">+</span>
+                </summary>
+                <p class="mt-2 mb-0 text-sm text-slate-600">Enable reminders to get notified before deadlines and when new high-fit scholarships appear.</p>
+              </details>
+              <details class="rounded-3 bg-white border border-slate-200 shadow-sm p-4 hover:shadow-md transition mb-3">
+                <summary class="cursor-pointer d-flex justify-content-between align-items-center fw-semibold text-slate-900">
+                  <span>Are scholarships verified?</span>
+                  <span class="text-slate-400">+</span>
+                </summary>
+                <p class="mt-2 mb-0 text-sm text-slate-600">Yes. Every listing is reviewed for legitimacy and funding details before it goes live.</p>
+              </details>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Newsletter CTA -->
+      <section class="py-10">
+        <div class="container">
+              <div class="p-5 rounded-4 text-white" style="background:linear-gradient(120deg,#6366f1,#8b5cf6); box-shadow:0 20px 50px rgba(99,102,241,0.25);">
+            <div class="row align-items-center g-3">
+              <div class="col-lg-7">
+                <h3 class="fw-bold mb-2">Stay updated</h3>
+                <p class="mb-0">Get fresh scholarships and deadlines straight to your inbox.</p>
+              </div>
+              <div class="col-lg-5">
+                <form class="d-flex gap-2">
+                  <input type="email" class="form-control" placeholder="you@example.com" required>
+                  <button class="btn btn-light text-indigo-700 fw-semibold" type="submit">Subscribe</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Trust & Safety -->
+    <section class="py-16 bg-white">
+      <div class="container">
+        <div class="card-soft p-5 d-flex flex-column flex-md-row gap-4 align-items-center">
+          <div class="h-12 w-12 rounded-2xl bg-emerald-100 text-emerald-700 d-flex align-items-center justify-content-center shadow-sm">
+            🛡
+          </div>
+          <div class="flex-grow-1">
+            <h4 class="fw-bold text-slate-900 mb-1">Verified Scholarships Only</h4>
+            <p class="text-muted mb-0">We filter out scams and only list legitimate, vetted opportunities so you apply with confidence.</p>
+          </div>
+          <a href="{% url 'scholarships' %}" class="btn text-white rounded-xl shadow px-4 py-2" style="background:linear-gradient(120deg,#6366f1,#8b5cf6);">Explore Safe Opportunities</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer from about.html -->
+    <footer class="bg-slate-900 text-slate-200 pt-12 pb-8 mt-auto">
+      <div class="mx-auto max-w-6xl px-4 grid gap-10 md:grid-cols-4">
+        <div>
+          <h4 class="text-xl fw-semibold text-white">ScholarDash</h4>
+          <p class="mt-3 text-sm text-slate-400">Helping students access global education opportunities.</p>
+          <div class="d-flex gap-3 mt-4 text-slate-300">
+            <a class="hover:text-white text-decoration-none" href="#">LinkedIn</a>
+            <a class="hover:text-white text-decoration-none" href="#">Twitter</a>
+            <a class="hover:text-white text-decoration-none" href="#">YouTube</a>
+          </div>
+        </div>
+        <div>
+          <h5 class="fw-semibold text-white mb-3">Quick Links</h5>
+          <ul class="list-unstyled space-y-2 text-sm text-slate-300">
+            <li><a class="hover:text-white text-decoration-none" href="{% url 'home' %}">Home</a></li>
+            <li><a class="hover:text-white text-decoration-none" href="{% url 'scholarships' %}">Scholarships</a></li>
+            <li><a class="hover:text-white text-decoration-none" href="{% url 'student_dashboard' %}">Dashboard</a></li>
+            <li><a class="hover:text-white text-decoration-none" href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="fw-semibold text-white mb-3">Legal</h5>
+          <ul class="list-unstyled space-y-2 text-sm text-slate-300">
+            <li><a class="hover:text-white text-decoration-none" href="#">Privacy Policy</a></li>
+            <li><a class="hover:text-white text-decoration-none" href="#">Terms of Service</a></li>
+          </ul>
+        </div>
+        <div>
+          <h5 class="fw-semibold text-white mb-3">Newsletter</h5>
+          <form class="d-flex flex-column gap-3">
+            <input type="email" placeholder="you@example.com" class="w-100 rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+            <button type="submit" class="w-100 px-4 py-3 rounded-lg bg-gradient-primary text-white fw-semibold shadow hover:-translate-y-1 transition">Subscribe</button>
+          </form>
+        </div>
+      </div>
+      <div class="mt-10 border-top border-slate-800 pt-4 text-center text-sm text-slate-500">
+        © 2026 ScholarDash. All rights reserved.
+        <a href="#top" class="ms-3 text-indigo-400 hover:text-indigo-200 text-decoration-none">Back to top ↑</a>
+      </div>
+    </footer>
+
+    <!-- Floating chatbox -->
+    <div class="position-fixed bottom-4 end-4 z-50">
+      <button id="chat-toggle" class="btn btn-lg text-white shadow-lg" style="background:linear-gradient(120deg,#6366f1,#8b5cf6);">Chat</button>
+      <div id="chat-window" class="chat-window card-soft p-3 d-none mt-2">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h6 class="mb-0">Scholar AI Assistant</h6>
+          <button class="btn btn-sm btn-outline-secondary" id="chat-close">×</button>
+        </div>
+        <div id="chat-messages" class="border rounded p-2 mb-2 bg-white" style="height:260px; overflow-y:auto;">
+          <div class="text-muted small">Hi! Ask me about scholarships, deadlines, or eligibility.</div>
+        </div>
+        <form id="chat-form" class="d-flex gap-2">
+          <input id="chat-input" class="form-control" placeholder="Type a question" />
+          <button class="btn btn-success text-white" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // live counter (demo)
+      const live = document.getElementById('live-count');
+      if (live) {
+        let base = 1240;
+        setInterval(() => { base += Math.floor(Math.random()*3); live.textContent = base.toLocaleString(); }, 2800);
+      }
+      // stories scroll
+      const track = document.querySelector('#stories-track > div');
+      document.getElementById('stories-next')?.addEventListener('click', () => { track.scrollBy({left: 280, behavior:'smooth'}); });
+      document.getElementById('stories-prev')?.addEventListener('click', () => { track.scrollBy({left: -280, behavior:'smooth'}); });
+      // chat
+      const chatToggle = document.getElementById('chat-toggle');
+      const chatWindow = document.getElementById('chat-window');
+      const chatClose = document.getElementById('chat-close');
+      const chatForm = document.getElementById('chat-form');
+      const chatInput = document.getElementById('chat-input');
+      const chatMessages = document.getElementById('chat-messages');
+      const addChat = (sender, text) => {
+        const row = document.createElement('div');
+        row.className = 'mb-2';
+        row.innerHTML = `<span class="fw-semibold ${sender==='You'?'text-indigo-600':'text-purple-600'}">${sender}:</span> <span class="text-muted">${text}</span>`;
+        chatMessages.appendChild(row); chatMessages.scrollTop = chatMessages.scrollHeight;
+      };
+      chatToggle?.addEventListener('click', ()=> chatWindow.classList.toggle('d-none'));
+      chatClose?.addEventListener('click', ()=> chatWindow.classList.add('d-none'));
+      chatForm?.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const text = chatInput.value.trim();
+        if(!text) return;
+        addChat('You', text);
+        addChat('Bot', 'Thanks! I recommend filtering by country and level to refine results.');
+        chatInput.value='';
+      });
+      // mobile nav toggle (about.html style)
+      const navToggle = document.getElementById('nav-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      navToggle?.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+      // activity feed removed
+    </script>
+  </body>
+</html>
