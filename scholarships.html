@@ -96,6 +96,9 @@
       .card-soft::before, .card-surface::before, .glass-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg,#6366f1,#8b5cf6); border-radius: 9999px; opacity: 0.9; }
       .bg-gradient-to-r { box-shadow: 0 12px 30px rgba(99,102,241,0.20); transition: transform 150ms ease, box-shadow 150ms ease; }
       .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
+      #scholarship-results {
+        scroll-margin-top: 120px;
+      }
     </style>
   </head>
   <body class="min-h-screen flex flex-col bg-white text-slate-900 relative overflow-x-hidden">
@@ -133,7 +136,7 @@
             <div class="flex items-center gap-3">
               {% if request.user.is_authenticated %}
                 {% if request.user.is_staff %}
-                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                  <a href="{% url 'admin:index' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Admin</a>
                 {% else %}
                   <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
                 {% endif %}
@@ -158,7 +161,7 @@
           <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
           {% if request.user.is_authenticated %}
             {% if request.user.is_staff %}
-              <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+              <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Admin</a>
             {% else %}
               <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
             {% endif %}
@@ -332,12 +335,13 @@
         <div id="feat-track" class="flex gap-4 overflow-x-auto scroll-smooth pb-2">
           {% if featured_scholarships %}
             {% for fs in featured_scholarships|slice:":5" %}
+              {% cycle 'images/recommendation-global-campus.svg' 'images/recommendation-study-desk.svg' 'images/recommendation-research-lab.svg' 'images/recommendation-passport-route.svg' 'images/recommendation-library-spotlight.svg' as featured_fallback silent %}
               <article class="card-surface min-w-[260px] max-w-[280px] rounded-2xl overflow-hidden flex-shrink-0">
                 <div class="relative h-40 overflow-hidden">
                   {% if fs.image %}
                     <img src="{{ fs.image.url }}" alt="{{ fs.title }}" class="w-full h-full object-cover">
                   {% else %}
-                    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="{{ fs.title }}" class="w-full h-full object-cover">
+                    <img src="{% static featured_fallback %}" alt="{{ fs.title }}" class="w-full h-full object-cover">
                   {% endif %}
                   <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/35 to-transparent"></div>
                   <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold bg-white/85 text-slate-900 shadow">{{ fs.organization|default:"TBA" }}</div>
@@ -354,12 +358,13 @@
             {% endfor %}
           {% elif scholarships %}
             {% for fs in scholarships|slice:":5" %}
+          {% cycle 'images/recommendation-global-campus.svg' 'images/recommendation-study-desk.svg' 'images/recommendation-research-lab.svg' 'images/recommendation-passport-route.svg' 'images/recommendation-library-spotlight.svg' as featured_fallback silent %}
           <article class="card-surface min-w-[260px] max-w-[280px] rounded-2xl overflow-hidden flex-shrink-0">
             <div class="relative h-40 overflow-hidden">
               {% if fs.image %}
                 <img src="{{ fs.image.url }}" alt="{{ fs.title }}" class="w-full h-full object-cover">
               {% else %}
-                <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="{{ fs.title }}" class="w-full h-full object-cover">
+                <img src="{% static featured_fallback %}" alt="{{ fs.title }}" class="w-full h-full object-cover">
               {% endif %}
               <div class="absolute inset-0 bg-gradient-to-t from-slate-900/70 via-slate-900/35 to-transparent"></div>
               <div class="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold bg-white/85 text-slate-900 shadow">{{ fs.organization|default:"TBA" }}</div>
@@ -604,7 +609,23 @@
       </section>
 
       <!-- Cards -->
-      <section class="mx-auto max-w-6xl px-4 mt-10 space-y-8">
+      <section id="scholarship-results" class="mx-auto max-w-6xl px-4 mt-10 space-y-8">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-[0.22em] text-indigo-500">Results</p>
+            <h2 class="text-2xl font-semibold text-slate-900">Available scholarships</h2>
+            {% if scholarships %}
+              <p class="text-sm text-slate-600">Showing {{ scholarships.start_index }}-{{ scholarships.end_index }} of {{ scholarships.paginator.count }} scholarships.</p>
+            {% else %}
+              <p class="text-sm text-slate-600">Use the filters above to narrow the scholarship list.</p>
+            {% endif %}
+          </div>
+          {% if scholarships %}
+            <span class="inline-flex items-center justify-center rounded-full border border-indigo-100 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 shadow-sm">
+              Page {{ scholarships.number }} of {{ scholarships.paginator.num_pages }}
+            </span>
+          {% endif %}
+        </div>
         {% if scholarships %}
           {# Scholarship cards grid #}
           <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -735,7 +756,7 @@
               {# Prev button (only when a previous page exists) #}
               {% if scholarships.has_previous %}
                 <a
-                  href="?page={{ scholarships.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                  href="?page={{ scholarships.previous_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}#scholarship-results"
                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white text-sm font-medium hover:from-indigo-500 hover:to-purple-500 transition shadow-sm"
                 >
                   <span class="text-xs">‹</span> Prev
@@ -751,7 +772,7 @@
                     </span>
                   {% else %}
                     <a
-                      href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                      href="?page={{ num }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}#scholarship-results"
                       class="inline-flex items-center justify-center px-3 py-2 rounded-lg bg-white text-indigo-800 text-sm hover:bg-indigo-50 transition border border-indigo-100"
                     >
                       {{ num }}
@@ -763,7 +784,7 @@
               {# Next button (only when a next page exists) #}
               {% if scholarships.has_next %}
                 <a
-                  href="?page={{ scholarships.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}"
+                  href="?page={{ scholarships.next_page_number }}{% for key,value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value|urlencode }}{% endif %}{% endfor %}#scholarship-results"
                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white text-sm font-medium hover:from-indigo-500 hover:to-purple-500 transition shadow-sm"
                 >
                   Next <span class="text-xs">›</span>
@@ -826,10 +847,17 @@
         </div>
         <div>
           <h4 class="font-semibold text-white mb-3">Newsletter</h4>
-          <form class="flex flex-col gap-3">
-            <input type="email" placeholder="you@example.com" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+          <form class="flex flex-col gap-3" id="scholarships-footer-newsletter" action="{% url 'subscribe_newsletter' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="anchor" value="scholarships-footer-newsletter">
+            <input type="hidden" name="source" value="scholarships-footer">
+            <input type="email" name="email" placeholder="you@example.com" autocomplete="email" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" required />
             <button type="submit" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
           </form>
+          {% with newsletter_feedback_source="scholarships-footer" %}
+            {% include "includes/newsletter_feedback.html" %}
+          {% endwith %}
         </div>
       </div>
       <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
@@ -893,46 +921,61 @@
         setTimeout(hideSkeleton, 1800);
       })();
 
+      // Keep pagination and filtered views focused on the scholarship results block.
+      const resultsSection = document.getElementById('scholarship-results');
+      const searchParams = new URLSearchParams(window.location.search);
+      const hasActiveFilters = ['q', 'country', 'level', 'category', 'deadline_before', 'deadline_after']
+        .some((key) => (searchParams.get(key) || '').trim());
+      if (resultsSection && (window.location.hash === '#scholarship-results' || searchParams.has('page') || hasActiveFilters)) {
+        window.requestAnimationFrame(() => {
+          resultsSection.scrollIntoView({ behavior: 'auto', block: 'start' });
+        });
+      }
+
       // Category-based rotating fallback images
       const imagePools = {
         undergraduate: [
-          'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-library-spotlight.svg' %}",
+          "{% static 'images/recommendation-award-stage.svg' %}"
         ],
         postgraduate: [
-          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-research-lab.svg' %}",
+          "{% static 'images/recommendation-global-campus.svg' %}"
         ],
         masters: [
-          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1509099836639-18ba02e2e1ba?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-study-desk.svg' %}",
+          "{% static 'images/recommendation-passport-route.svg' %}"
         ],
         phd: [
-          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-research-lab.svg' %}",
+          "{% static 'images/recommendation-library-spotlight.svg' %}"
         ],
         fellowship: [
-          'https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-award-stage.svg' %}",
+          "{% static 'images/recommendation-global-campus.svg' %}"
         ],
         grant: [
-          'https://images.unsplash.com/photo-1509099836639-18ba02e2e1ba?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-study-desk.svg' %}",
+          "{% static 'images/recommendation-award-stage.svg' %}"
         ],
         scholarship: [
-          'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-global-campus.svg' %}",
+          "{% static 'images/recommendation-passport-route.svg' %}"
         ],
         default: [
-          'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=80',
-          'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1400&q=80'
+          "{% static 'images/recommendation-study-desk.svg' %}",
+          "{% static 'images/recommendation-library-spotlight.svg' %}",
+          "{% static 'images/recommendation-passport-route.svg' %}",
+          "{% static 'images/recommendation-global-campus.svg' %}",
+          "{% static 'images/recommendation-research-lab.svg' %}",
+          "{% static 'images/recommendation-award-stage.svg' %}"
         ]
       };
 
-      document.querySelectorAll('[data-card-category]').forEach((card) => {
+      document.querySelectorAll('[data-card-category]').forEach((card, index) => {
         const cat = (card.dataset.cardCategory || 'default').toLowerCase();
         const pool = imagePools[cat] || imagePools.default;
-        const chosen = pool[Math.floor(Math.random() * pool.length)];
+        const chosen = pool[index % pool.length];
         const img = card.querySelector('[data-card-image]');
         if (img && (img.dataset.useFallback === 'true' || !img.getAttribute('src'))) {
           img.src = chosen;
@@ -955,6 +998,8 @@
         ['#6366f1','#a855f7','#8b5cf6','#22d3ee']);
       makeChart('chartStatus', 'doughnut', ['Active','Expired'], [78,22],
         ['#22c55e','#e11d48']);
+
     </script>
-  </body>
+{% include "includes/chat_widget.html" %}
+</body>
 </html>

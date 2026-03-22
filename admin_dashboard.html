@@ -1162,6 +1162,10 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
             <span class="nav-ico"><i class="bi bi-mortarboard"></i></span>
             <span class="nav-copy"><strong>Scholarships</strong></span>
           </a>
+          <a href="{% url 'admin_chat' %}" class="nav-link" data-route-link>
+            <span class="nav-ico"><i class="bi bi-chat-dots"></i></span>
+            <span class="nav-copy"><strong>Chat Inbox{% if unread_chat_threads %} ({{ unread_chat_threads }}){% endif %}</strong></span>
+          </a>
         </div>
       </div>
       <div class="nav-group hide-when-collapsed">
@@ -1201,6 +1205,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
         <button type="button" class="icon-btn" id="themeToggle"><i class="bi bi-moon-stars"></i><span>Dark mode</span></button>
         <button type="button" class="icon-btn d-lg-none" id="mobileMenuButton"><i class="bi bi-layout-sidebar"></i><span>Menu</span></button>
         <button type="button" class="icon-btn" data-action="refresh"><i class="bi bi-arrow-clockwise"></i><span>Refresh</span></button>
+        <a href="{% url 'admin_chat' %}" class="chip" style="text-decoration:none;"><i class="bi bi-chat-dots"></i><span>Chat Inbox{% if unread_chat_threads %} · {{ unread_chat_threads }} new{% endif %}</span></a>
         <button type="button" class="chip primary" data-action="create"><i class="bi bi-plus-lg"></i><span>Add Scholarship</span></button>
       </div>
     </section>
@@ -1210,6 +1215,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
       <article class="cardx stat" data-stat-card="total-students"><div class="stat-top"><div><p class="stat-label">Total Students</p><div class="stat-val" data-stat>{{ total_students|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-people-fill"></i></div></div><div class="stat-foot"><span>Student accounts available for review</span><span class="pill"><i class="bi bi-person-badge-fill"></i>Directory</span></div></article>
       <article class="cardx stat" data-stat-card="total-applications"><div class="stat-top"><div><p class="stat-label">Applications</p><div class="stat-val" data-stat>{{ total_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-inboxes-fill"></i></div></div><div class="stat-foot"><span>Total submissions across all scholarships</span><span class="pill"><i class="bi bi-clock-history"></i>Tracked</span></div></article>
       <article class="cardx stat" data-stat-card="approved-applications"><div class="stat-top"><div><p class="stat-label">Approved</p><div class="stat-val" data-stat>{{ approved_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-patch-check-fill"></i></div></div><div class="stat-foot"><span>Applications currently approved</span><span class="pill"><i class="bi bi-check2-circle"></i>Resolved</span></div></article>
+      <article class="cardx stat" data-stat-card="chat-threads"><div class="stat-top"><div><p class="stat-label">Chat Threads</p><div class="stat-val" data-stat>{{ open_chat_threads|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-chat-left-dots-fill"></i></div></div><div class="stat-foot"><span>Open conversations waiting in the admin inbox</span><span class="pill"><i class="bi bi-bell-fill"></i>{{ unread_chat_threads|default:0 }} unread</span></div></article>
     </section>
 
     <section class="charts">
@@ -1241,7 +1247,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
             {% for application in recent_applications %}
             <tr data-kind="application" data-id="{{ application.id }}" data-search="{{ application.student_name }} {{ application.scholarship.title }} {{ application.status }}" data-status="{{ application.status|lower }}" data-date="{% if application.date_applied %}{{ application.date_applied|date:'c' }}{% else %}{% now 'c' %}{% endif %}">
               <td><div class="pri"><strong>{{ application.student_name }}</strong><span class="meta">{{ application.email|default:"No email provided" }}</span></div></td>
-              <td><div class="pri"><strong>{{ application.scholarship.title }}</strong><span class="meta">Application ID #{{ application.id }}</span></div></td>
+              <td><div class="pri"><strong>{{ application.scholarship.title }}</strong><span class="meta">Application ready for review</span></div></td>
               <td data-app-status>{% if application.status == "Pending" %}<span class="badge pending">Pending</span>{% elif application.status == "Approved" %}<span class="badge approved">Approved</span>{% else %}<span class="badge rejected">Rejected</span>{% endif %}</td>
               <td>{% if application.date_applied %}{{ application.date_applied|date:"d M Y" }}{% else %}-{% endif %}</td>
               <td><div class="table-actions justify-content-end"><button type="button" class="btnx success small" data-action="approve" data-url="{% url 'approve_application' application.id %}"><i class="bi bi-check2"></i><span>Approve</span></button><button type="button" class="btnx danger small" data-action="reject" data-url="{% url 'reject_application' application.id %}"><i class="bi bi-x-lg"></i><span>Reject</span></button></div></td>

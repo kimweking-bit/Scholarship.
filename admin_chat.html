@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Chat Inbox</title>
+<link rel="icon" type="image/svg+xml" sizes="any" href="{% static 'images/scholarhub-logo.svg' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+:root{
+  --bg:#f6f7fb;
+  --panel:rgba(255,255,255,.92);
+  --panel-strong:#fff;
+  --line:rgba(15,23,42,.09);
+  --text:#111827;
+  --muted:#667085;
+  --soft:#94a3b8;
+  --accent:#6d4aff;
+  --accent-2:#8b5cf6;
+  --accent-soft:rgba(109,74,255,.12);
+  --ok:#1f9365;
+  --ok-soft:rgba(31,147,101,.14);
+  --warn:#c1851d;
+  --warn-soft:rgba(193,133,29,.16);
+  --shadow:0 24px 60px rgba(15,23,42,.12);
+}
+@keyframes page-enter{
+  0%{opacity:0;transform:translateY(24px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes float-in{
+  0%{opacity:0;transform:translateY(18px) scale(.985)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes badge-pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(109,74,255,.16)}
+  50%{box-shadow:0 0 0 10px rgba(109,74,255,0)}
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:"Manrope",sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at top left,rgba(109,74,255,.08),transparent 24%),
+    radial-gradient(circle at top right,rgba(139,92,246,.08),transparent 22%),
+    linear-gradient(180deg,#ffffff 0%,var(--bg) 100%);
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+.page{
+  width:min(1360px,calc(100% - 32px));
+  margin:0 auto;
+  padding:28px 0 36px;
+  animation:page-enter .58s cubic-bezier(.22,1,.36,1) both;
+}
+.topbar{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:18px;
+  margin-bottom:24px;
+}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  padding:0 12px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:#4c31d1;
+  font-size:.76rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.eyebrow:hover{
+  transform:translateY(-1px);
+  box-shadow:0 14px 24px rgba(109,74,255,.12);
+}
+.topbar h1{
+  margin:12px 0 8px;
+  font-size:clamp(2rem,3.8vw,3rem);
+  letter-spacing:-.04em;
+}
+.topbar p{
+  margin:0;
+  max-width:52rem;
+  color:var(--muted);
+  line-height:1.75;
+}
+.top-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.top-link{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:50px;
+  padding:0 18px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.82);
+  box-shadow:0 14px 32px rgba(15,23,42,.08);
+  font-weight:700;
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.top-link:hover{
+  transform:translateY(-2px);
+  border-color:rgba(109,74,255,.24);
+  box-shadow:0 20px 42px rgba(15,23,42,.12)
+}
+.top-link:active{transform:translateY(0)}
+.top-link--primary{
+  color:#fff;
+  border:none;
+  background:linear-gradient(120deg,var(--accent),var(--accent-2));
+  box-shadow:0 20px 40px rgba(109,74,255,.28);
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+  margin-bottom:20px;
+}
+.stat{
+  position:relative;
+  overflow:hidden;
+  padding:20px;
+  border-radius:22px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.stat::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  opacity:.88;
+}
+.stat::after{
+  content:"";
+  position:absolute;
+  top:-65%;
+  left:-32%;
+  width:42%;
+  height:220%;
+  background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.42),rgba(255,255,255,0));
+  transform:rotate(18deg);
+  transition:transform .6s ease;
+}
+.stat:hover{
+  transform:translateY(-4px);
+  border-color:rgba(109,74,255,.18);
+  box-shadow:0 30px 56px rgba(15,23,42,.13);
+}
+.stat:hover::after{
+  transform:translate(24px,12px) rotate(18deg);
+}
+.stat .label{
+  color:var(--soft);
+  font-size:.75rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+.stat strong{
+  display:block;
+  margin-top:10px;
+  font-size:2rem;
+  letter-spacing:-.03em;
+}
+.stat span{
+  color:var(--muted);
+  font-size:.95rem;
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(300px,360px) minmax(0,1fr);
+  gap:20px;
+  align-items:start;
+}
+.panel{
+  position:relative;
+  border-radius:28px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  backdrop-filter:blur(14px);
+}
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:4px;
+  background:linear-gradient(90deg,rgba(109,74,255,.9),rgba(139,92,246,.5),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.panel-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:20px 22px;
+  border-bottom:1px solid var(--line);
+}
+.panel-head h2,
+.panel-head h3{
+  margin:0;
+  font-size:1.05rem;
+  font-weight:800;
+}
+.panel-head p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:.92rem;
+}
+.thread-list{
+  display:grid;
+  gap:12px;
+  padding:18px;
+  max-height:min(72vh,780px);
+  overflow-y:auto;
+  scrollbar-width:thin;
+}
+.thread-card{
+  display:grid;
+  gap:10px;
+  padding:16px;
+  position:relative;
+  overflow:hidden;
+  border-radius:22px;
+  border:1px solid rgba(203,213,225,.8);
+  background:linear-gradient(180deg,rgba(255,255,255,.96),rgba(248,250,252,.92));
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.thread-card::after{
+  content:"";
+  position:absolute;
+  top:-24%;
+  right:-28%;
+  width:38%;
+  height:180%;
+  background:linear-gradient(180deg,rgba(255,255,255,0),rgba(255,255,255,.32),rgba(255,255,255,0));
+  transform:rotate(20deg);
+  opacity:0;
+  transition:opacity .2s ease, transform .45s ease;
+}
+.thread-card:hover{
+  transform:translateY(-2px);
+  border-color:rgba(109,74,255,.28);
+  box-shadow:0 18px 40px rgba(15,23,42,.08);
+}
+.thread-card:hover::after{
+  opacity:1;
+  transform:translate(-10px,14px) rotate(20deg);
+}
+.thread-card.is-active{
+  border-color:rgba(109,74,255,.38);
+  background:linear-gradient(180deg,rgba(242,240,255,.98),rgba(255,255,255,.95));
+  box-shadow:0 18px 44px rgba(109,74,255,.12);
+}
+.thread-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.thread-name{
+  font-size:1rem;
+  font-weight:800;
+}
+.thread-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:32px;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:#4c31d1;
+  font-size:.8rem;
+  font-weight:800;
+  animation:badge-pulse 2.4s ease-in-out infinite;
+}
+.thread-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  color:var(--soft);
+  font-size:.82rem;
+  font-weight:700;
+}
+.thread-preview{
+  color:var(--muted);
+  line-height:1.65;
+  font-size:.92rem;
+}
+.thread-empty,
+.conversation-empty{
+  padding:22px;
+  color:var(--muted);
+  text-align:center;
+}
+.conversation{
+  display:grid;
+  grid-template-rows:auto minmax(340px,1fr) auto;
+  min-height:680px;
+}
+.conversation-meta{
+  display:grid;
+  gap:14px;
+  padding:22px;
+  border-bottom:1px solid var(--line);
+}
+.conversation-meta h2{
+  margin:0;
+  font-size:1.3rem;
+  font-weight:800;
+}
+.conversation-meta p{
+  margin:0;
+  color:var(--muted);
+  line-height:1.7;
+}
+.meta-pills{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.meta-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:36px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid rgba(203,213,225,.85);
+  background:rgba(248,250,252,.92);
+  color:var(--muted);
+  font-size:.84rem;
+  font-weight:700;
+}
+.meta-pill--status-open{
+  background:var(--ok-soft);
+  border-color:rgba(134,239,172,.86);
+  color:var(--ok);
+}
+.meta-pill--status-resolved{
+  background:var(--warn-soft);
+  border-color:rgba(253,224,71,.82);
+  color:var(--warn);
+}
+.message-list{
+  display:grid;
+  gap:14px;
+  padding:22px;
+  background:
+    radial-gradient(circle at top left,rgba(109,74,255,.04),transparent 18%),
+    linear-gradient(180deg,rgba(255,255,255,.9),rgba(248,250,252,.82));
+  overflow-y:auto;
+  scroll-behavior:smooth;
+  scrollbar-width:thin;
+}
+.message-row{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-width:min(82%,620px);
+  animation:float-in .42s cubic-bezier(.22,1,.36,1) both;
+}
+.message-row--admin{
+  margin-left:auto;
+  align-items:flex-end;
+}
+.message-label{
+  color:var(--soft);
+  font-size:.8rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.message-bubble{
+  padding:16px 18px;
+  border-radius:22px;
+  border:1px solid rgba(226,232,240,.92);
+  background:#fff;
+  color:var(--text);
+  line-height:1.75;
+  box-shadow:0 16px 38px rgba(15,23,42,.08);
+  transition:transform .18s ease, box-shadow .18s ease;
+}
+.message-bubble:hover{
+  transform:translateY(-1px);
+  box-shadow:0 22px 42px rgba(15,23,42,.1);
+}
+.message-row--admin .message-bubble{
+  background:linear-gradient(120deg,var(--accent),var(--accent-2));
+  border:none;
+  color:#fff;
+  box-shadow:0 20px 42px rgba(109,74,255,.22);
+}
+.message-time{
+  color:var(--soft);
+  font-size:.8rem;
+  font-weight:700;
+}
+.reply-shell{
+  padding:20px 22px 22px;
+  border-top:1px solid var(--line);
+  background:rgba(255,255,255,.96);
+}
+.reply-shell textarea{
+  min-height:96px;
+  resize:none;
+  border-radius:20px;
+  border:1px solid rgba(203,213,225,.9);
+  padding:14px 16px;
+  transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.reply-shell textarea:focus{
+  border-color:rgba(109,74,255,.42);
+  box-shadow:0 0 0 4px rgba(109,74,255,.12);
+  transform:translateY(-1px);
+}
+.reply-errors .errorlist{
+  margin:0 0 14px;
+  padding-left:18px;
+  color:#c2410c;
+}
+.reply-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:14px;
+}
+.btnx{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  min-height:48px;
+  padding:0 18px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--text);
+  font-weight:800;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.btnx:hover{
+  transform:translateY(-2px);
+  border-color:rgba(109,74,255,.22);
+  box-shadow:0 18px 34px rgba(15,23,42,.08)
+}
+.btnx:active{transform:translateY(0)}
+.btnx--primary{
+  border:none;
+  background:linear-gradient(120deg,var(--accent),var(--accent-2));
+  color:#fff;
+  box-shadow:0 18px 38px rgba(109,74,255,.24);
+}
+.btnx--resolve{
+  background:rgba(240,253,244,.96);
+  color:var(--ok);
+  border-color:rgba(134,239,172,.84);
+}
+.btnx--reopen{
+  background:rgba(255,247,237,.96);
+  color:var(--warn);
+  border-color:rgba(253,186,116,.84);
+}
+.is-staged{
+  opacity:0;
+  transform:translateY(18px) scale(.985);
+  transition:
+    opacity .48s ease var(--item-delay,0ms),
+    transform .48s cubic-bezier(.22,1,.36,1) var(--item-delay,0ms);
+}
+.page-ready .is-staged{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}
+@media (max-width: 1100px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .layout{grid-template-columns:1fr}
+  .conversation{min-height:unset}
+}
+@media (max-width: 720px){
+  .page{width:min(100% - 20px,1360px)}
+  .topbar{flex-direction:column}
+  .top-actions,.reply-actions{width:100%}
+  .top-link,.btnx{width:100%}
+  .stats{grid-template-columns:1fr}
+  .message-row{max-width:100%}
+}
+</style>
+</head>
+<body>
+  <div class="page">
+    <section class="topbar">
+      <div>
+        <span class="eyebrow"><i class="bi bi-chat-dots"></i>Admin inbox</span>
+        <h1>Support conversations with real visitors</h1>
+        <p>Messages sent from the ScholarHub chat widget land here. Open a thread, reply directly, and mark it resolved once the visitor has what they need.</p>
+      </div>
+      <div class="top-actions">
+        <a href="{% url 'admin_dashboard' %}" class="top-link"><i class="bi bi-speedometer2"></i><span>Back to Dashboard</span></a>
+        <a href="{% url 'home' %}" class="top-link top-link--primary"><i class="bi bi-house-door"></i><span>Open Homepage</span></a>
+      </div>
+    </section>
+
+    <section class="stats">
+      <article class="stat">
+        <span class="label">Open Threads</span>
+        <strong>{{ open_thread_count|default:0 }}</strong>
+        <span>Conversations that still need attention or follow-up.</span>
+      </article>
+      <article class="stat">
+        <span class="label">Unread Threads</span>
+        <strong>{{ unread_thread_count|default:0 }}</strong>
+        <span>Threads with fresh visitor messages that the admin has not opened yet.</span>
+      </article>
+      <article class="stat">
+        <span class="label">Inbox Size</span>
+        <strong>{{ thread_cards|length }}</strong>
+        <span>Total saved chat threads currently available in ScholarHub.</span>
+      </article>
+    </section>
+
+    <section class="layout">
+      <aside class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Threads</h2>
+            <p>Newest conversations appear first.</p>
+          </div>
+        </div>
+
+        <div class="thread-list">
+          {% for item in thread_cards %}
+            <a href="{% url 'admin_chat' %}?thread={{ item.thread.id }}" class="thread-card {% if selected_thread and selected_thread.id == item.thread.id %}is-active{% endif %}">
+              <div class="thread-top">
+                <span class="thread-name">{{ item.thread.participant_name }}</span>
+                {% if item.unread_count %}
+                  <span class="thread-badge">{{ item.unread_count }}</span>
+                {% endif %}
+              </div>
+              <div class="thread-meta">
+                <span><i class="bi bi-clock-history"></i> {{ item.thread.last_message_at|timesince }} ago</span>
+                <span><i class="bi bi-life-preserver"></i> {{ item.thread.status }}</span>
+              </div>
+              <div class="thread-preview">
+                {% if item.latest_message %}
+                  {{ item.latest_message.body|truncatewords:18 }}
+                {% else %}
+                  Conversation started but no messages have been saved yet.
+                {% endif %}
+              </div>
+            </a>
+          {% empty %}
+            <div class="thread-empty">
+              <i class="bi bi-chat-square-dots" style="font-size: 2rem;"></i>
+              <p class="mb-0 mt-2">No chat messages yet. New homepage conversations will appear here automatically.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </aside>
+
+      <section class="panel conversation">
+        {% if selected_thread %}
+          <div class="conversation-meta">
+            <div>
+              <h2>{{ selected_thread.participant_name }}</h2>
+              <p>
+                {% if selected_thread.user %}
+                  Logged in as <strong>{{ selected_thread.user.username }}</strong>
+                {% else %}
+                  Anonymous visitor tracked in the current browser session
+                {% endif %}
+              </p>
+            </div>
+            <div class="meta-pills">
+              <span class="meta-pill {% if selected_thread.status == 'Open' %}meta-pill--status-open{% else %}meta-pill--status-resolved{% endif %}">
+                <i class="bi {% if selected_thread.status == 'Open' %}bi-broadcast-pin{% else %}bi-check2-circle{% endif %}"></i>
+                <span>{{ selected_thread.status }}</span>
+              </span>
+              <span class="meta-pill"><i class="bi bi-calendar-event"></i><span>Started {{ selected_thread.created_at|date:"M j, Y" }}</span></span>
+              <span class="meta-pill"><i class="bi bi-clock-history"></i><span>Last message {{ selected_thread.last_message_at|timesince }} ago</span></span>
+            </div>
+          </div>
+
+          <div class="message-list">
+            {% for message in selected_thread.messages.all %}
+              <article class="message-row {% if message.sender_role == 'Admin' %}message-row--admin{% endif %}">
+                <span class="message-label">{{ message.sender_name|default:message.sender_role }}</span>
+                <div class="message-bubble">{{ message.body|linebreaksbr }}</div>
+                <span class="message-time">{{ message.created_at|date:"M j, Y - g:i A" }}</span>
+              </article>
+            {% empty %}
+              <div class="conversation-empty">
+                <i class="bi bi-chat-left-text" style="font-size: 2rem;"></i>
+                <p class="mb-0 mt-2">This thread is empty. As soon as the visitor sends a message, it will appear here.</p>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="reply-shell">
+            <div class="reply-errors">{{ reply_form.body.errors }}</div>
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="thread_id" value="{{ selected_thread.id }}">
+              {{ reply_form.body }}
+              <div class="reply-actions">
+                <button type="submit" name="action" value="reply" class="btnx btnx--primary"><i class="bi bi-send-check"></i><span>Send Reply</span></button>
+                {% if selected_thread.status == 'Open' %}
+                  <button type="submit" name="action" value="resolve" class="btnx btnx--resolve"><i class="bi bi-check2-circle"></i><span>Mark Resolved</span></button>
+                {% else %}
+                  <button type="submit" name="action" value="reopen" class="btnx btnx--reopen"><i class="bi bi-arrow-repeat"></i><span>Reopen Thread</span></button>
+                {% endif %}
+              </div>
+            </form>
+          </div>
+        {% else %}
+          <div class="conversation-empty" style="padding: 80px 24px;">
+            <i class="bi bi-chat-heart" style="font-size: 2.4rem;"></i>
+            <h3 class="mt-3 mb-2">Select a conversation</h3>
+            <p class="mb-0">When visitors send messages from the homepage chat widget, you will be able to open the thread here and answer them directly.</p>
+          </div>
+        {% endif %}
+      </section>
+    </section>
+  </div>
+  <script>
+    const stagedElements = document.querySelectorAll('.stat, .panel, .thread-card, .top-link, .btnx');
+    stagedElements.forEach((element, index) => {
+      element.classList.add('is-staged');
+      element.style.setProperty('--item-delay', `${Math.min((index % 8) * 55, 275)}ms`);
+    });
+    requestAnimationFrame(() => {
+      document.body.classList.add('page-ready');
+    });
+
+    const messageList = document.querySelector('.message-list');
+    if (messageList) {
+      requestAnimationFrame(() => {
+        messageList.scrollTop = messageList.scrollHeight;
+      });
+    }
+
+    const replyInput = document.querySelector('.reply-shell textarea');
+    if (replyInput) {
+      const resizeReplyInput = () => {
+        replyInput.style.height = 'auto';
+        replyInput.style.height = `${Math.min(replyInput.scrollHeight, 220)}px`;
+      };
+
+      resizeReplyInput();
+      replyInput.addEventListener('input', resizeReplyInput);
+    }
+  </script>
+</body>
+</html>

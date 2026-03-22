@@ -1,6 +1,14 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 
-from .models import Application, ContactMessage, Scholarship
+from .newsletter import send_newsletter_welcome_email
+from .models import (
+    Application,
+    ChatMessage,
+    ChatThread,
+    ContactMessage,
+    NewsletterSubscriber,
+    Scholarship,
+)
 
 
 @admin.register(Scholarship)
@@ -26,3 +34,42 @@ class ContactMessageAdmin(admin.ModelAdmin):
     list_display = ("name", "email", "subject", "created_at")
     list_filter = ("created_at",)
     search_fields = ("name", "email", "subject", "message")
+
+
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ("email", "user", "source", "is_active", "subscribed_at", "welcome_email_sent_at")
+    list_filter = ("is_active", "source", "subscribed_at")
+    search_fields = ("email", "user__username", "user__first_name", "user__last_name")
+    actions = ("resend_welcome_email",)
+
+    @admin.action(description="Resend ScholarHub welcome email")
+    def resend_welcome_email(self, request, queryset):
+        sent = 0
+        failed = 0
+
+        for subscriber in queryset:
+            try:
+                send_newsletter_welcome_email(subscriber, request=request)
+                sent += 1
+            except Exception:
+                failed += 1
+
+        if sent:
+            self.message_user(request, f"Sent {sent} welcome email(s).", level=messages.SUCCESS)
+        if failed:
+            self.message_user(request, f"{failed} subscriber(s) could not be emailed.", level=messages.ERROR)
+
+
+@admin.register(ChatThread)
+class ChatThreadAdmin(admin.ModelAdmin):
+    list_display = ("participant_name", "status", "last_message_at", "last_admin_reply_at", "last_user_message_at")
+    list_filter = ("status", "last_message_at")
+    search_fields = ("guest_label", "session_key", "user__username", "user__first_name", "user__last_name")
+
+
+@admin.register(ChatMessage)
+class ChatMessageAdmin(admin.ModelAdmin):
+    list_display = ("thread", "sender_role", "sender_name", "created_at")
+    list_filter = ("sender_role", "created_at")
+    search_fields = ("sender_name", "body", "thread__guest_label", "thread__user__username")

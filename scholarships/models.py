@@ -185,3 +185,86 @@ class ContactMessage(models.Model):
 
     def __str__(self) -> str:
         return f"{self.name} - {self.email}"
+
+
+class NewsletterSubscriber(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="newsletter_subscriptions",
+        null=True,
+        blank=True,
+    )
+    email = models.EmailField(unique=True)
+    source = models.CharField(max_length=80, blank=True)
+    is_active = models.BooleanField(default=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    welcome_email_sent_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-subscribed_at"]
+
+    def __str__(self) -> str:
+        return self.email
+
+
+class ChatThread(models.Model):
+    STATUS_OPEN = "Open"
+    STATUS_RESOLVED = "Resolved"
+    STATUS_CHOICES = [
+        (STATUS_OPEN, "Open"),
+        (STATUS_RESOLVED, "Resolved"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        related_name="chat_threads",
+        null=True,
+        blank=True,
+    )
+    session_key = models.CharField(max_length=64, blank=True, db_index=True)
+    guest_label = models.CharField(max_length=120, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    last_message_at = models.DateTimeField(default=timezone.now, db_index=True)
+    last_admin_reply_at = models.DateTimeField(null=True, blank=True)
+    last_user_message_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-last_message_at", "-updated_at"]
+
+    def __str__(self) -> str:
+        return f"ChatThread({self.pk}) {self.participant_name}"
+
+    @property
+    def participant_name(self) -> str:
+        if self.user_id and self.user:
+            full_name = f"{self.user.first_name} {self.user.last_name}".strip()
+            return full_name or getattr(self.user, "username", "") or f"User {self.user_id}"
+        return (self.guest_label or "").strip() or "Guest visitor"
+
+
+class ChatMessage(models.Model):
+    SENDER_USER = "User"
+    SENDER_ADMIN = "Admin"
+    SENDER_CHOICES = [
+        (SENDER_USER, "User"),
+        (SENDER_ADMIN, "Admin"),
+    ]
+
+    thread = models.ForeignKey(ChatThread, on_delete=models.CASCADE, related_name="messages")
+    sender_role = models.CharField(max_length=20, choices=SENDER_CHOICES)
+    sender_name = models.CharField(max_length=150, blank=True)
+    body = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read_by_admin_at = models.DateTimeField(null=True, blank=True)
+    read_by_user_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.sender_role} -> thread {self.thread_id}"

@@ -71,7 +71,7 @@
             <div class="flex items-center gap-4">
               {% if request.user.is_authenticated %}
                 {% if request.user.is_staff %}
-                  <a href="{% url 'admin_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                  <a href="{% url 'admin:index' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Admin</a>
                 {% else %}
                   <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
                 {% endif %}
@@ -95,7 +95,7 @@
             <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
             {% if request.user.is_authenticated %}
               {% if request.user.is_staff %}
-                <a href="{% url 'admin_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+                <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Admin</a>
               {% else %}
                 <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
               {% endif %}
@@ -120,7 +120,7 @@
           <a class="hover:text-white transition" href="{% url 'contact' %}">Contact</a>
           {% if request.user.is_authenticated %}
             {% if request.user.is_staff %}
-              <a class="px-3 py-2 rounded-lg bg-white/15 text-white" href="{% url 'admin_dashboard' %}">Dashboard</a>
+              <a class="px-3 py-2 rounded-lg bg-white/15 text-white" href="{% url 'admin:index' %}">Admin</a>
             {% else %}
               <a class="px-3 py-2 rounded-lg bg-white/15 text-white" href="{% url 'student_dashboard' %}">Dashboard</a>
             {% endif %}
@@ -325,18 +325,25 @@
       </section>
 
       <!-- Newsletter -->
-      <section class="mx-auto max-w-6xl px-4 py-12 animate-fade-up">
+      <section class="mx-auto max-w-6xl px-4 py-12 animate-fade-up" id="about-newsletter">
         <div class="rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white p-8 shadow-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div>
             <p class="text-xs uppercase tracking-[0.25em] text-white/80">Stay updated</p>
             <h3 class="text-2xl font-semibold">Get new scholarships in your inbox</h3>
             <p class="text-white/80">Receive alerts for fresh opportunities and approaching deadlines.</p>
           </div>
-          <form class="flex flex-col sm:flex-row gap-3 w-full md:w-auto" action="#" method="post">
-            <input type="email" name="email" required placeholder="you@example.com" class="w-full sm:w-72 rounded-xl px-4 py-3 text-slate-900 focus:outline-none" />
+          <form class="flex flex-col sm:flex-row gap-3 w-full md:w-auto" action="{% url 'subscribe_newsletter' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="anchor" value="about-newsletter">
+            <input type="hidden" name="source" value="about-cta">
+            <input type="email" name="email" required placeholder="you@example.com" autocomplete="email" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}" class="w-full sm:w-72 rounded-xl px-4 py-3 text-slate-900 focus:outline-none" />
             <button type="submit" class="px-5 py-3 rounded-xl bg-white text-indigo-600 font-semibold shadow-lg hover:-translate-y-0.5 transition">Subscribe</button>
           </form>
         </div>
+        {% with newsletter_feedback_source="about-cta" %}
+          {% include "includes/newsletter_feedback.html" %}
+        {% endwith %}
       </section>
     </main>
 
@@ -372,10 +379,17 @@
         </div>
         <div>
           <h4 class="font-semibold text-white mb-3">Newsletter</h4>
-          <form class="flex flex-col gap-3">
-            <input type="email" placeholder="you@example.com" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" />
+          <form class="flex flex-col gap-3" id="about-footer-newsletter" action="{% url 'subscribe_newsletter' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <input type="hidden" name="anchor" value="about-footer-newsletter">
+            <input type="hidden" name="source" value="about-footer">
+            <input type="email" name="email" placeholder="you@example.com" autocomplete="email" value="{% if request.user.is_authenticated %}{{ request.user.email }}{% endif %}" class="w-full rounded-lg px-4 py-3 bg-slate-800 text-white border border-slate-700 focus:outline-none" required />
             <button type="submit" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow hover:-translate-y-0.5 transition">Subscribe</button>
           </form>
+          {% with newsletter_feedback_source="about-footer" %}
+            {% include "includes/newsletter_feedback.html" %}
+          {% endwith %}
         </div>
       </div>
       <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
@@ -423,5 +437,6 @@
         setTheme(next);
       });
     </script>
+    {% include "includes/chat_widget.html" %}
   </body>
 </html>

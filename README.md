@@ -25,6 +25,38 @@ python manage.py runserver
 
 The app uses SQLite locally unless you set `DATABASE_URL`.
 
+### Email and newsletter setup
+
+Newsletter subscriptions now store subscriber emails in Django and send a branded welcome email. To make delivery work outside local development, configure SMTP-style environment variables:
+
+```bash
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
+EMAIL_HOST=smtp.your-provider.com
+EMAIL_PORT=587
+EMAIL_HOST_USER=your-smtp-user
+EMAIL_HOST_PASSWORD=your-smtp-password
+EMAIL_USE_TLS=true
+DEFAULT_FROM_EMAIL=ScholarHub <hello@your-domain.com>
+SUPPORT_EMAIL=support@your-domain.com
+SITE_URL=https://your-live-domain.com
+```
+
+For local testing, you can keep `EMAIL_BACKEND=django.core.mail.backends.console.EmailBackend` so emails print to the terminal instead of going out to a real inbox.
+The app now auto-loads a root `.env` file, so copying `.env.example` to `.env` is enough for local email setup.
+
+To verify delivery after you add real SMTP credentials, run:
+
+```bash
+python manage.py email_doctor --connect
+python manage.py send_test_email --to you@example.com
+```
+
+If you want the email to include a real dashboard link for an existing account, add:
+
+```bash
+python manage.py send_test_email --to you@example.com --user your_username
+```
+
 ## Render deployment
 
 This repo includes a [render.yaml](./render.yaml) Blueprint for a Python web service plus a managed Postgres database.
@@ -60,6 +92,7 @@ python manage.py seed_scholarships
 - `DEBUG` is set to `false` in production.
 - `ALLOWED_HOSTS` automatically includes Render's hostname when `RENDER_EXTERNAL_HOSTNAME` is present.
 - `CSRF_TRUSTED_ORIGINS` automatically includes Render's external URL when `RENDER_EXTERNAL_URL` is present.
+- Configure the email variables above in Render as well if you want newsletter welcome emails to reach real inboxes.
 
 ## Notes
 

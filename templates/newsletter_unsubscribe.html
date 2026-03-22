@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Newsletter Preferences | ScholarHub</title>
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/scholarhub-logo.svg' %}" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #0f172a;
+        --muted: #475569;
+        --line: rgba(99, 102, 241, 0.12);
+        --soft: #eef2ff;
+        --surface: rgba(255, 255, 255, 0.92);
+        --brand-a: #312e81;
+        --brand-b: #4f46e5;
+        --brand-c: #8b5cf6;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, Helvetica, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(99, 102, 241, 0.18), transparent 35%),
+          radial-gradient(circle at right 10%, rgba(139, 92, 246, 0.14), transparent 32%),
+          linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
+      .panel {
+        width: min(100%, 720px);
+        border-radius: 32px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+      }
+      .hero {
+        padding: 36px 38px 26px;
+        background: linear-gradient(135deg, var(--brand-a), var(--brand-b) 50%, var(--brand-c));
+        color: white;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 18px 0 10px;
+        font-size: clamp(2rem, 5vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+      }
+      .hero p {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.84);
+        max-width: 34rem;
+      }
+      .body {
+        padding: 32px 38px 38px;
+      }
+      .status-card {
+        border-radius: 24px;
+        padding: 22px 24px;
+        border: 1px solid rgba(99, 102, 241, 0.12);
+        background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      }
+      .status-label {
+        margin: 0 0 10px;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #4f46e5;
+      }
+      .status-card h2 {
+        margin: 0 0 8px;
+        font-size: 1.45rem;
+        line-height: 1.2;
+      }
+      .status-card p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 24px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 18px;
+        border-radius: 16px;
+        text-decoration: none;
+        font-weight: 700;
+        transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn-primary {
+        color: white;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        box-shadow: 0 18px 36px rgba(99, 102, 241, 0.22);
+      }
+      .btn-secondary {
+        color: var(--ink);
+        background: white;
+        border: 1px solid rgba(148, 163, 184, 0.32);
+      }
+      .meta {
+        margin-top: 18px;
+        font-size: 0.94rem;
+        color: #64748b;
+      }
+      @media (max-width: 640px) {
+        .hero, .body {
+          padding: 28px 22px;
+        }
+        .actions {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <section class="hero">
+        <div class="eyebrow">ScholarHub Preferences</div>
+        <h1>Newsletter settings updated.</h1>
+        <p>We keep this simple, respectful, and easy to reverse whenever you want back in.</p>
+      </section>
+      <section class="body">
+        <div class="status-card">
+          <p class="status-label">Subscription Status</p>
+          {% if status == "success" %}
+            <h2>You have been unsubscribed.</h2>
+            <p>
+              {{ subscriber.email }} will no longer receive ScholarHub newsletter updates. If you change your mind, you can subscribe again from any page on the site.
+            </p>
+          {% elif status == "already" %}
+            <h2>This address was already unsubscribed.</h2>
+            <p>
+              {{ subscriber.email }} is not currently receiving ScholarHub newsletter updates, so there was nothing else to switch off.
+            </p>
+          {% else %}
+            <h2>This link is no longer valid.</h2>
+            <p>
+              The unsubscribe link may be expired or incomplete. If you still want off the list, subscribe again with the same email and use the fresh link from that message.
+            </p>
+          {% endif %}
+        </div>
+
+        <div class="actions">
+          <a class="btn btn-primary" href="{% url 'home' %}">Return to ScholarHub</a>
+          <a class="btn btn-secondary" href="{% url 'scholarships' %}">Browse scholarships</a>
+        </div>
+
+        <p class="meta">
+          Need help instead? Reach out through the contact page or the support chat and we will sort it out quickly.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

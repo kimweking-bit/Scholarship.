@@ -1,3 +1,4 @@
+{% load static %}
 <article
   class="scholarship-cardx {% if section == 'recommended' %}scholarship-cardx--recommended{% endif %}{% if section == 'catalog' %} scholarship-cardx--catalog{% endif %}"
   {% if section == 'catalog' %}data-catalog-card="true"{% endif %}
@@ -10,8 +11,10 @@
   data-match-score="{{ item.match_score }}"
 >
   <div class="scholarship-cardx__media">
-    {% if item.scholarship.image %}
-      <img src="{{ item.scholarship.image.url }}" class="scholarship-cardx__image" alt="{{ item.scholarship.title }}">
+    {% if fallback_art %}
+      <img src="{% static fallback_art %}" class="scholarship-cardx__image" alt="{{ item.scholarship.title }} illustration" loading="lazy">
+    {% elif item.scholarship.image %}
+      <img src="{{ item.scholarship.image.url }}" class="scholarship-cardx__image" alt="{{ item.scholarship.title }}" loading="lazy">
     {% else %}
       <div class="scholarship-cardx__placeholder">
         <span class="scholarship-cardx__placeholder-mark"><i class="bi bi-stars"></i></span>

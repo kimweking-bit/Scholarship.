@@ -4,87 +4,406 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{% if scholarship %}Edit Scholarship{% else %}Create Scholarship{% endif %}</title>
+    <title>ScholarHub | {% if scholarship %}Edit Scholarship{% else %}Create Scholarship{% endif %}</title>
+    <meta
+      name="description"
+      content="Create and refine scholarship listings in ScholarHub with a cleaner, more polished admin workflow."
+    />
     <link rel="icon" type="image/svg+xml" sizes="any" href="{% static 'images/scholarhub-logo.svg' %}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/form-pages.css' %}" />
   </head>
-  <body>
-    <div class="container mt-5" style="max-width: 860px">
-      <h2 class="mb-4">{% if scholarship %}Edit Scholarship{% else %}Add New Scholarship{% endif %}</h2>
 
-      <form method="post" enctype="multipart/form-data" class="card card-body shadow-sm">
-        {% csrf_token %}
+  <body class="form-page">
+    <div class="form-page__backdrop" aria-hidden="true"></div>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.title.id_for_label }}">Title</label>
-          {{ form.title }}
-          {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors }}</div>{% endif %}
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.organization.id_for_label }}">Organization</label>
-          {{ form.organization }}
-          {% if form.organization.errors %}<div class="text-danger small">{{ form.organization.errors }}</div>{% endif %}
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.country.id_for_label }}">Country</label>
-          {{ form.country }}
-          {% if form.country.errors %}<div class="text-danger small">{{ form.country.errors }}</div>{% endif %}
-        </div>
-
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <div class="mb-3">
-              <label class="form-label" for="{{ form.level.id_for_label }}">Level</label>
-              {{ form.level }}
-              {% if form.level.errors %}<div class="text-danger small">{{ form.level.errors }}</div>{% endif %}
+    <nav class="site-navbar fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <span class="flex h-10 w-10 items-center justify-center rounded-[18px] bg-white/15 shadow-lg ring-1 ring-white/20 backdrop-blur-sm transition group-hover:-translate-y-0.5 group-hover:bg-white/20">
+              <img src="{% static 'images/scholarhub-logo.svg' %}" alt="ScholarHub logo" class="h-7 w-7 drop-shadow-sm" />
+            </span>
+            <span class="text-lg font-semibold tracking-tight text-white group-hover:text-white transition">ScholarHub</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-4 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
+            </div>
+            <div class="flex items-center gap-3">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin:index' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Admin</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
             </div>
           </div>
-          <div class="col-12 col-md-6">
-            <div class="mb-3">
-              <label class="form-label" for="{{ form.category.id_for_label }}">Category</label>
-              {{ form.category }}
-              {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+        </div>
+      </div>
+      <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+        <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+          <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+          <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+          <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+          <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+          <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff %}
+              <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Admin</a>
+            {% else %}
+              <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+            <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    </nav>
+
+    <main class="form-main">
+      <div class="page-shell">
+        <section class="page-hero fade-up">
+          <div>
+            <p class="page-kicker">Admin Publishing</p>
+            <h1 class="page-title">
+              {% if scholarship %}
+                Refine this scholarship listing
+              {% else %}
+                Create a scholarship listing that feels credible
+              {% endif %}
+            </h1>
+            <p class="page-copy">
+              Keep the listing sharp, clear, and trustworthy. Strong titles, structured requirements, and confident visual
+              presentation make opportunities easier for students to understand and apply for.
+            </p>
+            <div class="hero-meta">
+              {% if scholarship and scholarship.organization %}
+                <span class="hero-meta__item"><i class="bi bi-building"></i>{{ scholarship.organization }}</span>
+              {% endif %}
+              {% if scholarship and scholarship.country %}
+                <span class="hero-meta__item"><i class="bi bi-globe2"></i>{{ scholarship.country }}</span>
+              {% else %}
+                <span class="hero-meta__item"><i class="bi bi-globe2"></i>Global-ready listing</span>
+              {% endif %}
+              {% if scholarship and scholarship.level %}
+                <span class="hero-meta__item"><i class="bi bi-mortarboard"></i>{{ scholarship.get_level_display|default:scholarship.level }}</span>
+              {% else %}
+                <span class="hero-meta__item"><i class="bi bi-mortarboard"></i>Level can be tailored</span>
+              {% endif %}
+              {% if scholarship and scholarship.deadline %}
+                <span class="hero-meta__item"><i class="bi bi-calendar2-week"></i>{{ scholarship.deadline|date:"M j, Y" }}</span>
+              {% endif %}
             </div>
           </div>
-        </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.amount_display.id_for_label }}">Amount</label>
-          {{ form.amount_display }}
-          {% if form.amount_display.errors %}<div class="text-danger small">{{ form.amount_display.errors }}</div>{% endif %}
-        </div>
+          <div class="hero-panel fade-up" style="animation-delay: 0.08s;">
+            <span class="hero-panel__eyebrow">Publishing flow</span>
+            <h2 class="hero-panel__title">Write it once, present it cleanly</h2>
+            <p class="hero-panel__copy">
+              A clear listing reduces confusion for students and saves review time later. Focus on title clarity, eligibility,
+              funding detail, and a confident description that reads like a real opportunity.
+            </p>
+            <div class="hero-actions">
+              <a href="{% url 'admin_dashboard' %}" class="hero-link hero-link--primary">
+                <i class="bi bi-speedometer2"></i>
+                <span>Back to Dashboard</span>
+              </a>
+              <a href="{% url 'scholarships' %}" class="hero-link hero-link--secondary">
+                <i class="bi bi-eye"></i>
+                <span>View Public Page</span>
+              </a>
+            </div>
+          </div>
+        </section>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.deadline.id_for_label }}">Deadline</label>
-          {{ form.deadline }}
-          {% if form.deadline.errors %}<div class="text-danger small">{{ form.deadline.errors }}</div>{% endif %}
-        </div>
+        <section class="page-grid">
+          <aside class="detail-card fade-up" style="animation-delay: 0.1s;">
+            <div class="detail-card__media">
+              {% if scholarship and scholarship.image %}
+                <img src="{{ scholarship.image.url }}" alt="{{ scholarship.title }}" />
+              {% else %}
+                <img src="{% static 'images/recommendation-global-campus.svg' %}" alt="Scholarship listing illustration" />
+              {% endif %}
+            </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.requirements.id_for_label }}">Requirements</label>
-          {{ form.requirements }}
-          {% if form.requirements.errors %}<div class="text-danger small">{{ form.requirements.errors }}</div>{% endif %}
-        </div>
+            <div class="detail-card__body">
+              <div class="status-row">
+                {% if scholarship %}
+                  {% if scholarship.is_expired %}
+                    <span class="status-badge status-badge--warning">
+                      <i class="bi bi-hourglass-split"></i>
+                      <span>Expired</span>
+                    </span>
+                  {% elif scholarship.is_active %}
+                    <span class="status-badge status-badge--active">
+                      <i class="bi bi-broadcast-pin"></i>
+                      <span>Live Listing</span>
+                    </span>
+                  {% else %}
+                    <span class="status-badge status-badge--draft">
+                      <i class="bi bi-pencil-square"></i>
+                      <span>Draft / Inactive</span>
+                    </span>
+                  {% endif %}
+                {% else %}
+                  <span class="status-badge status-badge--draft">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>New Listing</span>
+                  </span>
+                {% endif %}
+              </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.description.id_for_label }}">Description</label>
-          {{ form.description }}
-          {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
-        </div>
+              <div>
+                <h2>{% if scholarship %}{{ scholarship.title }}{% else %}Build a confident first draft{% endif %}</h2>
+                <p class="detail-card__summary">
+                  {% if scholarship and scholarship.description %}
+                    {{ scholarship.description|truncatewords:34 }}
+                  {% else %}
+                    Give students the information they need to trust the opportunity quickly: who is offering it, who it is for,
+                    what it covers, when it closes, and what documents are required.
+                  {% endif %}
+                </p>
+              </div>
 
-        <div class="mb-3">
-          <label class="form-label" for="{{ form.image.id_for_label }}">Image (optional)</label>
-          {{ form.image }}
-          {% if form.image.errors %}<div class="text-danger small">{{ form.image.errors }}</div>{% endif %}
-        </div>
+              <div class="detail-list">
+                <div class="detail-item">
+                  <span class="detail-item__label">Organization</span>
+                  <span class="detail-item__value">{% if scholarship and scholarship.organization %}{{ scholarship.organization }}{% else %}Set the sponsor or university clearly{% endif %}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-item__label">Deadline</span>
+                  <span class="detail-item__value">{% if scholarship and scholarship.deadline %}{{ scholarship.deadline|date:"M j, Y" }}{% else %}Open ended until you define it{% endif %}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-item__label">Funding</span>
+                  <span class="detail-item__value">{% if scholarship and scholarship.amount_display %}{{ scholarship.amount_display }}{% else %}Add a clear amount or funding summary{% endif %}</span>
+                </div>
+              </div>
 
-        <div class="d-flex gap-2">
-          <button class="btn btn-primary" type="submit">{% if scholarship %}Update Scholarship{% else %}Create Scholarship{% endif %}</button>
-          <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">Cancel</a>
-        </div>
-      </form>
-    </div>
+              <div class="support-card">
+                <p class="support-card__title">Publishing checklist</p>
+                <ul class="feature-list">
+                  <li>Use a specific title that students can recognize instantly.</li>
+                  <li>Add the sponsoring organization and country to anchor trust.</li>
+                  <li>Write requirements in plain language with the exact documents expected.</li>
+                  <li>Use the description to explain value, eligibility, and scope without filler.</li>
+                </ul>
+              </div>
+
+              <div class="support-card">
+                <p class="support-card__title">Current snapshot</p>
+                <div class="meta-stack">
+                  <div class="meta-row">
+                    <span class="meta-row__label">Mode</span>
+                    <span class="meta-row__value">{% if scholarship %}Editing existing listing{% else %}Creating a new listing{% endif %}</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-row__label">Audience</span>
+                    <span class="meta-row__value">{% if scholarship and scholarship.level %}{{ scholarship.get_level_display|default:scholarship.level }}{% else %}Open level until selected{% endif %}</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-row__label">Created</span>
+                    <span class="meta-row__value">{% if scholarship %}{{ scholarship.created_at|date:"M j, Y" }}{% else %}Will be stamped on save{% endif %}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          <div class="form-card fade-up" style="animation-delay: 0.15s;">
+            <div class="form-card__head">
+              <span class="form-card__eyebrow">{% if scholarship %}Edit Listing{% else %}New Listing{% endif %}</span>
+              <h2 class="form-card__title">{% if scholarship %}Update scholarship details{% else %}Add a new scholarship{% endif %}</h2>
+              <p class="form-card__copy">
+                Use the structure below to keep each opportunity consistent across the dashboard and the public scholarship catalog.
+              </p>
+            </div>
+
+            {% if form.non_field_errors %}
+              <div class="alert-surface mb-4">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="styled-form">
+              {% csrf_token %}
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Essentials</span>
+                  <h3>Opportunity basics</h3>
+                  <p>Lead with the information students scan first when deciding whether to open a listing.</p>
+                </div>
+
+                <div class="field-grid field-grid--two">
+                  <div class="field-group">
+                    <label for="{{ form.title.id_for_label }}">Title</label>
+                    {{ form.title }}
+                    <div class="field-errors">{{ form.title.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.organization.id_for_label }}">Organization</label>
+                    {{ form.organization }}
+                    <div class="field-errors">{{ form.organization.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.country.id_for_label }}">Country</label>
+                    {{ form.country }}
+                    <p class="field-note">Add the primary destination or sponsoring location students should associate with this listing.</p>
+                    <div class="field-errors">{{ form.country.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.amount_display.id_for_label }}">Amount</label>
+                    {{ form.amount_display }}
+                    <p class="field-note">Use a student-facing funding label like "Fully Funded" or "KES 150,000 per year".</p>
+                    <div class="field-errors">{{ form.amount_display.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Classification</span>
+                  <h3>Audience and timing</h3>
+                  <p>Set who the scholarship is for and when students need to act.</p>
+                </div>
+
+                <div class="field-grid field-grid--two">
+                  <div class="field-group">
+                    <label for="{{ form.level.id_for_label }}">Level</label>
+                    {{ form.level }}
+                    <div class="field-errors">{{ form.level.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.category.id_for_label }}">Category</label>
+                    {{ form.category }}
+                    <div class="field-errors">{{ form.category.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.deadline.id_for_label }}">Deadline</label>
+                    {{ form.deadline }}
+                    <p class="field-note">Leave blank only when the opportunity is truly open ended or rolling.</p>
+                    <div class="field-errors">{{ form.deadline.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Content</span>
+                  <h3>Requirements and description</h3>
+                  <p>These are the two sections students rely on most when deciding whether to apply.</p>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field-group">
+                    <label for="{{ form.requirements.id_for_label }}">Requirements</label>
+                    {{ form.requirements }}
+                    <p class="field-note">List eligibility, documents, grade expectations, and any important exclusions.</p>
+                    <div class="field-errors">{{ form.requirements.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.description.id_for_label }}">Description</label>
+                    {{ form.description }}
+                    <p class="field-note">Write the listing like a clear briefing, not a vague promo paragraph.</p>
+                    <div class="field-errors">{{ form.description.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Visual</span>
+                  <h3>Media and finishing touches</h3>
+                  <p>A strong visual helps the listing feel credible and more complete on the public scholarship pages.</p>
+                </div>
+
+                {% if scholarship and scholarship.image %}
+                  <div class="image-preview">
+                    <img src="{{ scholarship.image.url }}" alt="{{ scholarship.title }}" />
+                  </div>
+                {% endif %}
+
+                <div class="field-grid mt-3">
+                  <div class="field-group">
+                    <label for="{{ form.image.id_for_label }}">Image</label>
+                    {{ form.image }}
+                    <p class="field-note">Optional. Use a clean scholarship or education visual that supports trust and clarity.</p>
+                    <div class="field-errors">{{ form.image.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <button type="submit" class="primary-cta">
+                  <i class="bi bi-check2-circle"></i>
+                  <span>{% if scholarship %}Update Scholarship{% else %}Create Scholarship{% endif %}</span>
+                </button>
+                <a href="{% url 'admin_dashboard' %}" class="secondary-cta">
+                  <i class="bi bi-arrow-left"></i>
+                  <span>Cancel</span>
+                </a>
+                <a href="{% url 'scholarships' %}" class="ghost-cta">
+                  <i class="bi bi-eye"></i>
+                  <span>Preview Public Page</span>
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const toggle = document.getElementById("nav-toggle");
+      const mobile = document.getElementById("mobile-menu");
+      const navbar = document.getElementById("navbar");
+
+      if (toggle && mobile) {
+        toggle.addEventListener("click", () => mobile.classList.toggle("hidden"));
+      }
+
+      const syncNavbar = () => {
+        if (!navbar) return;
+        navbar.classList.toggle("is-scrolled", window.scrollY > 8);
+      };
+
+      syncNavbar();
+      window.addEventListener("scroll", syncNavbar, { passive: true });
+    </script>
   </body>
 </html>

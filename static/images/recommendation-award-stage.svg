@@ -1,0 +1,29 @@
+<svg width="1600" height="960" viewBox="0 0 1600 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="stageBg" x1="188" y1="84" x2="1404" y2="896" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4C1D95"/>
+      <stop offset="0.5" stop-color="#BE185D"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+    <linearGradient id="stageFloor" x1="346" y1="590" x2="1302" y2="854" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC" stop-opacity="0.26"/>
+      <stop offset="1" stop-color="#F8FAFC" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="960" rx="44" fill="url(#stageBg)"/>
+  <circle cx="1286" cy="170" r="118" fill="#FBCFE8" fill-opacity="0.18"/>
+  <circle cx="278" cy="210" r="88" fill="#FDE68A" fill-opacity="0.18"/>
+  <path d="M0 650C234 590 446 576 640 606C824 634 994 718 1212 714C1346 712 1474 682 1600 628V960H0V650Z" fill="url(#stageFloor)"/>
+  <rect x="612" y="510" width="376" height="224" rx="34" fill="#F8FAFC" fill-opacity="0.94"/>
+  <rect x="666" y="560" width="84" height="124" rx="20" fill="#FDE68A"/>
+  <rect x="758" y="530" width="84" height="154" rx="20" fill="#F8FAFC"/>
+  <rect x="850" y="584" width="84" height="100" rx="20" fill="#DDD6FE"/>
+  <circle cx="800" cy="334" r="110" fill="#FDE68A"/>
+  <circle cx="800" cy="334" r="78" fill="#FFF7ED"/>
+  <circle cx="800" cy="334" r="58" fill="#F59E0B"/>
+  <path d="M760 422L800 382L840 422L820 520H780L760 422Z" fill="#FDE68A"/>
+  <path d="M632 248L650 286L690 292L660 320L668 360L632 340L596 360L604 320L574 292L614 286L632 248Z" fill="#F8FAFC" fill-opacity="0.86"/>
+  <path d="M968 248L986 286L1026 292L996 320L1004 360L968 340L932 360L940 320L910 292L950 286L968 248Z" fill="#F8FAFC" fill-opacity="0.86"/>
+  <path d="M520 404L532 430L560 434L540 454L546 482L520 468L494 482L500 454L480 434L508 430L520 404Z" fill="#FBCFE8" fill-opacity="0.82"/>
+  <path d="M1080 404L1092 430L1120 434L1100 454L1106 482L1080 468L1054 482L1060 454L1040 434L1068 430L1080 404Z" fill="#FBCFE8" fill-opacity="0.82"/>
+</svg>

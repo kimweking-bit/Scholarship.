@@ -1,0 +1,730 @@
+{% if not request.user.is_staff %}
+<div
+  id="scholar-chat"
+  class="scholar-chat"
+  data-state-url="{% url 'chat_state' %}"
+  data-send-url="{% url 'chat_send' %}"
+>
+  <style>
+    .scholar-chat {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 70;
+      width: min(356px, calc(100vw - 24px));
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #0f172a;
+    }
+    .scholar-chat *,
+    .scholar-chat *::before,
+    .scholar-chat *::after {
+      box-sizing: border-box;
+    }
+    .scholar-chat__toggle {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 0;
+      border-radius: 24px;
+      color: #ffffff;
+      cursor: pointer;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.22), transparent 30%),
+        linear-gradient(125deg, #4f46e5 0%, #7c3aed 60%, #8b5cf6 100%);
+      box-shadow: 0 22px 50px rgba(99, 102, 241, 0.28);
+      transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    }
+    .scholar-chat__toggle:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 28px 58px rgba(99, 102, 241, 0.34);
+    }
+    .scholar-chat__toggle:active {
+      transform: translateY(0);
+      filter: saturate(1.05);
+    }
+    .scholar-chat__icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+    .scholar-chat__copy {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      align-items: flex-start;
+      line-height: 1.28;
+    }
+    .scholar-chat__label {
+      font-size: 0.96rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .scholar-chat__sub {
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 0.81rem;
+    }
+    .scholar-chat__badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: scale(0.92);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .scholar-chat.has-reply .scholar-chat__badge {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .scholar-chat__window {
+      position: absolute;
+      right: 0;
+      bottom: calc(100% + 10px);
+      width: 100%;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      max-height: min(560px, calc(100vh - 116px));
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 28px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.98);
+      box-shadow: 0 28px 72px rgba(15, 23, 42, 0.18);
+      backdrop-filter: blur(18px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(16px) scale(0.985);
+      transform-origin: bottom right;
+      transition:
+        opacity 220ms ease,
+        transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 220ms;
+    }
+    .scholar-chat__window.is-open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      transition:
+        opacity 220ms ease,
+        transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0s;
+    }
+    .scholar-chat__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 16px 14px;
+      color: #ffffff;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent 28%),
+        linear-gradient(125deg, #4f46e5 0%, #7c3aed 58%, #8b5cf6 100%);
+    }
+    .scholar-chat__eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.16);
+      font-size: 0.69rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .scholar-chat__title {
+      margin: 10px 0 4px;
+      font-size: 1.02rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .scholar-chat__meta {
+      margin: 0;
+      max-width: 18rem;
+      color: rgba(255, 255, 255, 0.84);
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+    .scholar-chat__close {
+      width: 36px;
+      height: 36px;
+      flex: 0 0 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+    .scholar-chat__close:hover {
+      background: rgba(255, 255, 255, 0.24);
+      transform: translateY(-1px);
+    }
+    .scholar-chat__status {
+      margin: 12px 16px 0;
+      padding: 8px 12px;
+      border-radius: 14px;
+      font-size: 0.79rem;
+      line-height: 1.5;
+    }
+    .scholar-chat__status--muted { background: #eef2ff; color: #4f46e5; }
+    .scholar-chat__status--success { background: #ecfdf3; color: #047857; }
+    .scholar-chat__status--error { background: #fef2f2; color: #b91c1c; }
+    .scholar-chat__messages {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-height: 0;
+      margin-top: 10px;
+      padding: 0 16px 16px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: thin;
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.05), transparent 22%),
+        linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
+    }
+    .scholar-chat__empty {
+      margin: auto 0;
+      padding: 18px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.94);
+      color: #475569;
+    }
+    .scholar-chat__empty h6 {
+      margin: 0 0 6px;
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .scholar-chat__empty p {
+      margin: 0;
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+    .scholar-chat__bubble {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      max-width: 86%;
+      padding: 12px 14px;
+      border-radius: 18px;
+      border: 1px solid #dbe4f0;
+      background: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+      animation: scholar-chat-bubble-in 0.3s ease both;
+    }
+    .scholar-chat__bubble--user {
+      margin-left: auto;
+      border-color: transparent;
+      background: linear-gradient(125deg, #6366f1, #8b5cf6);
+      color: #ffffff;
+      box-shadow: 0 16px 32px rgba(99, 102, 241, 0.22);
+    }
+    .scholar-chat__sender {
+      font-size: 0.73rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .scholar-chat__body {
+      font-size: 0.9rem;
+      line-height: 1.58;
+      white-space: pre-wrap;
+    }
+    .scholar-chat__time {
+      font-size: 0.76rem;
+      color: #64748b;
+    }
+    .scholar-chat__bubble--user .scholar-chat__sender,
+    .scholar-chat__bubble--user .scholar-chat__time {
+      color: rgba(255, 255, 255, 0.78);
+    }
+    .scholar-chat__form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 16px 16px;
+      border-top: 1px solid rgba(226, 232, 240, 0.92);
+      background: rgba(255, 255, 255, 0.98);
+    }
+    .scholar-chat__textarea {
+      min-height: 56px;
+      max-height: 132px;
+      resize: none;
+      border-radius: 16px;
+      border: 1px solid #cbd5e1;
+      padding: 12px 14px;
+      line-height: 1.55;
+      font: inherit;
+      color: inherit;
+      background: #ffffff;
+      transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+    }
+    .scholar-chat__textarea:focus {
+      outline: none;
+      border-color: #8b5cf6;
+      box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.12);
+      transform: translateY(-1px);
+    }
+    .scholar-chat__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .scholar-chat__helper {
+      max-width: 13rem;
+      margin: 0;
+      color: #64748b;
+      font-size: 0.74rem;
+      line-height: 1.5;
+    }
+    .scholar-chat__send {
+      flex-shrink: 0;
+      min-width: 122px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 16px;
+      font: inherit;
+      font-weight: 800;
+      color: #ffffff;
+      cursor: pointer;
+      background: linear-gradient(120deg, #6366f1, #8b5cf6);
+      box-shadow: 0 16px 28px rgba(99, 102, 241, 0.22);
+      transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+    }
+    .scholar-chat__send:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 20px 34px rgba(99, 102, 241, 0.28);
+    }
+    .scholar-chat__send:disabled {
+      opacity: 0.7;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+    html[data-theme="dark"] .scholar-chat__window {
+      border-color: rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.96);
+      color: #e2e8f0;
+    }
+    html[data-theme="dark"] .scholar-chat__messages {
+      background:
+        radial-gradient(circle at top left, rgba(99, 102, 241, 0.08), transparent 24%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(17, 24, 39, 0.98));
+    }
+    html[data-theme="dark"] .scholar-chat__empty,
+    html[data-theme="dark"] .scholar-chat__bubble,
+    html[data-theme="dark"] .scholar-chat__form,
+    html[data-theme="dark"] .scholar-chat__textarea {
+      background: rgba(15, 23, 42, 0.92);
+      color: #e2e8f0;
+      border-color: rgba(148, 163, 184, 0.18);
+    }
+    html[data-theme="dark"] .scholar-chat__empty h6 {
+      color: #f8fafc;
+    }
+    html[data-theme="dark"] .scholar-chat__helper,
+    html[data-theme="dark"] .scholar-chat__time {
+      color: #94a3b8;
+    }
+    html[data-theme="dark"] .scholar-chat__status--muted {
+      background: rgba(79, 70, 229, 0.18);
+      color: #c7d2fe;
+    }
+    html[data-theme="dark"] .scholar-chat__status--success {
+      background: rgba(4, 120, 87, 0.2);
+      color: #a7f3d0;
+    }
+    html[data-theme="dark"] .scholar-chat__status--error {
+      background: rgba(185, 28, 28, 0.22);
+      color: #fecaca;
+    }
+    @keyframes scholar-chat-bubble-in {
+      0% { opacity: 0; transform: translateY(10px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @media (max-width: 575.98px) {
+      .scholar-chat {
+        right: 0.75rem;
+        left: 0.75rem;
+        bottom: 0.75rem;
+        width: auto;
+      }
+      .scholar-chat__window {
+        left: 0;
+        right: 0;
+        max-height: min(520px, calc(100vh - 98px));
+        transform-origin: bottom center;
+      }
+      .scholar-chat__footer {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .scholar-chat__helper {
+        max-width: none;
+      }
+      .scholar-chat__send {
+        width: 100%;
+      }
+      .scholar-chat__bubble {
+        max-width: 92%;
+      }
+    }
+  </style>
+
+  <button id="scholar-chat-toggle" type="button" class="scholar-chat__toggle" aria-expanded="false" aria-controls="scholar-chat-window">
+    <span class="scholar-chat__icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24">
+        <path d="M7 10.5h10M7 14.5h6M5.75 4.75h12.5a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2H12l-4.25 3v-3H5.75a2 2 0 0 1-2-2v-8.5a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/>
+      </svg>
+    </span>
+    <span class="scholar-chat__copy">
+      <span class="scholar-chat__label">Message ScholarHub</span>
+      <span id="scholar-chat-toggle-status" class="scholar-chat__sub">Direct support from the admin team</span>
+    </span>
+    <span class="scholar-chat__badge" aria-hidden="true">Reply</span>
+  </button>
+
+  <section id="scholar-chat-window" class="scholar-chat__window" aria-live="polite" aria-hidden="true">
+    <div class="scholar-chat__header">
+      <div>
+        <span class="scholar-chat__eyebrow">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3l2.2 4.45 4.92.72-3.56 3.47.84 4.9L12 14.18 7.6 16.54l.84-4.9L4.88 8.17l4.92-.72L12 3Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7"/>
+          </svg>
+          Direct Admin Support
+        </span>
+        <h6 class="scholar-chat__title">ScholarHub Support</h6>
+        <p class="scholar-chat__meta">Messages sent here land in the admin inbox, and replies come back in this chat.</p>
+      </div>
+      <button id="scholar-chat-close" type="button" class="scholar-chat__close" aria-label="Close chat">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+        </svg>
+      </button>
+    </div>
+
+    <div id="scholar-chat-status" class="scholar-chat__status scholar-chat__status--muted">Loading your conversation...</div>
+    <div id="scholar-chat-messages" class="scholar-chat__messages"></div>
+
+    <form id="scholar-chat-form" class="scholar-chat__form">
+      <label for="scholar-chat-input" class="visually-hidden">Your message</label>
+      <textarea
+        id="scholar-chat-input"
+        class="scholar-chat__textarea"
+        rows="3"
+        maxlength="2000"
+        placeholder="Ask a question, request help, or tell the admin what you need."
+      ></textarea>
+      <div class="scholar-chat__footer">
+        <p class="scholar-chat__helper">If you already messaged us before logging in, your thread follows you here.</p>
+        <button id="scholar-chat-submit" class="scholar-chat__send" type="submit">Send Message</button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    (() => {
+      const root = document.getElementById('scholar-chat');
+      if (!root || root.dataset.ready === '1') {
+        return;
+      }
+      root.dataset.ready = '1';
+
+      const toggle = document.getElementById('scholar-chat-toggle');
+      const toggleStatus = document.getElementById('scholar-chat-toggle-status');
+      const windowEl = document.getElementById('scholar-chat-window');
+      const closeButton = document.getElementById('scholar-chat-close');
+      const form = document.getElementById('scholar-chat-form');
+      const input = document.getElementById('scholar-chat-input');
+      const submit = document.getElementById('scholar-chat-submit');
+      const messages = document.getElementById('scholar-chat-messages');
+      const status = document.getElementById('scholar-chat-status');
+      const stateUrl = root.dataset.stateUrl;
+      const sendUrl = root.dataset.sendUrl;
+      const pollIntervalMs = 8000;
+      let renderedStateKey = '';
+      let pollTimer = null;
+      let isSending = false;
+
+      const resizeInput = () => {
+        input.style.height = 'auto';
+        input.style.height = `${Math.min(input.scrollHeight, 132)}px`;
+      };
+
+      const getCookie = (name) => {
+        const cookies = document.cookie ? document.cookie.split(';') : [];
+        for (const cookie of cookies) {
+          const trimmed = cookie.trim();
+          if (trimmed.startsWith(`${name}=`)) {
+            return decodeURIComponent(trimmed.substring(name.length + 1));
+          }
+        }
+        return '';
+      };
+
+      const setStatus = (message, tone = 'muted') => {
+        status.textContent = message;
+        status.className = `scholar-chat__status scholar-chat__status--${tone}`;
+      };
+
+      const scrollMessagesToBottom = () => {
+        messages.scrollTop = messages.scrollHeight;
+      };
+
+      const renderEmptyState = () => {
+        messages.innerHTML = `
+          <div class="scholar-chat__empty">
+            <h6>Start a direct conversation</h6>
+            <p>Tell the ScholarHub admin team what you need help with, and their reply will show up right here.</p>
+          </div>
+        `;
+      };
+
+      const buildMessageNode = (message) => {
+        const article = document.createElement('article');
+        article.className = `scholar-chat__bubble ${message.sender_role === 'User' ? 'scholar-chat__bubble--user' : ''}`.trim();
+        article.innerHTML = `
+          <span class="scholar-chat__sender">${message.sender_role === 'User' ? 'You' : (message.sender_name || 'Admin')}</span>
+          <div class="scholar-chat__body"></div>
+          <span class="scholar-chat__time">${message.created_at}</span>
+        `;
+        article.querySelector('.scholar-chat__body').textContent = message.body;
+        return article;
+      };
+
+      const renderMessages = (messageList, forceScroll = false) => {
+        const nearBottom = messages.scrollHeight - messages.scrollTop - messages.clientHeight < 80;
+        messages.innerHTML = '';
+
+        if (!messageList.length) {
+          renderEmptyState();
+          return;
+        }
+
+        messageList.forEach((message) => messages.appendChild(buildMessageNode(message)));
+        if (forceScroll || nearBottom || messageList.length <= 2) {
+          scrollMessagesToBottom();
+        }
+      };
+
+      const updateToggleCopy = (messageList, threadStatus) => {
+        if (!messageList.length) {
+          toggleStatus.textContent = 'Direct support from the admin team';
+          root.classList.remove('has-reply');
+          return;
+        }
+
+        const lastMessage = messageList[messageList.length - 1];
+        if (threadStatus === 'Resolved') {
+          toggleStatus.textContent = 'Resolved thread saved for you';
+          root.classList.remove('has-reply');
+        } else if (lastMessage?.sender_role === 'Admin') {
+          toggleStatus.textContent = 'Admin replied. Open to continue';
+          root.classList.toggle('has-reply', !windowEl.classList.contains('is-open'));
+        } else {
+          toggleStatus.textContent = 'Your message is in the admin inbox';
+          root.classList.remove('has-reply');
+        }
+      };
+
+      const updateConversationStatus = (payload, override) => {
+        if (override) {
+          setStatus(override.message, override.tone);
+          return;
+        }
+
+        const messageList = payload.messages || [];
+        if (!messageList.length) {
+          setStatus('Send a message and the admin team will receive it here.', 'muted');
+          return;
+        }
+
+        if (payload.status === 'Resolved') {
+          setStatus('This conversation was marked resolved. Send a new message if you still need help.', 'muted');
+          return;
+        }
+
+        const lastMessage = messageList[messageList.length - 1];
+        if (lastMessage?.sender_role === 'Admin') {
+          setStatus('Admin replied. You can continue the conversation below.', 'success');
+        } else {
+          setStatus('Your latest message has been delivered to the admin inbox.', 'muted');
+        }
+      };
+
+      const fetchChatState = async ({ silent = false } = {}) => {
+        if (!silent) {
+          setStatus('Loading your conversation...', 'muted');
+        }
+
+        try {
+          const response = await fetch(stateUrl, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+            cache: 'no-store',
+          });
+
+          if (!response.ok) {
+            throw new Error('Unable to load the chat right now.');
+          }
+
+          const payload = await response.json();
+          const messageList = payload.messages || [];
+          const stateKey = `${payload.status}|${messageList.map((message) => message.id).join(',')}`;
+          const changed = stateKey !== renderedStateKey;
+
+          renderMessages(messageList, changed);
+          updateToggleCopy(messageList, payload.status);
+          updateConversationStatus(payload);
+          renderedStateKey = stateKey;
+        } catch (error) {
+          if (!messages.children.length) {
+            renderEmptyState();
+          }
+          setStatus(error.message || 'Chat is temporarily unavailable.', 'error');
+        }
+      };
+
+      const startPolling = () => {
+        if (pollTimer) {
+          return;
+        }
+        pollTimer = window.setInterval(() => {
+          if (!document.hidden) {
+            fetchChatState({ silent: true });
+          }
+        }, pollIntervalMs);
+      };
+
+      const stopPolling = () => {
+        if (pollTimer) {
+          window.clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      };
+
+      const setOpen = (open) => {
+        windowEl.classList.toggle('is-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        windowEl.setAttribute('aria-hidden', open ? 'false' : 'true');
+        if (open) {
+          root.classList.remove('has-reply');
+          resizeInput();
+          input.focus();
+          fetchChatState({ silent: true });
+          startPolling();
+        }
+      };
+
+      toggle.addEventListener('click', () => {
+        setOpen(!windowEl.classList.contains('is-open'));
+      });
+
+      closeButton?.addEventListener('click', () => {
+        setOpen(false);
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && windowEl.classList.contains('is-open')) {
+          setOpen(false);
+        }
+      });
+
+      input.addEventListener('input', resizeInput);
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const body = input.value.trim();
+        if (!body || isSending) {
+          return;
+        }
+
+        isSending = true;
+        submit.disabled = true;
+        setStatus('Sending your message to the admin inbox...', 'muted');
+
+        try {
+          const response = await fetch(sendUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken'),
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ body }),
+          });
+
+          const payload = await response.json();
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload?.errors?.body?.[0] || 'We could not send your message. Please try again.');
+          }
+
+          input.value = '';
+          resizeInput();
+          await fetchChatState({ silent: true });
+          setStatus('Message sent. The admin team can reply here.', 'success');
+          startPolling();
+        } catch (error) {
+          setStatus(error.message || 'We could not send your message. Please try again.', 'error');
+        } finally {
+          isSending = false;
+          submit.disabled = false;
+          input.focus();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          stopPolling();
+          return;
+        }
+        fetchChatState({ silent: true });
+        startPolling();
+      });
+
+      document.querySelectorAll('[data-chat-launch]').forEach((button) => {
+        button.addEventListener('click', () => {
+          setOpen(true);
+        });
+      });
+
+      window.ScholarHubChat = {
+        open: () => setOpen(true),
+        close: () => setOpen(false),
+        refresh: () => fetchChatState({ silent: true }),
+      };
+
+      resizeInput();
+      fetchChatState({ silent: true });
+      startPolling();
+    })();
+  </script>
+</div>
+{% endif %}

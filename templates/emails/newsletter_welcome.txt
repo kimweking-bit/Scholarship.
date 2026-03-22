@@ -1,0 +1,34 @@
+Welcome to ScholarHub
+
+Hi {{ recipient_name }},
+
+Your scholarship alerts are now live.
+
+What you can expect:
+- Verified scholarship opportunities with clearer funding context
+- Better visibility on deadlines that need quick action
+- A cleaner route from discovery to application
+
+Explore live scholarships:
+{{ scholarships_url }}
+
+See how ScholarHub helps:
+{{ services_url }}
+
+{% if dashboard_url %}
+Open your dashboard:
+{{ dashboard_url }}
+{% elif register_url %}
+Create your ScholarHub account:
+{{ register_url }}
+{% endif %}
+
+Need help? Reply to this email or reach us at {{ support_email }}.
+{% if site_url %}
+ScholarHub online: {{ site_url }}
+{% endif %}
+
+Unsubscribe:
+{{ unsubscribe_url }}
+
+Copyright {{ year }} ScholarHub

@@ -4,139 +4,357 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Apply for Scholarship</title>
+    <title>ScholarHub | Apply for {{ scholarship.title }}</title>
+    <meta
+      name="description"
+      content="Submit a polished scholarship application with ScholarHub and stay aligned with the opportunity requirements."
+    />
     <link rel="icon" type="image/svg+xml" sizes="any" href="{% static 'images/scholarhub-logo.svg' %}" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-    <style>
-      body {
-        background: #f8f9fa;
-        font-family: "Segoe UI", sans-serif;
-      }
-
-      .apply-card {
-        max-width: 600px;
-        margin: 50px auto;
-        padding: 30px 40px;
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-        border-top: 6px solid #ff7e5f;
-      }
-
-      .apply-card h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #2d6a4f;
-        font-weight: bold;
-      }
-
-      .form-control {
-        border-radius: 10px;
-        border: 1px solid #ced4da;
-        padding: 12px;
-        transition: all 0.3s;
-      }
-
-      .form-control:focus {
-        border-color: #ff7e5f;
-        box-shadow: 0 0 5px rgba(255, 126, 95, 0.5);
-      }
-
-      .btn-submit {
-        background: linear-gradient(to right, #ff7e5f, #2d6a4f);
-        border: none;
-        border-radius: 25px;
-        padding: 12px 25px;
-        font-weight: bold;
-        color: #fff;
-        transition: transform 0.2s, box-shadow 0.2s;
-      }
-
-      .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      }
-
-      label {
-        font-weight: 500;
-        color: #495057;
-      }
-
-      .note {
-        font-size: 0.9rem;
-        color: #6c757d;
-      }
-    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/form-pages.css' %}" />
   </head>
 
-  <body>
-    <div class="apply-card">
-      <h2>Apply for {{ scholarship.title }}</h2>
+  <body class="form-page">
+    <div class="form-page__backdrop" aria-hidden="true"></div>
 
-      <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-
-        {{ form.non_field_errors }}
-
-        <div class="mb-3">
-          {{ form.student_name.label_tag }}
-          {{ form.student_name }}
-          {{ form.student_name.errors }}
-        </div>
-
-        <div class="mb-3">
-          {{ form.email.label_tag }}
-          {{ form.email }}
-          {{ form.email.errors }}
-        </div>
-
-        <div class="mb-3">
-          {{ form.phone.label_tag }}
-          {{ form.phone }}
-          {{ form.phone.errors }}
-        </div>
-
-        <div class="mb-3">
-          {{ form.cv.label_tag }}
-          {{ form.cv }}
-          <div class="note">Upload your CV (PDF preferred)</div>
-          {{ form.cv.errors }}
-
-          {% if profile and profile.cv %}
-            <div class="form-check mt-2">
-              <input class="form-check-input" type="checkbox" value="1" id="useProfileCv" name="use_profile_cv" checked>
-              <label class="form-check-label" for="useProfileCv">
-                Use my profile CV (uploaded in Profile)
-              </label>
+    <nav class="site-navbar fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
+      <div class="mx-auto max-w-7xl px-4">
+        <div class="flex items-center gap-4 h-12">
+          <a href="{% url 'home' %}" class="flex items-center gap-3 group">
+            <span class="flex h-10 w-10 items-center justify-center rounded-[18px] bg-white/15 shadow-lg ring-1 ring-white/20 backdrop-blur-sm transition group-hover:-translate-y-0.5 group-hover:bg-white/20">
+              <img src="{% static 'images/scholarhub-logo.svg' %}" alt="ScholarHub logo" class="h-7 w-7 drop-shadow-sm" />
+            </span>
+            <span class="text-lg font-semibold tracking-tight text-white group-hover:text-white transition">ScholarHub</span>
+          </a>
+          <div class="lg:hidden ml-auto">
+            <button id="nav-toggle" class="p-2 rounded-lg hover:bg-white/20 transition" aria-label="Toggle navigation">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
+          <div class="hidden lg:flex items-center w-full">
+            <div class="flex-1 flex items-center justify-end gap-4 text-white/90 font-medium">
+              <a href="{% url 'home' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Home</a>
+              <a href="{% url 'scholarships' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Scholarships</a>
+              <a href="{% url 'services' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Services</a>
+              <a href="{% url 'about' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">About</a>
+              <a href="{% url 'contact' %}" class="px-3 py-2 rounded-lg hover:bg-white/10 transition">Contact</a>
             </div>
+            <div class="flex items-center gap-3">
+              {% if request.user.is_authenticated %}
+                {% if request.user.is_staff %}
+                  <a href="{% url 'admin:index' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Admin</a>
+                {% else %}
+                  <a href="{% url 'student_dashboard' %}" class="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 transition font-medium">Dashboard</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}" class="m-0">
+                  {% csrf_token %}
+                  <button type="submit" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Logout</button>
+                </form>
+              {% else %}
+                <a href="{% url 'login' %}" class="px-3 py-1.5 rounded-lg border border-white/30 hover:bg-white/10 transition font-medium">Login</a>
+                <a href="{% url 'register' %}" class="px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition font-medium">Register</a>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="mobile-menu" class="hidden lg:hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600">
+        <div class="flex flex-col gap-2 px-4 pb-4 pt-2">
+          <a href="{% url 'home' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Home</a>
+          <a href="{% url 'scholarships' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Scholarships</a>
+          <a href="{% url 'services' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Services</a>
+          <a href="{% url 'about' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">About</a>
+          <a href="{% url 'contact' %}" class="text-white hover:text-white/90 transition py-2 rounded-lg hover:bg-white/10">Contact</a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.is_staff %}
+              <a href="{% url 'admin:index' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Admin</a>
+            {% else %}
+              <a href="{% url 'student_dashboard' %}" class="px-3 py-2 rounded-lg bg-white/15 text-white">Dashboard</a>
+            {% endif %}
+            <form method="post" action="{% url 'logout' %}" class="m-0">
+              {% csrf_token %}
+              <button type="submit" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition w-full text-left">Logout</button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/10 transition">Login</a>
+            <a href="{% url 'register' %}" class="px-3 py-2 rounded-lg bg-white text-indigo-700 shadow hover:-translate-y-0.5 transition inline-block text-center">Register</a>
           {% endif %}
         </div>
+      </div>
+    </nav>
 
-        <div class="mb-3">
-          <label for="{{ form.academic_documents.id_for_label }}">Academic Documents (optional)</label>
-          {{ form.academic_documents }}
-          <div class="note">{{ form.academic_documents.help_text }}</div>
-          {{ form.academic_documents.errors }}
-        </div>
+    <main class="form-main">
+      <div class="page-shell">
+        <section class="page-hero fade-up">
+          <div>
+            <p class="page-kicker">Scholarship Application</p>
+            <h1 class="page-title">Apply for {{ scholarship.title }}</h1>
+            <p class="page-copy">
+              Put your strongest application forward in one clean flow. We have kept the form focused, prefilled what we can,
+              and made room for the documents that matter most.
+            </p>
+            <div class="hero-meta">
+              {% if scholarship.organization %}
+                <span class="hero-meta__item"><i class="bi bi-building"></i>{{ scholarship.organization }}</span>
+              {% endif %}
+              <span class="hero-meta__item"><i class="bi bi-globe2"></i>{{ scholarship.country|default:"Global" }}</span>
+              {% if scholarship.level %}
+                <span class="hero-meta__item"><i class="bi bi-mortarboard"></i>{{ scholarship.get_level_display|default:scholarship.level }}</span>
+              {% endif %}
+              {% if scholarship.deadline %}
+                <span class="hero-meta__item"><i class="bi bi-calendar2-week"></i>{{ scholarship.deadline|date:"M j, Y" }}</span>
+              {% endif %}
+            </div>
+          </div>
 
-        <div class="mb-3">
-          {{ form.picture.label_tag }}
-          {{ form.picture }}
-          <div class="note">Optional: Upload your picture</div>
-          {{ form.picture.errors }}
-        </div>
+          <div class="hero-panel fade-up" style="animation-delay: 0.08s;">
+            <span class="hero-panel__eyebrow">Before you submit</span>
+            <h2 class="hero-panel__title">Make the essentials feel effortless</h2>
+            <p class="hero-panel__copy">
+              Double-check your CV, attach any academic proof you want reviewers to see, and use the motivation section to
+              explain fit rather than repeating your resume.
+            </p>
+            <div class="hero-actions">
+              <a href="{% url 'scholarships' %}" class="hero-link hero-link--primary">
+                <i class="bi bi-compass"></i>
+                <span>Browse More</span>
+              </a>
+              <a href="{% url 'my_applications' %}" class="hero-link hero-link--secondary">
+                <i class="bi bi-journal-check"></i>
+                <span>My Applications</span>
+              </a>
+            </div>
+          </div>
+        </section>
 
-        <div class="mb-3">
-          {{ form.motivation_letter.label_tag }}
-          {{ form.motivation_letter }}
-          {{ form.motivation_letter.errors }}
-        </div>
+        <section class="page-grid">
+          <aside class="detail-card fade-up" style="animation-delay: 0.1s;">
+            <div class="detail-card__media">
+              {% if scholarship.image %}
+                <img src="{{ scholarship.image.url }}" alt="{{ scholarship.title }}" />
+              {% else %}
+                <img src="{% static 'images/recommendation-award-stage.svg' %}" alt="{{ scholarship.title }} illustration" />
+              {% endif %}
+            </div>
 
-        <div class="text-center">
-          <button type="submit" class="btn btn-submit">Submit Application</button>
-        </div>
-      </form>
-    </div>
-  </body>
+            <div class="detail-card__body">
+              <div class="status-row">
+                <span class="status-badge status-badge--active">
+                  <i class="bi bi-stars"></i>
+                  <span>Open Application</span>
+                </span>
+                {% if scholarship.amount_display %}
+                  <span class="status-badge status-badge--draft">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>{{ scholarship.amount_display }}</span>
+                  </span>
+                {% endif %}
+              </div>
+
+              <div>
+                <h2>{{ scholarship.title }}</h2>
+                <p class="detail-card__summary">
+                  {% if scholarship.description %}
+                    {{ scholarship.description|truncatewords:34 }}
+                  {% else %}
+                    Complete your information carefully and show a clear fit for this opportunity. Strong, specific submissions
+                    move faster than generic ones.
+                  {% endif %}
+                </p>
+              </div>
+
+              <div class="detail-pills">
+                {% if scholarship.organization %}
+                  <span class="detail-pill"><i class="bi bi-bank2"></i>{{ scholarship.organization }}</span>
+                {% endif %}
+                {% if scholarship.category %}
+                  <span class="detail-pill"><i class="bi bi-diagram-3"></i>{{ scholarship.get_category_display }}</span>
+                {% endif %}
+                {% if scholarship.level %}
+                  <span class="detail-pill"><i class="bi bi-award"></i>{{ scholarship.get_level_display|default:scholarship.level }}</span>
+                {% endif %}
+              </div>
+
+              <div class="detail-list">
+                <div class="detail-item">
+                  <span class="detail-item__label">Country</span>
+                  <span class="detail-item__value">{{ scholarship.country|default:"Global / Flexible" }}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-item__label">Deadline</span>
+                  <span class="detail-item__value">{% if scholarship.deadline %}{{ scholarship.deadline|date:"M j, Y" }}{% else %}Rolling / Open ended{% endif %}</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-item__label">Funding</span>
+                  <span class="detail-item__value">{{ scholarship.amount_display|default:"Funding details shared by reviewer" }}</span>
+                </div>
+              </div>
+
+              <div class="support-card">
+                <p class="support-card__title">Application checklist</p>
+                <ul class="feature-list">
+                  <li>Use your full legal name and an email address you actively monitor.</li>
+                  <li>Upload the strongest CV version you have, ideally tailored to this scholarship.</li>
+                  <li>Add transcripts, certificates, or recommendation files if they improve your case.</li>
+                  <li>Write a motivation note that shows fit, goals, and why this opportunity matters now.</li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+
+          <div class="form-card fade-up" style="animation-delay: 0.15s;">
+            <div class="form-card__head">
+              <span class="form-card__eyebrow">Student Submission</span>
+              <h2 class="form-card__title">Send a polished application</h2>
+              <p class="form-card__copy">
+                Everything below goes into one clean submission for this scholarship. Fill in the essentials, attach supporting
+                documents, and submit when the details feel complete.
+              </p>
+              {% if profile and profile.cv %}
+                <span class="inline-note">
+                  <i class="bi bi-check2-circle"></i>
+                  <span>Your profile CV is available and can be reused below.</span>
+                </span>
+              {% endif %}
+            </div>
+
+            {% if form.non_field_errors %}
+              <div class="alert-surface mb-4">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" class="styled-form">
+              {% csrf_token %}
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Identity</span>
+                  <h3>Personal details</h3>
+                  <p>Make sure your contact details are correct so updates and review decisions reach you quickly.</p>
+                </div>
+
+                <div class="field-grid field-grid--two">
+                  <div class="field-group">
+                    {{ form.student_name.label_tag }}
+                    {{ form.student_name }}
+                    <div class="field-errors">{{ form.student_name.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    {{ form.email.label_tag }}
+                    {{ form.email }}
+                    <div class="field-errors">{{ form.email.errors }}</div>
+                  </div>
+                </div>
+
+                <div class="field-grid mt-3">
+                  <div class="field-group">
+                    {{ form.phone.label_tag }}
+                    {{ form.phone }}
+                    <p class="field-note">Use a reachable phone number in case the review team needs a quick confirmation.</p>
+                    <div class="field-errors">{{ form.phone.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Documents</span>
+                  <h3>Core files</h3>
+                  <p>Attach the files that best represent your academic profile and readiness for this opportunity.</p>
+                </div>
+
+                <div class="field-grid">
+                  <div class="field-group">
+                    {{ form.cv.label_tag }}
+                    {{ form.cv }}
+                    <p class="field-note">Upload your CV or resume. PDF is usually the safest option for clean review.</p>
+                    <div class="field-errors">{{ form.cv.errors }}</div>
+
+                    {% if profile and profile.cv %}
+                      <div class="form-check-shell">
+                        <div class="form-check m-0">
+                          <input class="form-check-input" type="checkbox" value="1" id="useProfileCv" name="use_profile_cv" checked />
+                          <label class="form-check-label" for="useProfileCv">Use the CV already saved in my student profile.</label>
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="field-group">
+                    <label for="{{ form.academic_documents.id_for_label }}">Academic Documents</label>
+                    {{ form.academic_documents }}
+                    <p class="field-note">{{ form.academic_documents.help_text }}</p>
+                    <div class="field-errors">{{ form.academic_documents.errors }}</div>
+                  </div>
+
+                  <div class="field-group">
+                    {{ form.picture.label_tag }}
+                    {{ form.picture }}
+                    <p class="field-note">Optional. Add a clear professional photo only if it strengthens your submission.</p>
+                    <div class="field-errors">{{ form.picture.errors }}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-block">
+                <div class="section-heading">
+                  <span class="section-heading__eyebrow">Your Story</span>
+                  <h3>Motivation letter</h3>
+                  <p>Use this space to connect your goals, experience, and the scholarship fit in a clear and human way.</p>
+                </div>
+
+                <div class="field-group">
+                  {{ form.motivation_letter.label_tag }}
+                  {{ form.motivation_letter }}
+                  <p class="field-note">Focus on why this scholarship fits your direction and what impact the funding would unlock.</p>
+                  <div class="field-errors">{{ form.motivation_letter.errors }}</div>
+                </div>
+              </div>
+
+              <div class="action-row">
+                <button type="submit" class="primary-cta">
+                  <i class="bi bi-send-check"></i>
+                  <span>Submit Application</span>
+                </button>
+                <a href="{% url 'student_dashboard' %}" class="secondary-cta">
+                  <i class="bi bi-grid-1x2"></i>
+                  <span>Back to Dashboard</span>
+                </a>
+                <a href="{% url 'scholarships' %}" class="ghost-cta">
+                  <i class="bi bi-arrow-left"></i>
+                  <span>Browse Scholarships</span>
+                </a>
+              </div>
+            </form>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const toggle = document.getElementById("nav-toggle");
+      const mobile = document.getElementById("mobile-menu");
+      const navbar = document.getElementById("navbar");
+
+      if (toggle && mobile) {
+        toggle.addEventListener("click", () => mobile.classList.toggle("hidden"));
+      }
+
+      const syncNavbar = () => {
+        if (!navbar) return;
+        navbar.classList.toggle("is-scrolled", window.scrollY > 8);
+      };
+
+      syncNavbar();
+      window.addEventListener("scroll", syncNavbar, { passive: true });
+    </script>
+{% include "includes/chat_widget.html" %}
+</body>
 </html>

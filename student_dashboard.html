@@ -85,6 +85,10 @@
             <span class="nav-meta">Help</span>
           </div>
           <div class="nav-stack">
+            <a href="#support-panel" class="nav-link" data-section-link="support-panel">
+              <span class="nav-ico"><i class="bi bi-chat-dots"></i></span>
+              <span class="nav-copy"><strong>Messages{% if unread_chat_replies %} ({{ unread_chat_replies }}){% endif %}</strong></span>
+            </a>
             <a href="{% url 'contact' %}" class="nav-link" data-route-link>
               <span class="nav-ico"><i class="bi bi-envelope-paper"></i></span>
               <span class="nav-copy"><strong>Contact</strong></span>
@@ -156,6 +160,7 @@
           <div class="hero-signals">
             <span class="hero-chip"><i class="bi bi-stars"></i>{{ recommended_cards|length }} AI picks ready now</span>
             <span class="hero-chip"><i class="bi bi-bell"></i>{{ unread_notifications }} unread updates</span>
+            <span class="hero-chip"><i class="bi bi-chat-dots"></i>{{ support_message_count }} support messages</span>
             <span class="hero-chip"><i class="bi bi-bookmark-check"></i><span id="heroSavedCount">0</span> saved</span>
           </div>
 
@@ -305,7 +310,8 @@
         {% if recommended_cards %}
           <div class="scholarship-grid scholarship-grid--featured">
             {% for item in recommended_cards %}
-              {% include "student_scholarship_card.html" with item=item section="recommended" %}
+              {% cycle 'images/recommendation-global-campus.svg' 'images/recommendation-study-desk.svg' 'images/recommendation-research-lab.svg' 'images/recommendation-passport-route.svg' 'images/recommendation-library-spotlight.svg' 'images/recommendation-award-stage.svg' as recommended_fallback silent %}
+              {% include "student_scholarship_card.html" with item=item section="recommended" fallback_art=recommended_fallback %}
             {% endfor %}
           </div>
         {% else %}
@@ -399,7 +405,8 @@
         {% if discover_cards %}
           <div class="scholarship-grid scholarship-grid--catalog" id="discoverGrid">
             {% for item in discover_cards %}
-              {% include "student_scholarship_card.html" with item=item section="catalog" %}
+              {% cycle 'images/recommendation-study-desk.svg' 'images/recommendation-library-spotlight.svg' 'images/recommendation-passport-route.svg' 'images/recommendation-global-campus.svg' 'images/recommendation-research-lab.svg' 'images/recommendation-award-stage.svg' as discover_fallback silent %}
+              {% include "student_scholarship_card.html" with item=item section="catalog" fallback_art=discover_fallback %}
             {% endfor %}
           </div>
           <div class="section-empty" id="catalogEmpty" hidden>
@@ -483,6 +490,69 @@
         </div>
       </section>
 
+      <section class="utility-panel utility-panel--support" id="support-panel">
+        <div class="section-head">
+          <div>
+            <span class="section-label section-label--soft">Support</span>
+            <h2>Your messages with ScholarHub</h2>
+            <p>If you contacted ScholarHub before signing in, that conversation follows you here so replies stay visible inside your dashboard.</p>
+          </div>
+          <div class="saved-panel__actions">
+            <span class="soft-badge">{{ support_message_count }} messages</span>
+            <button type="button" class="mini-action" data-chat-launch>
+              <i class="bi bi-chat-left-text"></i>
+              <span>Open Chat</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="utility-frame utility-frame--support">
+          {% if support_thread %}
+            <div class="support-overview">
+              <div class="support-overview__meta">
+                <span class="support-status support-status--{{ support_thread.status|lower }}">{{ support_thread.status }}</span>
+                {% if unread_chat_replies %}
+                  <span class="support-status support-status--new">{{ unread_chat_replies }} new replies</span>
+                {% endif %}
+                {% if latest_chat_message %}
+                  <span class="support-status">{{ latest_chat_message.created_at|timesince }} ago</span>
+                {% endif %}
+              </div>
+              <p class="support-overview__copy">
+                {% if latest_chat_message and latest_chat_message.sender_role == 'Admin' %}
+                  Admin replied to your latest message. Open the chat to continue the conversation in full.
+                {% elif latest_chat_message %}
+                  Your latest message is saved and visible to the admin team.
+                {% else %}
+                  Your conversation thread is ready whenever you need help with scholarships, documents, or deadlines.
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="support-thread">
+              {% for message in support_messages_preview %}
+                <article class="support-message {% if message.sender_role == 'Admin' %}support-message--admin{% else %}support-message--user{% endif %}">
+                  <span class="support-message__sender">
+                    {% if message.sender_role == 'User' %}
+                      You
+                    {% else %}
+                      {{ message.sender_name|default:"Admin" }}
+                    {% endif %}
+                  </span>
+                  <div class="support-message__body">{{ message.body|linebreaksbr }}</div>
+                  <span class="support-message__time">{{ message.created_at|date:"M j, Y - g:i A" }}</span>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="panel-empty">
+              <i class="bi bi-chat-heart"></i>
+              <p>No support conversation yet. Open the chat to message the admin team from anywhere in ScholarHub.</p>
+            </div>
+          {% endif %}
+        </div>
+      </section>
+
       <section class="utility-panel utility-panel--saved" id="saved">
         <div class="section-head">
           <div>
@@ -520,6 +590,7 @@
 
 <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
 
+{% include "includes/chat_widget.html" %}
 <script src="{% static 'js/student-dashboard.js' %}"></script>
 </body>
 </html>

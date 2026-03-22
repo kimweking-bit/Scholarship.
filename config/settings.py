@@ -14,11 +14,39 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+def load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+        if not key or key in os.environ:
+            continue
+
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+            value = value[1:-1]
+        os.environ[key] = value
+
+
+load_env_file(BASE_DIR / ".env")
+
+
 def env_bool(name: str, default: bool = False) -> bool:
     value = os.getenv(name)
     if value is None:
         return default
-    return value.strip().lower() in {"1", "true", "yes", "on"}
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    return default
 
 
 def env_list(name: str, default: list[str] | None = None) -> list[str]:
@@ -26,6 +54,23 @@ def env_list(name: str, default: list[str] | None = None) -> list[str]:
     if not value.strip():
         return list(default or [])
     return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def default_email_backend(debug: bool) -> str:
+    explicit_backend = os.getenv("EMAIL_BACKEND", "").strip()
+    if explicit_backend:
+        return explicit_backend
+
+    host = os.getenv("EMAIL_HOST", "").strip()
+    port = os.getenv("EMAIL_PORT", "").strip()
+    smtp_configured = any(
+        os.getenv(name, "").strip()
+        for name in ("EMAIL_HOST_USER", "EMAIL_HOST_PASSWORD", "DEFAULT_FROM_EMAIL")
+    )
+    smtp_configured = smtp_configured or host not in {"", "localhost"} or port not in {"", "1025"}
+    if smtp_configured or not debug:
+        return "django.core.mail.backends.smtp.EmailBackend"
+    return "django.core.mail.backends.console.EmailBackend"
 
 
 def database_config() -> dict:
@@ -198,6 +243,23 @@ CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
 render_external_url = os.getenv("RENDER_EXTERNAL_URL", "").strip()
 if render_external_url and render_external_url not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(render_external_url)
+SITE_URL = os.getenv("SITE_URL", render_external_url).strip().rstrip("/")
+
+EMAIL_BACKEND = default_email_backend(DEBUG)
+EMAIL_HOST = os.getenv("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(
+    os.getenv("EMAIL_PORT")
+    or ("587" if EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" else "1025")
+)
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "15"))
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "ScholarHub <hello@scholarhub.com>")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", "support@scholarhub.com")
+NEWSLETTER_TOKEN_MAX_AGE = int(os.getenv("NEWSLETTER_TOKEN_MAX_AGE", str(60 * 60 * 24 * 365 * 3)))
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", not DEBUG)

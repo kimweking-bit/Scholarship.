@@ -1,0 +1,37 @@
+<svg width="1600" height="960" viewBox="0 0 1600 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="routeBg" x1="176" y1="98" x2="1424" y2="874" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#134E4A"/>
+      <stop offset="0.55" stop-color="#0F766E"/>
+      <stop offset="1" stop-color="#67E8F9"/>
+    </linearGradient>
+    <linearGradient id="passport" x1="420" y1="266" x2="794" y2="714" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#312E81"/>
+      <stop offset="1" stop-color="#6D28D9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="960" rx="44" fill="url(#routeBg)"/>
+  <circle cx="1306" cy="182" r="112" fill="#CCFBF1" fill-opacity="0.14"/>
+  <circle cx="286" cy="220" r="92" fill="#99F6E4" fill-opacity="0.14"/>
+  <path d="M884 240C1018 220 1156 252 1262 334C1366 414 1420 532 1432 652" stroke="#F8FAFC" stroke-width="10" stroke-linecap="round" stroke-dasharray="10 22" stroke-opacity="0.74"/>
+  <path d="M1296 618L1416 656L1346 732" stroke="#F8FAFC" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="350" y="258" width="392" height="492" rx="38" transform="rotate(-8 350 258)" fill="url(#passport)"/>
+  <rect x="392" y="314" width="308" height="366" rx="28" transform="rotate(-8 392 314)" fill="#4338CA" fill-opacity="0.36" stroke="#C4B5FD" stroke-opacity="0.52" stroke-width="8"/>
+  <circle cx="550" cy="486" r="78" fill="#C4B5FD" fill-opacity="0.18"/>
+  <circle cx="550" cy="486" r="62" stroke="#EDE9FE" stroke-width="10" stroke-opacity="0.86"/>
+  <path d="M488 486H612" stroke="#EDE9FE" stroke-width="8" stroke-linecap="round" stroke-opacity="0.82"/>
+  <path d="M550 424V548" stroke="#EDE9FE" stroke-width="8" stroke-linecap="round" stroke-opacity="0.82"/>
+  <path d="M512 446C526 462 534 475 534 486C534 497 526 510 512 526" stroke="#EDE9FE" stroke-width="8" stroke-linecap="round" stroke-opacity="0.72"/>
+  <path d="M588 446C574 462 566 475 566 486C566 497 574 510 588 526" stroke="#EDE9FE" stroke-width="8" stroke-linecap="round" stroke-opacity="0.72"/>
+  <path d="M456 612H640" stroke="#EDE9FE" stroke-width="12" stroke-linecap="round" stroke-opacity="0.7"/>
+  <path d="M438 660H596" stroke="#C4B5FD" stroke-width="12" stroke-linecap="round" stroke-opacity="0.7"/>
+  <circle cx="1048" cy="548" r="174" fill="#F8FAFC" fill-opacity="0.12"/>
+  <circle cx="1048" cy="548" r="138" stroke="#CCFBF1" stroke-width="12" stroke-opacity="0.54"/>
+  <path d="M910 548H1186" stroke="#CCFBF1" stroke-width="10" stroke-linecap="round" stroke-opacity="0.56"/>
+  <path d="M1048 412V684" stroke="#CCFBF1" stroke-width="10" stroke-linecap="round" stroke-opacity="0.56"/>
+  <path d="M956 462C984 492 1000 520 1000 548C1000 576 984 604 956 634" stroke="#CCFBF1" stroke-width="10" stroke-linecap="round" stroke-opacity="0.44"/>
+  <path d="M1140 462C1112 492 1096 520 1096 548C1096 576 1112 604 1140 634" stroke="#CCFBF1" stroke-width="10" stroke-linecap="round" stroke-opacity="0.44"/>
+  <path d="M1022 300L1122 340L1052 388L972 350L1022 300Z" fill="#FDE68A"/>
+  <path d="M1108 332L1184 310" stroke="#FDE68A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M1184 310L1166 378" stroke="#FDE68A" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,30 +1,63 @@
+import json
+import logging
 from datetime import datetime, timedelta
 from datetime import date
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import login
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.views import LoginView
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.csrf import csrf_protect
+from django.urls import reverse
+from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
 from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.core.paginator import Paginator
 
 from .categorization import infer_categories_from_text, infer_levels_from_text
-from .forms import ApplicationForm, ScholarshipForm, StudentProfileForm, UserUpdateForm
+from .forms import (
+    ApplicationForm,
+    ChatMessageForm,
+    NewsletterSubscriptionForm,
+    ScholarshipForm,
+    StudentProfileForm,
+    UserUpdateForm,
+)
 from .models import (
     Application,
     ApplicationAttachment,
+    ChatMessage,
+    ChatThread,
     ContactMessage,
+    NewsletterSubscriber,
     Notification,
     Scholarship,
     StudentProfile,
 )
+from .newsletter import resolve_newsletter_token, send_newsletter_welcome_email
+
+logger = logging.getLogger(__name__)
+
+
+class RoleBasedLoginView(LoginView):
+    template_name = "login.html"
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        redirect_url = self.get_redirect_url()
+        if redirect_url:
+            return redirect_url
+        if self.request.user.is_staff:
+            return reverse("admin_dashboard")
+        return reverse("student_dashboard")
 
 
 def auto_deactivate_expired_scholarships() -> int:
@@ -199,6 +232,177 @@ def build_quick_filters(*, profile: StudentProfile | None, countries, levels, fu
     return chips[:5]
 
 
+def sanitized_newsletter_source(raw_value: str) -> str:
+    candidate = "".join(ch for ch in (raw_value or "").strip().lower() if ch.isalnum() or ch in {"-", "_"})
+    return candidate[:80]
+
+
+def safe_next_url(request) -> str:
+    next_url = (request.POST.get("next") or request.GET.get("next") or request.META.get("HTTP_REFERER") or "").strip()
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return reverse("home")
+
+
+def newsletter_redirect_url(target_url: str, *, status: str, source: str = "", anchor: str = "") -> str:
+    parts = urlsplit(target_url)
+    query = dict(parse_qsl(parts.query, keep_blank_values=True))
+    query["newsletter"] = status
+    if source:
+        query["newsletter_source"] = source
+    else:
+        query.pop("newsletter_source", None)
+
+    safe_anchor = "".join(ch for ch in (anchor or "").strip() if ch.isalnum() or ch in {"-", "_"})
+    return urlunsplit(
+        (
+            parts.scheme,
+            parts.netloc,
+            parts.path,
+            urlencode(query, doseq=True),
+            safe_anchor or parts.fragment,
+        )
+    )
+
+
+def ensure_session_key(request) -> str:
+    session_key = request.session.session_key
+    if not session_key:
+        request.session.create()
+        session_key = request.session.session_key or ""
+    return session_key or ""
+
+
+def thread_participant_label(request) -> str:
+    if request.user.is_authenticated:
+        full_name = f"{request.user.first_name} {request.user.last_name}".strip()
+        return full_name or getattr(request.user, "username", "") or "Student"
+    return "Guest visitor"
+
+
+def remember_chat_thread(request, thread: ChatThread | None) -> None:
+    if thread is None:
+        request.session.pop("chat_thread_id", None)
+        return
+    request.session["chat_thread_id"] = thread.id
+
+
+def get_chat_thread_for_request(request, *, create: bool = False) -> ChatThread | None:
+    session_key = ensure_session_key(request) if create or not request.user.is_authenticated else (request.session.session_key or "")
+    remembered_thread_id = request.session.get("chat_thread_id")
+    participant_label = thread_participant_label(request)
+
+    if request.user.is_authenticated:
+        thread = (
+            ChatThread.objects.filter(user=request.user)
+            .order_by("-last_message_at", "-updated_at")
+            .first()
+        )
+        if thread:
+            if session_key and thread.session_key != session_key:
+                thread.session_key = session_key
+                thread.save(update_fields=["session_key", "updated_at"])
+            remember_chat_thread(request, thread)
+            return thread
+
+        if remembered_thread_id:
+            remembered_thread = ChatThread.objects.filter(id=remembered_thread_id).first()
+            if remembered_thread and (remembered_thread.user_id in {None, request.user.id}):
+                update_fields = []
+                if remembered_thread.user_id != request.user.id:
+                    remembered_thread.user = request.user
+                    update_fields.append("user")
+                if remembered_thread.guest_label != participant_label:
+                    remembered_thread.guest_label = participant_label
+                    update_fields.append("guest_label")
+                if session_key and remembered_thread.session_key != session_key:
+                    remembered_thread.session_key = session_key
+                    update_fields.append("session_key")
+                if update_fields:
+                    remembered_thread.save(update_fields=update_fields + ["updated_at"])
+                remember_chat_thread(request, remembered_thread)
+                return remembered_thread
+
+        session_thread = None
+        if session_key:
+            session_thread = (
+                ChatThread.objects.filter(user__isnull=True, session_key=session_key)
+                .order_by("-last_message_at", "-updated_at")
+                .first()
+            )
+        if session_thread:
+            session_thread.user = request.user
+            session_thread.guest_label = participant_label
+            session_thread.save(update_fields=["user", "guest_label", "updated_at"])
+            remember_chat_thread(request, session_thread)
+            return session_thread
+
+        if create:
+            thread = ChatThread.objects.create(
+                user=request.user,
+                session_key=session_key,
+                guest_label=participant_label,
+            )
+            remember_chat_thread(request, thread)
+            return thread
+        return None
+
+    if not session_key:
+        return None
+
+    if remembered_thread_id:
+        remembered_thread = ChatThread.objects.filter(id=remembered_thread_id, user__isnull=True).first()
+        if remembered_thread:
+            update_fields = []
+            if remembered_thread.session_key != session_key:
+                remembered_thread.session_key = session_key
+                update_fields.append("session_key")
+            if remembered_thread.guest_label != participant_label:
+                remembered_thread.guest_label = participant_label
+                update_fields.append("guest_label")
+            if update_fields:
+                remembered_thread.save(update_fields=update_fields + ["updated_at"])
+            remember_chat_thread(request, remembered_thread)
+            return remembered_thread
+
+    thread = (
+        ChatThread.objects.filter(user__isnull=True, session_key=session_key)
+        .order_by("-last_message_at", "-updated_at")
+        .first()
+    )
+    if thread:
+        remember_chat_thread(request, thread)
+        return thread
+
+    if create:
+        thread = ChatThread.objects.create(
+            session_key=session_key,
+            guest_label=participant_label,
+        )
+        remember_chat_thread(request, thread)
+        return thread
+    return None
+
+
+def serialize_chat_message(message: ChatMessage) -> dict:
+    return {
+        "id": message.id,
+        "sender_role": message.sender_role,
+        "sender_name": message.sender_name or ("Admin" if message.sender_role == ChatMessage.SENDER_ADMIN else "You"),
+        "body": message.body,
+        "created_at": timezone.localtime(message.created_at).strftime("%b %d, %Y %I:%M %p"),
+    }
+
+
+def unread_user_message_count(thread: ChatThread) -> int:
+    return thread.messages.filter(sender_role=ChatMessage.SENDER_USER, read_by_admin_at__isnull=True).count()
+
+
+@ensure_csrf_cookie
 def index(request):
     auto_deactivate_expired_scholarships()
     # Public landing page. Logged-in users should go straight to their dashboard.
@@ -369,6 +573,91 @@ def services(request):
     return render(request, "services.html")
 
 
+@require_POST
+@csrf_protect
+def subscribe_newsletter(request):
+    form = NewsletterSubscriptionForm(request.POST)
+    redirect_target = safe_next_url(request)
+    source = sanitized_newsletter_source(request.POST.get("source") or "")
+    anchor = request.POST.get("anchor") or "newsletter"
+
+    if not form.is_valid():
+        return redirect(newsletter_redirect_url(redirect_target, status="invalid", source=source, anchor=anchor))
+
+    email = form.cleaned_data["email"].strip().lower()
+    subscriber = NewsletterSubscriber.objects.filter(email__iexact=email).first()
+    created = False
+    if subscriber is None:
+        subscriber = NewsletterSubscriber.objects.create(
+            email=email,
+            user=request.user if request.user.is_authenticated else None,
+            source=source,
+        )
+        created = True
+
+    should_send_welcome = created
+    status = "success"
+    update_fields = []
+
+    if subscriber.email != email:
+        subscriber.email = email
+        update_fields.append("email")
+
+    if request.user.is_authenticated and subscriber.user_id != request.user.id:
+        subscriber.user = request.user
+        update_fields.append("user")
+
+    if source and subscriber.source != source:
+        subscriber.source = source
+        update_fields.append("source")
+
+    if not subscriber.is_active:
+        subscriber.is_active = True
+        update_fields.append("is_active")
+        should_send_welcome = True
+        status = "resubscribed"
+
+    if update_fields:
+        subscriber.save(update_fields=update_fields + ["updated_at"])
+
+    if not should_send_welcome and subscriber.is_active:
+        status = "exists"
+
+    if should_send_welcome:
+        try:
+            send_newsletter_welcome_email(subscriber, request=request)
+        except Exception:
+            logger.exception("Newsletter welcome email failed for %s", subscriber.email)
+            status = "delivery_issue"
+
+    return redirect(newsletter_redirect_url(redirect_target, status=status, source=source, anchor=anchor))
+
+
+def newsletter_unsubscribe(request, token: str):
+    email = resolve_newsletter_token(token)
+    subscriber = None
+    status = "invalid"
+
+    if email:
+        subscriber = NewsletterSubscriber.objects.filter(email__iexact=email).first()
+        if subscriber:
+            if subscriber.is_active:
+                subscriber.is_active = False
+                subscriber.save(update_fields=["is_active", "updated_at"])
+                status = "success"
+            else:
+                status = "already"
+
+    return render(
+        request,
+        "newsletter_unsubscribe.html",
+        {
+            "status": status,
+            "subscriber": subscriber,
+        },
+    )
+
+
 @csrf_protect
 def contact(request):
     if request.method == "POST":
@@ -388,6 +677,152 @@ def contact(request):
         )
 
     return render(request, "contact.html")
+
+
+@ensure_csrf_cookie
+def chat_state(request):
+    thread = get_chat_thread_for_request(request, create=False)
+    if not thread:
+        remember_chat_thread(request, None)
+        return JsonResponse(
+            {
+                "thread_id": None,
+                "status": ChatThread.STATUS_OPEN,
+                "participant_name": thread_participant_label(request),
+                "messages": [],
+            }
+        )
+
+    ChatMessage.objects.filter(
+        thread=thread,
+        sender_role=ChatMessage.SENDER_ADMIN,
+        read_by_user_at__isnull=True,
+    ).update(read_by_user_at=timezone.now())
+    remember_chat_thread(request, thread)
+
+    messages = [serialize_chat_message(message) for message in thread.messages.all()]
+    return JsonResponse(
+        {
+            "thread_id": thread.id,
+            "status": thread.status,
+            "participant_name": thread.participant_name,
+            "messages": messages,
+        }
+    )
+
+
+@require_POST
+@csrf_protect
+def chat_send(request):
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except json.JSONDecodeError:
+        payload = request.POST
+
+    form = ChatMessageForm(payload)
+    if not form.is_valid():
+        return JsonResponse({"ok": False, "errors": form.errors}, status=400)
+
+    thread = get_chat_thread_for_request(request, create=True)
+    if thread is None:
+        return JsonResponse({"ok": False, "errors": {"body": ["Unable to open a chat thread."]}}, status=400)
+
+    now = timezone.now()
+    if thread.status != ChatThread.STATUS_OPEN:
+        thread.status = ChatThread.STATUS_OPEN
+
+    thread.guest_label = thread_participant_label(request)
+    thread.last_message_at = now
+    thread.last_user_message_at = now
+    thread.save(update_fields=["status", "guest_label", "last_message_at", "last_user_message_at", "updated_at"])
+
+    message = ChatMessage.objects.create(
+        thread=thread,
+        sender_role=ChatMessage.SENDER_USER,
+        sender_name=thread.participant_name,
+        body=form.cleaned_data["body"],
+        read_by_user_at=now,
+    )
+    remember_chat_thread(request, thread)
+
+    return JsonResponse(
+        {
+            "ok": True,
+            "thread_id": thread.id,
+            "message": serialize_chat_message(message),
+        }
+    )
+
+
+@staff_member_required
+def admin_chat(request):
+    selected_thread_id = request.GET.get("thread") or request.POST.get("thread_id")
+    threads = list(
+        ChatThread.objects.select_related("user").prefetch_related("messages").all()
+    )
+    selected_thread = next((thread for thread in threads if str(thread.id) == str(selected_thread_id)), None)
+    if selected_thread is None and threads:
+        selected_thread = threads[0]
+
+    reply_form = ChatMessageForm()
+
+    if request.method == "POST" and selected_thread:
+        action = (request.POST.get("action") or "reply").strip().lower()
+        if action in {"resolve", "reopen"}:
+            selected_thread.status = ChatThread.STATUS_RESOLVED if action == "resolve" else ChatThread.STATUS_OPEN
+            selected_thread.save(update_fields=["status", "updated_at"])
+            return redirect(f"{request.path}?thread={selected_thread.id}")
+
+        reply_form = ChatMessageForm(request.POST)
+        if reply_form.is_valid():
+            sender_name = (f"{request.user.first_name} {request.user.last_name}").strip() or request.user.username
+            now = timezone.now()
+            ChatMessage.objects.create(
+                thread=selected_thread,
+                sender_role=ChatMessage.SENDER_ADMIN,
+                sender_name=sender_name,
+                body=reply_form.cleaned_data["body"],
+                read_by_admin_at=now,
+            )
+            selected_thread.status = ChatThread.STATUS_OPEN
+            selected_thread.last_message_at = now
+            selected_thread.last_admin_reply_at = now
+            selected_thread.save(update_fields=["status", "last_message_at", "last_admin_reply_at", "updated_at"])
+            return redirect(f"{request.path}?thread={selected_thread.id}")
+
+    if selected_thread:
+        ChatMessage.objects.filter(
+            thread=selected_thread,
+            sender_role=ChatMessage.SENDER_USER,
+            read_by_admin_at__isnull=True,
+        ).update(read_by_admin_at=timezone.now())
+
+    thread_cards = []
+    for thread in threads:
+        messages = list(thread.messages.all())
+        latest_message = messages[-1] if messages else None
+        thread_cards.append(
+            {
+                "thread": thread,
+                "latest_message": latest_message,
+                "unread_count": unread_user_message_count(thread),
+            }
+        )
+
+    open_thread_count = sum(1 for thread in threads if thread.status == ChatThread.STATUS_OPEN)
+    unread_thread_count = sum(1 for item in thread_cards if item["unread_count"] > 0)
+
+    return render(
+        request,
+        "admin_chat.html",
+        {
+            "thread_cards": thread_cards,
+            "selected_thread": selected_thread,
+            "reply_form": reply_form,
+            "open_thread_count": open_thread_count,
+            "unread_thread_count": unread_thread_count,
+        },
+    )
 
 
 def register(request):
@@ -413,11 +848,19 @@ def admin_dashboard(request):
 
     applications_qs = Application.objects.select_related("scholarship", "user").all()
     scholarships_qs = Scholarship.objects.all()
+    chat_threads_qs = ChatThread.objects.all()
 
     total_scholarships = scholarships_qs.count()
     total_students = User.objects.filter(is_staff=False).count()
     total_applications = applications_qs.count()
     approved_applications = applications_qs.filter(status=Application.STATUS_APPROVED).count()
+    open_chat_threads = chat_threads_qs.filter(status=ChatThread.STATUS_OPEN).count()
+    unread_chat_threads = (
+        ChatMessage.objects.filter(sender_role=ChatMessage.SENDER_USER, read_by_admin_at__isnull=True)
+        .values("thread_id")
+        .distinct()
+        .count()
+    )
 
     recent_applications = applications_qs[:12]
     recent_scholarships = scholarships_qs[:12]
@@ -481,6 +924,8 @@ def admin_dashboard(request):
             "recent_scholarships": recent_scholarships,
             "applications_chart": {"labels": month_labels, "data": month_counts},
             "country_chart": {"labels": country_labels, "data": country_counts},
+            "open_chat_threads": open_chat_threads,
+            "unread_chat_threads": unread_chat_threads,
         },
     )
 
@@ -566,6 +1011,18 @@ def student_dashboard(request):
     journey_percent = min(100, 18 + (applied_count * 14) + (approved_count * 10) + (12 if profile else 0))
     unread_notifications = Notification.objects.filter(user=request.user, is_read=False).count()
     recent_notifications = Notification.objects.filter(user=request.user).all()[:5]
+    support_thread = get_chat_thread_for_request(request, create=False)
+    support_messages_preview = []
+    unread_chat_replies = 0
+    latest_chat_message = None
+    if support_thread:
+        support_messages_preview = list(support_thread.messages.order_by("-created_at")[:4])
+        support_messages_preview.reverse()
+        unread_chat_replies = support_thread.messages.filter(
+            sender_role=ChatMessage.SENDER_ADMIN,
+            read_by_user_at__isnull=True,
+        ).count()
+        latest_chat_message = support_messages_preview[-1] if support_messages_preview else None
 
     return render(
         request,
@@ -592,6 +1049,11 @@ def student_dashboard(request):
             "next_deadline_days": next_deadline_days,
             "unread_notifications": unread_notifications,
             "recent_notifications": recent_notifications,
+            "support_thread": support_thread,
+            "support_messages_preview": support_messages_preview,
+            "unread_chat_replies": unread_chat_replies,
+            "support_message_count": support_thread.messages.count() if support_thread else 0,
+            "latest_chat_message": latest_chat_message,
         },
     )
 

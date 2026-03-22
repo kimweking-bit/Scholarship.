@@ -1,0 +1,33 @@
+{% if request.GET.newsletter and request.GET.newsletter_source == newsletter_feedback_source %}
+  <div
+    role="status"
+    style="margin-top:14px;padding:14px 16px;border-radius:18px;border:1px solid {% if request.GET.newsletter == 'invalid' or request.GET.newsletter == 'delivery_issue' %}rgba(220, 38, 38, 0.18){% else %}rgba(79, 70, 229, 0.16){% endif %};background:{% if request.GET.newsletter == 'invalid' or request.GET.newsletter == 'delivery_issue' %}linear-gradient(180deg, rgba(254, 242, 242, 0.98), rgba(255, 255, 255, 0.98)){% else %}linear-gradient(180deg, rgba(238, 242, 255, 0.98), rgba(255, 255, 255, 0.98)){% endif %};color:{% if request.GET.newsletter == 'invalid' or request.GET.newsletter == 'delivery_issue' %}#991b1b{% else %}#312e81{% endif %};box-shadow:0 18px 35px rgba(15, 23, 42, 0.06);"
+  >
+    <div style="font-weight:700;letter-spacing:-0.01em;">
+      {% if request.GET.newsletter == "success" %}
+        You are subscribed.
+      {% elif request.GET.newsletter == "resubscribed" %}
+        Welcome back.
+      {% elif request.GET.newsletter == "exists" %}
+        You are already subscribed.
+      {% elif request.GET.newsletter == "delivery_issue" %}
+        Subscription saved, but the welcome email hit a delivery issue.
+      {% else %}
+        That email address needs another look.
+      {% endif %}
+    </div>
+    <p style="margin:6px 0 0;font-size:0.95rem;line-height:1.55;">
+      {% if request.GET.newsletter == "success" %}
+        Your ScholarHub welcome email is on its way with next steps, curated opportunities, and how to stay ahead of deadlines.
+      {% elif request.GET.newsletter == "resubscribed" %}
+        We have turned your scholarship alerts back on and sent a fresh welcome email to confirm everything is live again.
+      {% elif request.GET.newsletter == "exists" %}
+        We already have this address on the ScholarHub list, so you will keep receiving updates without creating duplicates.
+      {% elif request.GET.newsletter == "delivery_issue" %}
+        You are still on the list. Check your mail setup, then try again if you want a fresh welcome message in your inbox.
+      {% else %}
+        Please enter a valid email address so we can send your scholarship alerts to the right inbox.
+      {% endif %}
+    </p>
+  </div>
+{% endif %}
