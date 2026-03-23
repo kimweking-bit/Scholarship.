@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_protect, ensure_csrf_cookie
 from django.views.decorators.http import require_POST
-from django.db.models import Count, Sum
+from django.db.models import Count, Prefetch, Sum
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -94,6 +94,185 @@ def truncate_words(text: str, limit: int = 18) -> str:
     if len(words) <= limit:
         return " ".join(words)
     return " ".join(words[:limit]) + "..."
+
+
+def file_display_name(path: str) -> str:
+    normalized = (path or "").replace("\\", "/")
+    return normalized.rsplit("/", 1)[-1] or "Document"
+
+
+def optional_file_url(field) -> str:
+    if not field:
+        return ""
+    try:
+        return field.url
+    except Exception:
+        return ""
+
+
+def application_status_tone(status: str) -> str:
+    if status == Application.STATUS_APPROVED:
+        return "approved"
+    if status == Application.STATUS_REJECTED:
+        return "rejected"
+    return "pending"
+
+
+def build_student_record(student) -> dict:
+    try:
+        profile = student.student_profile
+    except StudentProfile.DoesNotExist:
+        profile = None
+
+    applications = list(student.scholarship_applications.all())
+    latest_application = applications[0] if applications else None
+
+    full_name = f"{student.first_name} {student.last_name}".strip()
+    fallback_name = latest_application.student_name if latest_application else ""
+    display_name = full_name or fallback_name or getattr(student, "username", "") or getattr(student, "email", "") or f"Student {student.pk}"
+    name_parts = [part for part in display_name.split() if part]
+    initials = "".join(part[0].upper() for part in name_parts[:2]) or display_name[:2].upper() or "ST"
+
+    preferred_level = ""
+    if profile and profile.preferred_level:
+        preferred_level = profile.get_preferred_level_display() or profile.preferred_level
+
+    preferred_country = (getattr(profile, "preferred_country", "") or "").strip()
+    course = (getattr(profile, "course", "") or "").strip()
+    qualifications = (getattr(profile, "qualifications", "") or "").strip()
+
+    email = (student.email or "").strip()
+    phone = ""
+    latest_picture_url = ""
+    approved_count = 0
+    pending_count = 0
+    rejected_count = 0
+    seen_documents = set()
+    documents = []
+    application_cards = []
+
+    def add_document(*, url: str, label: str, kind: str, meta: str, icon: str):
+        safe_url = (url or "").strip()
+        safe_label = (label or "").strip() or "Document"
+        if not safe_url:
+            return
+        key = (safe_label.lower(), safe_url)
+        if key in seen_documents:
+            return
+        seen_documents.add(key)
+        documents.append(
+            {
+                "url": safe_url,
+                "label": safe_label,
+                "kind": kind,
+                "meta": meta,
+                "icon": icon,
+            }
+        )
+
+    if profile and profile.cv:
+        add_document(
+            url=optional_file_url(profile.cv),
+            label="Profile CV",
+            kind="Profile",
+            meta="Uploaded on the student profile",
+            icon="bi-file-earmark-person",
+        )
+
+    for application in applications:
+        if application.status == Application.STATUS_APPROVED:
+            approved_count += 1
+        elif application.status == Application.STATUS_REJECTED:
+            rejected_count += 1
+        else:
+            pending_count += 1
+
+        if not email and application.email:
+            email = application.email.strip()
+        if not phone and application.phone:
+            phone = application.phone.strip()
+        if not latest_picture_url and application.picture:
+            latest_picture_url = optional_file_url(application.picture)
+
+        if application.cv:
+            add_document(
+                url=optional_file_url(application.cv),
+                label=f"Application CV - {application.scholarship.title}",
+                kind="Application",
+                meta=f"Submitted for {application.scholarship.title}",
+                icon="bi-file-earmark-text",
+            )
+
+        if application.picture:
+            add_document(
+                url=optional_file_url(application.picture),
+                label=f"Student photo - {application.scholarship.title}",
+                kind="Photo",
+                meta=f"Image upload for {application.scholarship.title}",
+                icon="bi-image",
+            )
+
+        for attachment in application.attachments.all():
+            add_document(
+                url=optional_file_url(attachment.file),
+                label=(attachment.label or "").strip() or file_display_name(getattr(attachment.file, "name", "")),
+                kind=attachment.get_kind_display(),
+                meta=f"{application.scholarship.title} - {attachment.get_kind_display()}",
+                icon="bi-file-earmark-richtext",
+            )
+
+        application_cards.append(
+            {
+                "title": application.scholarship.title,
+                "organization": application.scholarship.organization,
+                "status": application.status,
+                "status_tone": application_status_tone(application.status),
+                "date_applied": application.date_applied,
+            }
+        )
+
+    search_text = " ".join(
+        filter(
+            None,
+            [
+                display_name,
+                email,
+                phone,
+                getattr(student, "username", ""),
+                preferred_country,
+                preferred_level,
+                course,
+                qualifications,
+                " ".join(app["title"] for app in application_cards),
+            ],
+        )
+    )
+
+    return {
+        "user": student,
+        "name": display_name,
+        "initials": initials[:2],
+        "email": email,
+        "phone": phone,
+        "joined_at": getattr(student, "date_joined", None),
+        "has_profile": profile is not None,
+        "preferred_country": preferred_country,
+        "preferred_level": preferred_level,
+        "course": course,
+        "qualifications": qualifications,
+        "profile_cv_url": optional_file_url(profile.cv) if profile and profile.cv else "",
+        "photo_url": latest_picture_url,
+        "application_count": len(applications),
+        "approved_count": approved_count,
+        "pending_count": pending_count,
+        "rejected_count": rejected_count,
+        "latest_application_at": latest_application.date_applied if latest_application else None,
+        "documents": documents,
+        "document_count": len(documents),
+        "applications": application_cards,
+        "more_application_count": max(0, len(application_cards) - 3),
+        "search_text": search_text,
+    }
 
 
 def scholarship_card_payload(scholarship: Scholarship, *, profile: StudentProfile | None, recommended: bool, today: date):
@@ -843,6 +1022,17 @@ def admin_dashboard(request):
     applications_qs = Application.objects.select_related("scholarship", "user").all()
     scholarships_qs = Scholarship.objects.all()
     chat_threads_qs = ChatThread.objects.all()
+    students_qs = (
+        User.objects.filter(is_staff=False)
+        .select_related("student_profile")
+        .prefetch_related(
+            Prefetch(
+                "scholarship_applications",
+                queryset=Application.objects.select_related("scholarship").prefetch_related("attachments").all(),
+            )
+        )
+        .order_by("-date_joined", "-id")
+    )
 
     total_scholarships = scholarships_qs.count()
     total_students = User.objects.filter(is_staff=False).count()
@@ -858,6 +1048,8 @@ def admin_dashboard(request):
 
     recent_applications = applications_qs[:12]
     recent_scholarships = scholarships_qs[:12]
+    student_records = [build_student_record(student) for student in students_qs]
+    student_document_total = sum(record["document_count"] for record in student_records)
 
     # Applications overview: last 6 months (including current month).
     today = timezone.localdate()
@@ -920,6 +1112,8 @@ def admin_dashboard(request):
             "country_chart": {"labels": country_labels, "data": country_counts},
             "open_chat_threads": open_chat_threads,
             "unread_chat_threads": unread_chat_threads,
+            "student_records": student_records,
+            "student_document_total": student_document_total,
         },
     )
 

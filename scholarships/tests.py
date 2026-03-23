@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Application, Scholarship
+from .models import Application, ApplicationAttachment, Scholarship, StudentProfile
 
 
 class AdminDashboardTests(TestCase):
@@ -30,6 +30,44 @@ class AdminDashboardTests(TestCase):
         body = resp.content.decode("utf-8")
         assert "Alice Applicant" in body
         assert "Example Scholarship" in body
+
+    def test_student_records_include_qualifications_and_documents(self):
+        User = get_user_model()
+        staff = User.objects.create_user(username="staff", password="pass", is_staff=True)
+        student = User.objects.create_user(username="learner", password="pass", email="learner@example.com")
+        self.client.force_login(staff)
+
+        scholarship = Scholarship.objects.create(title="Data Leaders Scholarship", organization="Global Institute")
+        application = Application.objects.create(
+            scholarship=scholarship,
+            user=student,
+            student_name="Lina Student",
+            email="learner@example.com",
+            phone="0700000000",
+            motivation_letter="I want to study data science.",
+            cv="cv/learner-resume.pdf",
+        )
+        StudentProfile.objects.create(
+            user=student,
+            preferred_country="Germany",
+            course="Computer Science",
+            qualifications="BSc in Computer Science\nPython certification",
+            cv="profile_cvs/learner-profile-cv.pdf",
+        )
+        ApplicationAttachment.objects.create(
+            application=application,
+            label="Transcript.pdf",
+            file="application_docs/transcript.pdf",
+        )
+
+        resp = self.client.get(reverse("admin_dashboard"))
+        assert resp.status_code == 200
+        body = resp.content.decode("utf-8")
+        assert "Student Records and Documents" in body
+        assert "Computer Science" in body
+        assert "BSc in Computer Science" in body
+        assert "Profile CV" in body
+        assert "Transcript.pdf" in body
 
 
 class LoginRedirectTests(TestCase):

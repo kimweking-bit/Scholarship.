@@ -271,20 +271,87 @@
           <h2 class="text-3xl font-semibold text-slate-900 dark:text-white">Students who found funding</h2>
         </div>
         <div class="grid gap-6 md:grid-cols-3">
-          {% for t in "123"|make_list %}
-          <div class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow hover:-translate-y-1 hover:shadow-xl transition">
-            <div class="flex items-center gap-3 mb-4">
-              <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80" alt="Student" class="h-12 w-12 rounded-full object-cover">
-              <div>
-                <p class="font-semibold text-slate-900 dark:text-white">Alex Kim</p>
-                <p class="text-xs text-slate-500 dark:text-slate-400">Computer Science · Canada</p>
+          <article class="rounded-[30px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl shadow-indigo-500/10 transition hover:-translate-y-1 hover:shadow-2xl">
+            <div class="h-full rounded-[26px] bg-gradient-to-br from-indigo-50 via-white to-violet-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 p-6">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <img src="{% static 'images/pexels-ron-lach-9829479.jpg' %}" alt="Nadia Karim" class="h-16 w-16 rounded-2xl object-cover shadow-lg ring-4 ring-white dark:ring-slate-800">
+                  <div>
+                    <p class="font-semibold text-slate-900 dark:text-white">Nadia Karim</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Public Policy · Morocco</p>
+                  </div>
+                </div>
+                <span class="inline-flex rounded-full bg-indigo-600 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white">Chevening</span>
+              </div>
+              <p class="mt-5 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                ScholarHub helped me move from broad searching to a focused shortlist. I found a policy scholarship that matched my leadership work and prepared a stronger application in less than a month.
+              </p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Outcome</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">Full tuition plus living stipend</p>
+                </div>
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Turnaround</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">Shortlisted in 3 weeks</p>
+                </div>
               </div>
             </div>
-            <p class="text-sm text-slate-600 dark:text-slate-300">
-              “ScholarHub matched me to a fellowship I didn’t even know existed. The reminders kept me on track until I submitted.”
-            </p>
-          </div>
-          {% endfor %}
+          </article>
+          <article class="rounded-[30px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl shadow-emerald-500/10 transition hover:-translate-y-1 hover:shadow-2xl">
+            <div class="h-full rounded-[26px] bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 p-6">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <img src="{% static 'images/pexels-olia-danilevich-8093016.jpg' %}" alt="Samuel Bekele" class="h-16 w-16 rounded-2xl object-cover shadow-lg ring-4 ring-white dark:ring-slate-800">
+                  <div>
+                    <p class="font-semibold text-slate-900 dark:text-white">Samuel Bekele</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Data Science · Ethiopia</p>
+                  </div>
+                </div>
+                <span class="inline-flex rounded-full bg-emerald-600 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white">DAAD</span>
+              </div>
+              <p class="mt-5 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                I used the match filters to focus on research programs in Germany. The document checklist kept everything organized, and I submitted my strongest application without missing a single requirement.
+              </p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Award</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">Research grant with monthly stipend</p>
+                </div>
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Best win</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">Document prep felt simple</p>
+                </div>
+              </div>
+            </div>
+          </article>
+          <article class="rounded-[30px] border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-2 shadow-xl shadow-amber-500/10 transition hover:-translate-y-1 hover:shadow-2xl">
+            <div class="h-full rounded-[26px] bg-gradient-to-br from-amber-50 via-white to-rose-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 p-6">
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <img src="{% static 'images/pexels-nappy-935948.jpg' %}" alt="David Otieno" class="h-16 w-16 rounded-2xl object-cover shadow-lg ring-4 ring-white dark:ring-slate-800">
+                  <div>
+                    <p class="font-semibold text-slate-900 dark:text-white">David Otieno</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">MBA · Kenya</p>
+                  </div>
+                </div>
+                <span class="inline-flex rounded-full bg-amber-500 px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-950">Foundation Grant</span>
+              </div>
+              <p class="mt-5 text-sm leading-7 text-slate-600 dark:text-slate-300">
+                The platform surfaced business scholarships I had never seen before. With deadline reminders and profile-based recommendations, I secured support for tuition and relocation costs.
+              </p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Coverage</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">Tuition and relocation support</p>
+                </div>
+                <div class="rounded-2xl border border-white/70 bg-white/80 p-4 dark:border-slate-700 dark:bg-slate-800/80">
+                  <p class="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Match quality</p>
+                  <p class="mt-1 text-sm font-semibold text-slate-900 dark:text-white">High-fit options from day one</p>
+                </div>
+              </div>
+            </div>
+          </article>
         </div>
       </section>
 
@@ -340,7 +407,7 @@
           <h2 class="text-3xl font-semibold text-slate-900 dark:text-white">Common questions</h2>
         </div>
         <div class="space-y-3">
-          {% for q in "12345"|make_list %}
+          {% for q in "1"|make_list %}
           <details class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow">
             <summary class="cursor-pointer text-sm font-semibold text-slate-900 dark:text-white flex items-center justify-between">
               <span>How do I apply for a scholarship?</span>
@@ -348,6 +415,32 @@
             </summary>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
               Browse matches, open a scholarship detail page, and follow the application instructions. Use your dashboard to track submissions.
+            </p>
+          </details>
+          {% endfor %}
+        </div>
+        <div class="space-y-3">
+          {% for q in "1"|make_list %}
+          <details class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow">
+            <summary class="cursor-pointer text-sm font-semibold text-slate-900 dark:text-white flex items-center justify-between">
+              <span>How many scholarshibs can I apply to?</span>
+              <span class="text-slate-500 dark:text-slate-400">+</span>
+            </summary>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              ScholarHub does not limit you as long as you qualify for the Scholarships.
+            </p>
+          </details>
+          {% endfor %}
+        </div>
+        <div class="space-y-3">
+          {% for q in "1"|make_list %}
+          <details class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 shadow">
+            <summary class="cursor-pointer text-sm font-semibold text-slate-900 dark:text-white flex items-center justify-between">
+              <span>Can I get real-time recommendations?</span>
+              <span class="text-slate-500 dark:text-slate-400">+</span>
+            </summary>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">
+              Yes, ScholarHub provides real-time data for students. This keeps you ahead fora greater future.
             </p>
           </details>
           {% endfor %}

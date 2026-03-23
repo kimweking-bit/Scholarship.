@@ -994,6 +994,254 @@ a{color:inherit}
   line-height:1.7;
 }
 
+.student-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:24px;
+}
+.student-card{
+  position:relative;
+  display:grid;
+  gap:20px;
+  padding:24px;
+  border-radius:26px;
+  border:1px solid var(--bd);
+  background:linear-gradient(180deg,var(--surface-raised),var(--surface-2));
+  box-shadow:0 22px 46px rgba(15,23,42,.08);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.student-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow2);
+  border-color:var(--accent-200);
+}
+.student-card[hidden]{display:none !important}
+.student-card__hero{
+  display:flex;
+  align-items:flex-start;
+  gap:16px;
+}
+.student-card__avatar{
+  width:72px;
+  height:72px;
+  flex:0 0 72px;
+  border-radius:24px;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+  border:1px solid var(--accent-200);
+  background:linear-gradient(135deg,var(--accent-100),var(--surface-3));
+  color:var(--accent-700);
+  font-size:1.35rem;
+  font-weight:800;
+  box-shadow:0 18px 34px rgba(124,92,255,.18);
+}
+.student-card__avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.student-card__identity{
+  flex:1;
+  min-width:0;
+  display:grid;
+  gap:10px;
+}
+.student-card__title{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+}
+.student-card__title h4{
+  margin:0;
+  font-size:1.18rem;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.student-card__identity p{
+  margin:4px 0 0;
+  color:var(--muted);
+  line-height:1.6;
+}
+.student-card__chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.student-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--accent-200);
+  background:var(--surface-tint);
+  color:var(--accent-700);
+  font-size:.78rem;
+  font-weight:700;
+  line-height:1.2;
+}
+.student-card__stats{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.student-card__metric{
+  padding:14px 16px;
+  border-radius:20px;
+  border:1px solid var(--bd);
+  background:linear-gradient(135deg,var(--surface-3),rgba(124,92,255,.04));
+}
+.student-card__metric strong{
+  display:block;
+  font-size:1.32rem;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.student-card__metric span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:.8rem;
+}
+.student-card__details{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.student-detail{
+  padding:14px 16px;
+  border-radius:20px;
+  border:1px solid var(--bd);
+  background:var(--surface-3);
+}
+.student-detail span{
+  display:block;
+  color:var(--soft);
+  font-size:.72rem;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.student-detail strong{
+  display:block;
+  margin-top:6px;
+  font-size:.95rem;
+  line-height:1.55;
+}
+.student-card__block{
+  display:grid;
+  gap:12px;
+}
+.student-card__block-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.student-card__block-head h5{
+  margin:0;
+  font-size:.92rem;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+.student-card__block-head span{
+  color:var(--muted);
+  font-size:.82rem;
+  font-weight:700;
+}
+.student-note{
+  padding:16px 18px;
+  border-radius:22px;
+  border:1px solid var(--bd);
+  background:linear-gradient(135deg,var(--surface-3),rgba(124,92,255,.04));
+  color:var(--muted);
+  line-height:1.75;
+}
+.student-app-list{
+  display:grid;
+  gap:10px;
+}
+.student-app-item{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 16px;
+  border-radius:20px;
+  border:1px solid var(--bd);
+  background:var(--surface-3);
+}
+.student-app-copy{
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+.student-app-copy strong{
+  font-size:.92rem;
+  line-height:1.45;
+}
+.student-app-copy span{
+  color:var(--muted);
+  font-size:.82rem;
+  line-height:1.55;
+}
+.student-doc-list{
+  display:grid;
+  gap:10px;
+}
+.student-doc{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 16px;
+  border-radius:20px;
+  border:1px solid var(--bd);
+  background:var(--surface-3);
+  text-decoration:none;
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+.student-doc:hover{
+  transform:translateY(-1px);
+  box-shadow:0 18px 36px rgba(15,23,42,.1);
+  border-color:var(--accent-200);
+}
+.student-doc__icon{
+  width:44px;
+  height:44px;
+  flex:0 0 44px;
+  border-radius:16px;
+  display:grid;
+  place-items:center;
+  background:var(--accent-100);
+  color:var(--accent-700);
+}
+.student-doc__copy{
+  flex:1;
+  min-width:0;
+  display:grid;
+  gap:4px;
+}
+.student-doc__copy strong{
+  font-size:.9rem;
+  line-height:1.45;
+}
+.student-doc__copy small{
+  color:var(--muted);
+  line-height:1.5;
+}
+.student-doc__jump{color:var(--soft)}
+.student-doc--empty{
+  color:var(--muted);
+  cursor:default;
+}
+.student-doc--empty:hover{
+  transform:none;
+  box-shadow:none;
+  border-color:var(--bd);
+}
+
 .overlay{
   position:fixed;
   inset:0;
@@ -1118,6 +1366,9 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
   .toolbar-row.control-row{flex-direction:column;align-items:stretch}
   .toolbar-actions{width:100%;justify-content:flex-start}
   .top-actions{justify-content:flex-start}
+  .student-grid{grid-template-columns:1fr}
+  .student-card__hero,.student-card__title{flex-direction:column}
+  .student-card__stats,.student-card__details{grid-template-columns:1fr}
   .tablex{min-width:620px}
   .toasts{top:16px;right:16px}
   .section,.chart-card,.stat,.modal-box{padding:24px}
@@ -1153,6 +1404,10 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
           <a href="{% url 'admin_dashboard' %}" class="nav-link" data-route-link>
             <span class="nav-ico"><i class="bi bi-speedometer2"></i></span>
             <span class="nav-copy"><strong>Dashboard</strong></span>
+          </a>
+          <a href="#students-panel" class="nav-link" data-section-link="students-panel">
+            <span class="nav-ico"><i class="bi bi-people"></i></span>
+            <span class="nav-copy"><strong>Student Records</strong></span>
           </a>
           <a href="#applications-panel" class="nav-link" data-section-link="applications-panel">
             <span class="nav-ico"><i class="bi bi-file-earmark-text"></i></span>
@@ -1199,7 +1454,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
       <div>
         <span class="eyebrow"><i class="bi bi-shield-check"></i>Admin only</span>
         <h2>Operational dashboard for scholarship management</h2>
-        <p>Review activity, make decisions quickly, and manage scholarship listings from a cleaner internal workspace.</p>
+        <p>Review student records, inspect uploaded documents, make decisions quickly, and manage scholarship listings from one cleaner internal workspace.</p>
       </div>
       <div class="top-actions topbar-actions">
         <button type="button" class="icon-btn" id="themeToggle"><i class="bi bi-moon-stars"></i><span>Dark mode</span></button>
@@ -1213,6 +1468,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
     <section class="stats" id="statsGrid">
       <article class="cardx stat" data-stat-card="total-scholarships"><div class="stat-top"><div><p class="stat-label">Total Scholarships</p><div class="stat-val" data-stat>{{ total_scholarships|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-mortarboard-fill"></i></div></div><div class="stat-foot"><span>Published opportunities in the system</span><span class="pill"><i class="bi bi-lightning-charge-fill"></i>Live</span></div></article>
       <article class="cardx stat" data-stat-card="total-students"><div class="stat-top"><div><p class="stat-label">Total Students</p><div class="stat-val" data-stat>{{ total_students|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-people-fill"></i></div></div><div class="stat-foot"><span>Student accounts available for review</span><span class="pill"><i class="bi bi-person-badge-fill"></i>Directory</span></div></article>
+      <article class="cardx stat" data-stat-card="student-documents"><div class="stat-top"><div><p class="stat-label">Student Files</p><div class="stat-val" data-stat>{{ student_document_total|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-folder2-open"></i></div></div><div class="stat-foot"><span>CVs, profile uploads, and academic documents on file</span><span class="pill"><i class="bi bi-file-earmark-check"></i>Review ready</span></div></article>
       <article class="cardx stat" data-stat-card="total-applications"><div class="stat-top"><div><p class="stat-label">Applications</p><div class="stat-val" data-stat>{{ total_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-inboxes-fill"></i></div></div><div class="stat-foot"><span>Total submissions across all scholarships</span><span class="pill"><i class="bi bi-clock-history"></i>Tracked</span></div></article>
       <article class="cardx stat" data-stat-card="approved-applications"><div class="stat-top"><div><p class="stat-label">Approved</p><div class="stat-val" data-stat>{{ approved_applications|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-patch-check-fill"></i></div></div><div class="stat-foot"><span>Applications currently approved</span><span class="pill"><i class="bi bi-check2-circle"></i>Resolved</span></div></article>
       <article class="cardx stat" data-stat-card="chat-threads"><div class="stat-top"><div><p class="stat-label">Chat Threads</p><div class="stat-val" data-stat>{{ open_chat_threads|default:0 }}</div></div><div class="stat-ico"><i class="bi bi-chat-left-dots-fill"></i></div></div><div class="stat-foot"><span>Open conversations waiting in the admin inbox</span><span class="pill"><i class="bi bi-bell-fill"></i>{{ unread_chat_threads|default:0 }} unread</span></div></article>
@@ -1221,6 +1477,155 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
     <section class="charts">
       <article class="cardx chart-card"><div class="head"><div><h3>Applications Overview</h3><p>Track monthly application volume across the last six months.</p></div><div class="mini"><strong>{{ total_applications|default:0 }}</strong><span>Total records</span></div></div><div class="chart-wrap"><canvas id="applicationsChart"></canvas></div></article>
       <article class="cardx chart-card"><div class="head"><div><h3>Scholarships by Country</h3><p>See where active scholarship coverage is most concentrated.</p></div><div class="mini"><strong>{{ total_scholarships|default:0 }}</strong><span>Tracked listings</span></div></div><div class="chart-wrap"><canvas id="countryChart"></canvas></div></article>
+    </section>
+
+    <section class="cardx section data-section" id="students-panel">
+      <div class="head section-head">
+        <div>
+          <span class="section-kicker">Students</span>
+          <h3>Student Records and Documents</h3>
+          <p>See profile details, qualifications, uploaded files, and recent scholarship submissions for every student in one place.</p>
+        </div>
+        <a href="#applications-panel" class="chip" style="text-decoration:none;"><i class="bi bi-inboxes"></i><span>Jump to applications</span></a>
+      </div>
+      <div class="toolbar">
+        <div class="toolbar-row search-row">
+          <div class="field"><i class="bi bi-search"></i><label class="sr" for="studentRecordSearch">Search students</label><input id="studentRecordSearch" class="ctrl" type="search" placeholder="Search student, email, course, qualification, or scholarship"></div>
+        </div>
+        <div class="toolbar-row control-row">
+          <div class="toolbar-filters">
+            <div><label class="sr" for="studentRecordFilter">Filter students</label><select id="studentRecordFilter" class="ctrl"><option value="all">All students</option><option value="documents">With documents</option><option value="profile">Profile ready</option><option value="missing-profile">Needs profile</option></select></div>
+            <div><label class="sr" for="studentRecordSort">Sort students</label><select id="studentRecordSort" class="ctrl"><option value="recent">Recent activity</option><option value="most-applications">Most applications</option><option value="name">Name A-Z</option><option value="joined">Newest accounts</option></select></div>
+          </div>
+          <div class="toolbar-actions">
+            <button type="button" class="btnx" data-clear="students"><i class="bi bi-x-circle"></i><span>Clear filters</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="subrow"><span>Student directory</span><strong id="studentRecordsCount">0 visible</strong></div>
+      <div class="student-grid" id="studentRecordsGrid">
+        {% for student in student_records %}
+        <article class="student-card" data-kind="student-record" data-search="{{ student.search_text|escape }}" data-documents="{{ student.document_count }}" data-profile="{{ student.has_profile|yesno:'true,false' }}" data-applications="{{ student.application_count }}" data-joined="{% if student.joined_at %}{{ student.joined_at|date:'c' }}{% endif %}" data-latest="{% if student.latest_application_at %}{{ student.latest_application_at|date:'c' }}{% endif %}" data-name="{{ student.name|lower|escape }}">
+          <div class="student-card__hero">
+            <div class="student-card__avatar">
+              {% if student.photo_url %}
+                <img src="{{ student.photo_url }}" alt="{{ student.name }}">
+              {% else %}
+                <span>{{ student.initials }}</span>
+              {% endif %}
+            </div>
+            <div class="student-card__identity">
+              <div class="student-card__title">
+                <div>
+                  <h4>{{ student.name }}</h4>
+                  <p>{{ student.email|default:"No email on file" }}</p>
+                </div>
+                {% if student.has_profile %}
+                  <span class="badge approved">Profile ready</span>
+                {% else %}
+                  <span class="badge pending">Needs profile</span>
+                {% endif %}
+              </div>
+              <div class="student-card__chips">
+                <span class="student-chip"><i class="bi bi-person-vcard"></i>{{ student.user.username }}</span>
+                {% if student.preferred_level %}
+                  <span class="student-chip"><i class="bi bi-mortarboard"></i>{{ student.preferred_level }}</span>
+                {% endif %}
+                {% if student.preferred_country %}
+                  <span class="student-chip"><i class="bi bi-geo-alt"></i>{{ student.preferred_country }}</span>
+                {% endif %}
+                {% if student.document_count %}
+                  <span class="student-chip"><i class="bi bi-folder2-open"></i>{{ student.document_count }} files</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="student-card__stats">
+            <div class="student-card__metric"><strong>{{ student.application_count }}</strong><span>Applications</span></div>
+            <div class="student-card__metric"><strong>{{ student.document_count }}</strong><span>Documents</span></div>
+            <div class="student-card__metric"><strong>{{ student.approved_count }}</strong><span>Approved</span></div>
+          </div>
+
+          <div class="student-card__details">
+            <div class="student-detail"><span>Phone</span><strong>{{ student.phone|default:"Not provided yet" }}</strong></div>
+            <div class="student-detail"><span>Course</span><strong>{{ student.course|default:"No course shared yet" }}</strong></div>
+            <div class="student-detail"><span>Joined</span><strong>{% if student.joined_at %}{{ student.joined_at|date:"d M Y" }}{% else %}Unknown{% endif %}</strong></div>
+            <div class="student-detail"><span>Latest submission</span><strong>{% if student.latest_application_at %}{{ student.latest_application_at|date:"d M Y" }}{% else %}No applications yet{% endif %}</strong></div>
+          </div>
+
+          <div class="student-card__block">
+            <div class="student-card__block-head">
+              <h5>Qualifications</h5>
+              <span>{% if student.qualifications %}Student supplied{% else %}Awaiting details{% endif %}</span>
+            </div>
+            <div class="student-note">
+              {% if student.qualifications %}
+                {{ student.qualifications|linebreaksbr }}
+              {% else %}
+                No qualifications have been added to this student profile yet.
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="student-card__block">
+            <div class="student-card__block-head">
+              <h5>Recent submissions</h5>
+              <span>{{ student.application_count }} total</span>
+            </div>
+            <div class="student-app-list">
+              {% for application in student.applications|slice:":3" %}
+              <div class="student-app-item">
+                <div class="student-app-copy">
+                  <strong>{{ application.title }}</strong>
+                  <span>{% if application.organization %}{{ application.organization }} · {% endif %}{{ application.date_applied|date:"d M Y" }}</span>
+                </div>
+                <span class="badge {{ application.status_tone }}">{{ application.status }}</span>
+              </div>
+              {% empty %}
+              <div class="student-app-item">
+                <div class="student-app-copy">
+                  <strong>No submissions yet</strong>
+                  <span>This student has not applied for a scholarship through the platform.</span>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% if student.more_application_count %}
+              <span class="meta">{{ student.more_application_count }} more submissions are on file.</span>
+            {% endif %}
+          </div>
+
+          <div class="student-card__block">
+            <div class="student-card__block-head">
+              <h5>Documents on file</h5>
+              <span>{{ student.document_count }} uploaded</span>
+            </div>
+            <div class="student-doc-list">
+              {% for document in student.documents %}
+              <a href="{{ document.url }}" class="student-doc" target="_blank" rel="noopener">
+                <span class="student-doc__icon"><i class="bi {{ document.icon }}"></i></span>
+                <span class="student-doc__copy">
+                  <strong>{{ document.label }}</strong>
+                  <small>{{ document.meta }}</small>
+                </span>
+                <span class="student-doc__jump"><i class="bi bi-box-arrow-up-right"></i></span>
+              </a>
+              {% empty %}
+              <div class="student-doc student-doc--empty">
+                <span class="student-doc__icon"><i class="bi bi-folder-x"></i></span>
+                <span class="student-doc__copy">
+                  <strong>No documents uploaded</strong>
+                  <small>This student has not shared CVs, photos, or academic files yet.</small>
+                </span>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      <div class="empty" id="studentRecordsEmpty" hidden><i class="bi bi-people"></i><h4>No student records match the current view</h4><p>Try clearing the filters or refresh the dashboard to load the latest profiles, applications, and uploaded files.</p></div>
     </section>
 
     <section class="cardx section data-section" id="applications-panel">
@@ -1356,6 +1761,12 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
     appsSort: $("#applicationDateSort"),
     appsCount: $("#applicationsCount"),
     appsEmpty: $("#applicationsEmpty"),
+    studentRecordsGrid: $("#studentRecordsGrid"),
+    studentsSearch: $("#studentRecordSearch"),
+    studentsFilter: $("#studentRecordFilter"),
+    studentsSort: $("#studentRecordSort"),
+    studentsCount: $("#studentRecordsCount"),
+    studentsEmpty: $("#studentRecordsEmpty"),
     scholarshipsBody: $("#scholarshipsBody"),
     scholarshipsSearch: $("#scholarshipSearch"),
     scholarshipsStatus: $("#scholarshipStatusFilter"),
@@ -1503,6 +1914,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
 
   function updateCount(el, n, one, many){ if (el) el.textContent = `${n} ${n === 1 ? one : many} visible`; }
   function appRows(){ return $$('tr[data-kind="application"]', dom.appsBody); }
+  function studentCards(){ return $$('[data-kind="student-record"]', dom.studentRecordsGrid); }
   function scholarshipRows(){ return $$('tr[data-kind="scholarship"]', dom.scholarshipsBody); }
   function applyAppFilters(){
     const q = (dom.appsSearch.value || "").trim().toLowerCase(), status = dom.appsStatus.value, sort = dom.appsSort.value;
@@ -1538,6 +1950,36 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
     updateCount(dom.scholarshipsCount, c, "listing", "listings");
     dom.scholarshipsEmpty.hidden = c !== 0;
   }
+  function applyStudentFilters(){
+    if (!dom.studentRecordsGrid) return;
+    const q = (dom.studentsSearch?.value || "").trim().toLowerCase();
+    const filter = dom.studentsFilter?.value || "all";
+    const sort = dom.studentsSort?.value || "recent";
+    studentCards().sort((a, b) => {
+      if (sort === "name") return (a.dataset.name || "").localeCompare(b.dataset.name || "");
+      if (sort === "most-applications") {
+        const x = Number(a.dataset.applications || 0), y = Number(b.dataset.applications || 0);
+        if (y !== x) return y - x;
+      }
+      if (sort === "joined") {
+        return new Date(b.dataset.joined || 0).getTime() - new Date(a.dataset.joined || 0).getTime();
+      }
+      const x = new Date(a.dataset.latest || a.dataset.joined || 0).getTime();
+      const y = new Date(b.dataset.latest || b.dataset.joined || 0).getTime();
+      return y - x;
+    }).forEach((card) => dom.studentRecordsGrid.appendChild(card));
+    let c = 0;
+    studentCards().forEach((card) => {
+      const hasDocs = Number(card.dataset.documents || 0) > 0;
+      const hasProfile = card.dataset.profile === "true";
+      const ok = (!q || (card.dataset.search || "").toLowerCase().includes(q))
+        && (filter === "all" || (filter === "documents" && hasDocs) || (filter === "profile" && hasProfile) || (filter === "missing-profile" && !hasProfile));
+      card.hidden = !ok;
+      if (ok) c += 1;
+    });
+    updateCount(dom.studentsCount, c, "student", "students");
+    dom.studentsEmpty.hidden = c !== 0;
+  }
 
   async function post(url, body){
     const opts = { method: "POST", credentials: "same-origin", headers: { "X-CSRFToken": csrf(), "X-Requested-With": "XMLHttpRequest" } };
@@ -1554,7 +1996,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
       .then(async (res) => {
         if (!res.ok) throw new Error(`Unable to refresh dashboard (${res.status})`);
         const doc = new DOMParser().parseFromString(await res.text(), "text/html");
-        [["statsGrid", "statsGrid"], ["applicationsBody", "applicationsBody"], ["scholarshipsBody", "scholarshipsBody"]].forEach(([a, b]) => {
+        [["statsGrid", "statsGrid"], ["studentRecordsGrid", "studentRecordsGrid"], ["applicationsBody", "applicationsBody"], ["scholarshipsBody", "scholarshipsBody"]].forEach(([a, b]) => {
           const local = document.getElementById(a), remote = doc.getElementById(b);
           if (local && remote) local.innerHTML = remote.innerHTML;
         });
@@ -1562,6 +2004,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
         if (newApps) document.getElementById("applications-chart-data").textContent = newApps.textContent;
         if (newCountry) document.getElementById("country-chart-data").textContent = newCountry.textContent;
         applyAppFilters();
+        applyStudentFilters();
         applyScholarshipFilters();
         renderCharts();
       })
@@ -1690,6 +2133,9 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
     dom.appsSearch?.addEventListener("input", applyAppFilters);
     dom.appsStatus?.addEventListener("change", applyAppFilters);
     dom.appsSort?.addEventListener("change", applyAppFilters);
+    dom.studentsSearch?.addEventListener("input", applyStudentFilters);
+    dom.studentsFilter?.addEventListener("change", applyStudentFilters);
+    dom.studentsSort?.addEventListener("change", applyStudentFilters);
     dom.scholarshipsSearch?.addEventListener("input", applyScholarshipFilters);
     dom.scholarshipsStatus?.addEventListener("change", applyScholarshipFilters);
     dom.scholarshipsSort?.addEventListener("change", applyScholarshipFilters);
@@ -1700,7 +2146,8 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
       if (el.matches("[data-modal-cancel]")) { closeModal(); return; }
       if (el.dataset.clear) {
         if (el.dataset.clear === "applications") { dom.appsSearch.value = ""; dom.appsStatus.value = "all"; dom.appsSort.value = "newest"; applyAppFilters(); }
-        else { dom.scholarshipsSearch.value = ""; dom.scholarshipsStatus.value = "all"; dom.scholarshipsSort.value = "soonest"; applyScholarshipFilters(); }
+        else if (el.dataset.clear === "scholarships") { dom.scholarshipsSearch.value = ""; dom.scholarshipsStatus.value = "all"; dom.scholarshipsSort.value = "soonest"; applyScholarshipFilters(); }
+        else { dom.studentsSearch.value = ""; dom.studentsFilter.value = "all"; dom.studentsSort.value = "recent"; applyStudentFilters(); }
         return;
       }
       if (el.dataset.action === "create") { openScholarshipForm("create"); return; }
@@ -1773,6 +2220,7 @@ input[type=file].ctrl{padding:12px 16px;min-height:auto}
   initSidebar();
   initNav();
   applyAppFilters();
+  applyStudentFilters();
   applyScholarshipFilters();
   renderCharts();
   bindEvents();

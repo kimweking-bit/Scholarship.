@@ -35,6 +35,35 @@
       .hover-rise { transition: transform 180ms ease, box-shadow 180ms ease; }
       .hover-rise:hover { transform: translateY(-6px); box-shadow:0 16px 36px rgba(0,0,0,0.14); }
       .hero-img { height: 520px; object-fit: cover; }
+      .hero-image-wrap {
+        position: relative;
+      }
+      .hero-image-glow {
+        position: absolute;
+        inset: -24px;
+        border-radius: 36px;
+        background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.08));
+        filter: blur(38px);
+        opacity: 0.9;
+      }
+      .hero-image-frame {
+        position: relative;
+        padding: 14px;
+        border-radius: 32px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.8);
+        border: 1px solid rgba(255,255,255,0.72);
+        box-shadow: 0 28px 72px rgba(15,23,42,0.16);
+        backdrop-filter: blur(14px);
+      }
+      .hero-image-frame img {
+        width: 100%;
+        height: 540px;
+        display: block;
+        object-fit: cover;
+        object-position: center top;
+        border-radius: 24px;
+      }
       .stat-dot { width:10px; height:10px; border-radius:9999px; display:inline-block; }
       .map-holder { position: relative; overflow: hidden; border-radius: 20px; }
       .timeline-dot { width:12px; height:12px; border-radius:9999px; background: linear-gradient(135deg,#6366f1,#8b5cf6); box-shadow:0 0 0 6px rgba(99,102,241,0.18); }
@@ -311,6 +340,14 @@
         transform: translateY(0) scale(0.99);
       }
       @media (max-width: 575.98px) {
+        .hero-image-frame {
+          padding: 10px;
+          border-radius: 24px;
+        }
+        .hero-image-frame img {
+          height: 420px;
+          border-radius: 18px;
+        }
         .chat-dock {
           right: 0.75rem;
           left: 0.75rem;
@@ -431,35 +468,12 @@
                 <span>Live: <span id="live-count" class="fw-semibold text-slate-700">1,240</span></span>
               </div>
             </div>
-            <!-- Right column: calm onboarding card -->
+            <!-- Right column: hero image -->
             <div class="col-lg-5">
-              <div class="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm h-100 d-flex flex-column gap-3">
-                <div>
-                  <p class="text-xs text-slate-500 mb-1">Start in 60 seconds</p>
-                  <h5 class="fw-semibold text-slate-900 mb-1">Stay organized and ahead</h5>
-                  <p class="text-sm text-slate-600 mb-0">Create your profile, get tailored matches, and track deadlines in one place.</p>
-                </div>
-                <div class="d-flex flex-column gap-3">
-                  <div class="d-flex align-items-center gap-2 text-slate-700">
-                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
-                    Create your profile and goals
-                  </div>
-                  <div class="d-flex align-items-center gap-2 text-slate-700">
-                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
-                    Receive high-fit matches weekly
-                  </div>
-                  <div class="d-flex align-items-center gap-2 text-slate-700">
-                    <span class="h-2.5 w-2.5 rounded-pill bg-gradient-primary d-inline-block"></span>
-                    Track deadlines with reminders
-                  </div>
-                </div>
-                <div class="d-grid gap-2 mt-2">
-                  <a href="{% url 'register' %}" class="btn rounded-xl text-white fw-semibold bg-gradient-primary hover:opacity-90">Create free account</a>
-                  <a href="#smart-match" class="btn rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-100 fw-semibold">See how it works</a>
-                </div>
-                <div class="d-flex align-items-center gap-2 text-xs text-slate-500">
-                  <span class="h-2 w-2 rounded-circle bg-emerald-400 d-inline-block"></span>
-                  No spam, cancel anytime.
+              <div class="hero-image-wrap">
+                <div class="hero-image-glow"></div>
+                <div class="hero-image-frame">
+                  <img src="{% static 'images/pexels-nappy-935948.jpg' %}" alt="Graduate celebrating a scholarship milestone">
                 </div>
               </div>
             </div>
