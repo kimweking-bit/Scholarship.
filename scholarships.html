@@ -1,6 +1,6 @@
 <!doctype html>
 {% load static %}
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -99,9 +99,171 @@
       #scholarship-results {
         scroll-margin-top: 120px;
       }
+      .filter-panel {
+        position: relative;
+        overflow: hidden;
+        background:
+          linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+          radial-gradient(circle at top right, rgba(129, 140, 248, 0.14), transparent 35%);
+        border: 1px solid rgba(226, 232, 240, 0.95);
+        box-shadow: 0 22px 60px rgba(15, 23, 42, 0.12);
+      }
+      .filter-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(99, 102, 241, 0.08), transparent 24%),
+          radial-gradient(circle at 88% 20%, rgba(168, 85, 247, 0.08), transparent 22%);
+      }
+      .filter-field {
+        position: relative;
+        border-radius: 22px;
+        border: 1px solid rgba(203, 213, 225, 0.95);
+        background: rgba(255, 255, 255, 0.92);
+        padding: 0.9rem 1rem 0.95rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+      }
+      .filter-field:hover {
+        transform: translateY(-2px);
+        border-color: rgba(129, 140, 248, 0.45);
+        box-shadow: 0 18px 36px rgba(99, 102, 241, 0.1);
+      }
+      .filter-field--active {
+        border-color: rgba(99, 102, 241, 0.45);
+        background: linear-gradient(180deg, rgba(238, 242, 255, 0.9), rgba(255, 255, 255, 0.98));
+        box-shadow: 0 18px 36px rgba(99, 102, 241, 0.12);
+      }
+      .filter-field:focus-within {
+        transform: translateY(-2px);
+        border-color: rgba(99, 102, 241, 0.58);
+        box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.13), 0 22px 42px rgba(99, 102, 241, 0.12);
+      }
+      .filter-field__label {
+        display: block;
+        margin-bottom: 0.65rem;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #64748b;
+      }
+      .filter-field__body {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+      .filter-field__icon {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        z-index: 1;
+        transform: translateY(-50%);
+        color: #6366f1;
+        pointer-events: none;
+      }
+      .filter-control {
+        width: 100%;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #0f172a;
+        font-size: 0.98rem;
+        font-weight: 600;
+        line-height: 1.5rem;
+        padding: 0 2.65rem 0 2rem;
+      }
+      .filter-control::placeholder {
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      .filter-select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+      }
+      .filter-select option {
+        background: #ffffff;
+        color: #0f172a;
+        font-weight: 600;
+      }
+      .filter-select--placeholder {
+        color: #94a3b8;
+        font-weight: 500;
+      }
+      .filter-select-wrap::after {
+        content: "";
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        z-index: 2;
+        width: 0.6rem;
+        height: 0.6rem;
+        border-right: 2px solid #ffffff;
+        border-bottom: 2px solid #ffffff;
+        transform: translateY(-65%) rotate(45deg);
+        pointer-events: none;
+      }
+      .filter-select-wrap::before {
+        content: "";
+        position: absolute;
+        right: 0.25rem;
+        top: 50%;
+        width: 2.3rem;
+        height: 2.3rem;
+        transform: translateY(-50%);
+        border-radius: 9999px;
+        background: linear-gradient(135deg, #6366f1, #8b5cf6);
+        box-shadow: 0 14px 28px rgba(99, 102, 241, 0.24);
+        pointer-events: none;
+      }
+      .filter-field--active .filter-select-wrap::before,
+      .filter-field:focus-within .filter-select-wrap::before {
+        background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      }
+      .filter-date {
+        min-height: 1.75rem;
+      }
+      .filter-date::-webkit-calendar-picker-indicator {
+        position: absolute;
+        right: 0;
+        width: 2.25rem;
+        height: 2.25rem;
+        margin: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+      .filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(199, 210, 254, 0.95);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 0.55rem 0.9rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #4338ca;
+        box-shadow: 0 10px 24px rgba(99, 102, 241, 0.08);
+      }
+      .filter-chip--subtle {
+        border-color: rgba(226, 232, 240, 0.95);
+        color: #475569;
+      }
+      @media (max-width: 640px) {
+        .filter-field {
+          padding: 0.8rem 0.9rem 0.9rem;
+        }
+        .filter-control {
+          font-size: 0.95rem;
+        }
+      }
     </style>
   </head>
-  <body class="min-h-screen flex flex-col bg-white text-slate-900 relative overflow-x-hidden">
+  <body class="min-h-screen flex flex-col bg-white text-slate-900 relative overflow-x-hidden" id="top">
     <!-- Background -->
     <div class="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
       <div class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(99,102,241,0.08),transparent_32%),radial-gradient(circle_at_82%_10%,rgba(168,85,247,0.08),transparent_30%),linear-gradient(135deg,#eef2ff,#f8fafc_60%,#ffffff)]"></div>
@@ -241,68 +403,114 @@
 
       <!-- Filters (sticky) -->
       <section class="mx-auto max-w-6xl px-4 mt-8 animate-fade-up" style="animation-delay:0.05s;">
-        <div class="rounded-2xl bg-white text-slate-900 shadow-xl border border-slate-200 p-6">
-          <form method="get" action="{% url 'scholarships' %}" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div class="relative">
-              <input
-                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-transparent py-3 px-4 focus:bg-white"
-                type="text"
-                name="country"
-                id="country"
-                placeholder="Country"
-                value="{{ country|default:'' }}"
-              />
-              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
-                Country
-              </label>
+        <div class="filter-panel rounded-[28px] p-5 sm:p-6 lg:p-7 text-slate-900">
+          <div class="relative z-10 flex flex-col gap-5 mb-6 lg:flex-row lg:items-end lg:justify-between">
+            <div class="space-y-2">
+              <p class="text-xs uppercase tracking-[0.24em] text-indigo-500">Refine Results</p>
+              <div>
+                <h2 class="text-2xl font-semibold text-slate-900">Style your shortlist with better filters</h2>
+                <p class="text-sm text-slate-600 max-w-2xl">
+                  Narrow the list with polished controls for country, study level, category, and a clean deadline cutoff.
+                </p>
+              </div>
+            </div>
+            <div class="relative z-10 flex flex-wrap gap-2 lg:justify-end">
+              <span class="filter-chip filter-chip--subtle">Fresh matches</span>
+              {% if q %}<span class="filter-chip">Search: {{ q }}</span>{% endif %}
+              {% if country %}<span class="filter-chip">{{ country }}</span>{% endif %}
+              {% if level %}<span class="filter-chip">{{ level|title }}</span>{% endif %}
+              {% if category %}<span class="filter-chip">{{ category|title }}</span>{% endif %}
+              {% if deadline_before %}<span class="filter-chip">By {{ deadline_before }}</span>{% endif %}
+            </div>
+          </div>
+
+          <form method="get" action="{% url 'scholarships' %}" class="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="filter-field {% if country %}filter-field--active{% endif %}">
+              <label for="country" class="filter-field__label">Country</label>
+              <div class="filter-field__body">
+                <span class="filter-field__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M12 21s7-4.35 7-11a7 7 0 1 0-14 0c0 6.65 7 11 7 11Z" />
+                    <circle cx="12" cy="10" r="2.5" stroke-width="1.7" />
+                  </svg>
+                </span>
+                <input
+                  class="filter-control"
+                  type="text"
+                  name="country"
+                  id="country"
+                  placeholder="Type a country"
+                  value="{{ country|default:'' }}"
+                />
+              </div>
             </div>
 
-            <div class="relative">
-              <select
-                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 py-3 px-4 focus:bg-white"
-                name="level"
-                id="level"
-              >
-                <option value="" class="bg-white text-slate-900">All levels</option>
-                {% for value,label in level_options %}
-                  <option value="{{ value }}" {% if level == value %}selected{% endif %} class="bg-white text-slate-900">{{ label }}</option>
-                {% endfor %}
-              </select>
-              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
-                Level
-              </label>
+            <div class="filter-field {% if level %}filter-field--active{% endif %}">
+              <label for="level" class="filter-field__label">Level</label>
+              <div class="filter-field__body filter-select-wrap">
+                <span class="filter-field__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="m3 9 9-5 9 5-9 5-9-5Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M6 10.8V15l6 3 6-3v-4.2" />
+                  </svg>
+                </span>
+                <select
+                  class="filter-control filter-select"
+                  name="level"
+                  id="level"
+                >
+                  <option value="">Select level</option>
+                  {% for value,label in level_options %}
+                    <option value="{{ value }}" {% if level == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
 
-            <div class="relative">
-              <select
-                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 py-3 px-4 focus:bg-white"
-                name="category"
-                id="category"
-              >
-                <option value="" class="bg-white text-slate-900">All categories</option>
-                {% for value,label in category_options %}
-                  <option value="{{ value }}" {% if category == value %}selected{% endif %} class="bg-white text-slate-900">{{ label }}</option>
-                {% endfor %}
-              </select>
-              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
-                Category
-              </label>
+            <div class="filter-field {% if category %}filter-field--active{% endif %}">
+              <label for="category" class="filter-field__label">Category</label>
+              <div class="filter-field__body filter-select-wrap">
+                <span class="filter-field__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="4" y="4" width="6" height="6" rx="1.4" stroke-width="1.7" />
+                    <rect x="14" y="4" width="6" height="6" rx="1.4" stroke-width="1.7" />
+                    <rect x="4" y="14" width="6" height="6" rx="1.4" stroke-width="1.7" />
+                    <rect x="14" y="14" width="6" height="6" rx="1.4" stroke-width="1.7" />
+                  </svg>
+                </span>
+                <select
+                  class="filter-control filter-select"
+                  name="category"
+                  id="category"
+                >
+                  <option value="">Select category</option>
+                  {% for value,label in category_options %}
+                    <option value="{{ value }}" {% if category == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
             </div>
 
-            <div class="relative">
-              <input
-                class="floating-input w-full rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder-transparent py-3 px-4 focus:bg-white"
-                type="date"
-                name="deadline_before"
-                id="deadline_before"
-                value="{{ deadline_before|default:'' }}"
-              />
-              <label class="pointer-events-none absolute left-4 top-3 text-sm text-slate-500 transition-all duration-200 origin-left">
-                Deadline on/before
-              </label>
+            <div class="filter-field {% if deadline_before %}filter-field--active{% endif %}">
+              <label for="deadline_before" class="filter-field__label">Deadline Cutoff</label>
+              <div class="filter-field__body">
+                <span class="filter-field__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <rect x="3.75" y="5" width="16.5" height="15" rx="2.2" stroke-width="1.7" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" d="M8 3.75V7M16 3.75V7M3.75 9.25h16.5" />
+                  </svg>
+                </span>
+                <input
+                  class="filter-control filter-date"
+                  type="date"
+                  name="deadline_before"
+                  id="deadline_before"
+                  value="{{ deadline_before|default:'' }}"
+                />
+              </div>
             </div>
 
-            <div class="md:col-span-2 lg:col-span-4 flex gap-3">
+            <div class="md:col-span-2 lg:col-span-4 flex flex-col gap-3 pt-1 sm:flex-row">
               <button
                 class="flex-1 h-12 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-500 text-white font-semibold shadow-lg shadow-indigo-500/35 transition duration-200 hover:-translate-y-0.5 hover:shadow-indigo-500/55 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-indigo-400/60 animate-gradient-x"
                 type="submit"
@@ -310,7 +518,7 @@
                 Apply Filters
               </button>
               <a
-                class="h-12 px-4 inline-flex items-center justify-center rounded-xl border border-slate-200 text-slate-800 bg-white hover:bg-slate-50 transition"
+                class="h-12 px-5 inline-flex items-center justify-center rounded-xl border border-slate-200 text-slate-800 bg-white/90 hover:bg-white transition shadow-sm"
                 href="{% url 'scholarships' %}"
               >
                 Reset
@@ -863,6 +1071,9 @@
       <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
         © 2026 ScholarHub. All rights reserved.
       </div>
+      <div class="pt-3 text-center text-sm">
+        <a href="#top" class="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-200 transition-colors">Back to top ↑</a>
+      </div>
     </footer>
 
     <!-- Skeleton loader (hidden once DOM ready) -->
@@ -980,6 +1191,15 @@
         if (img && (img.dataset.useFallback === 'true' || !img.getAttribute('src'))) {
           img.src = chosen;
         }
+      });
+
+      // Keep empty filter dropdowns feeling like placeholders until a value is chosen.
+      document.querySelectorAll('.filter-select').forEach((select) => {
+        const syncPlaceholderState = () => {
+          select.classList.toggle('filter-select--placeholder', !select.value);
+        };
+        syncPlaceholderState();
+        select.addEventListener('change', syncPlaceholderState);
       });
 
       // Simple charts (sample data)

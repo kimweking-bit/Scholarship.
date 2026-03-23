@@ -42,7 +42,7 @@
       try { localStorage.removeItem('theme'); } catch (e) {}
     </script>
   </head>
-  <body class="min-h-screen flex flex-col bg-white text-slate-900">
+  <body class="min-h-screen flex flex-col bg-white text-slate-900" id="top">
  <!-- Navbar (exactly as about.html) -->
     <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
       <div class="mx-auto max-w-7xl px-4">
@@ -291,15 +291,45 @@
       <!-- Partners -->
       <section class="mx-auto max-w-6xl px-4 py-10 space-y-6 animate-fade-up" id="partners">
         <div class="text-center space-y-2">
-          <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">Partners</p>
-          <h2 class="text-3xl font-semibold text-slate-900 dark:text-white">Universities & sponsors</h2>
+          <p class="text-xs uppercase tracking-[0.25em] text-indigo-500">Featured Institutions</p>
+          <h2 class="text-3xl font-semibold text-slate-900 dark:text-white">Recognized universities, funders, and employers</h2>
+          <p class="text-sm text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+            We highlight the kinds of institutions and sponsors students actively search for, from top universities to major scholarship foundations and employer-backed programs.
+          </p>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 items-center">
-          {% for p in "123456"|make_list %}
-          <div class="h-16 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-center shadow-sm">
-            <span class="text-sm font-semibold text-slate-500 dark:text-slate-300">Logo {{ forloop.counter }}</span>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">University of Oxford</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">University</span>
           </div>
-          {% endfor %}
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">University of Toronto</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">University</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">University of Melbourne</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">University</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">Harvard University</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">University</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">Mastercard Foundation</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">Foundation</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">DAAD</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">Funding organization</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">Google</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">Employer sponsor</span>
+          </div>
+          <div class="min-h-24 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex flex-col items-center justify-center shadow-sm p-4 text-center">
+            <span class="text-sm font-semibold text-slate-700 dark:text-slate-100">Microsoft</span>
+            <span class="text-xs text-slate-500 dark:text-slate-300 mt-1">Employer sponsor</span>
+          </div>
         </div>
       </section>
 
@@ -394,6 +424,9 @@
       </div>
       <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
         © 2026 ScholarHub. All rights reserved.
+      </div>
+      <div class="pt-3 text-center text-sm">
+        <a href="#top" class="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-200 transition-colors">Back to top ↑</a>
       </div>
     </footer>
 

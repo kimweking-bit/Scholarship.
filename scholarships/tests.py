@@ -58,6 +58,31 @@ class LoginRedirectTests(TestCase):
         assert resp["Location"] == reverse("student_dashboard")
 
 
+class HomePageTests(TestCase):
+    def test_homepage_renders_for_logged_out_user(self):
+        resp = self.client.get(reverse("home"))
+        assert resp.status_code == 200
+        assert "index.html" in [template.name for template in resp.templates if template.name]
+
+    def test_homepage_renders_for_logged_in_staff_user(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="staff", password="pass", is_staff=True)
+        self.client.force_login(user)
+
+        resp = self.client.get(reverse("home"))
+        assert resp.status_code == 200
+        assert "index.html" in [template.name for template in resp.templates if template.name]
+
+    def test_homepage_renders_for_logged_in_student_user(self):
+        User = get_user_model()
+        user = User.objects.create_user(username="student", password="pass")
+        self.client.force_login(user)
+
+        resp = self.client.get(reverse("home"))
+        assert resp.status_code == 200
+        assert "index.html" in [template.name for template in resp.templates if template.name]
+
+
 class StudentDashboardTests(TestCase):
     def test_requires_login(self):
         resp = self.client.get(reverse("student_dashboard"), follow=True)

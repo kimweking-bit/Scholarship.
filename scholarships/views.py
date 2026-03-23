@@ -405,12 +405,6 @@ def unread_user_message_count(thread: ChatThread) -> int:
 @ensure_csrf_cookie
 def index(request):
     auto_deactivate_expired_scholarships()
-    # Public landing page. Logged-in users should go straight to their dashboard.
-    if request.user.is_authenticated:
-        if request.user.is_staff:
-            return redirect("admin_dashboard")
-        return redirect("student_dashboard")
-
     User = get_user_model()
     scholarships_qs = available_scholarships_qs()
 

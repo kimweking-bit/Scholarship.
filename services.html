@@ -1,6 +1,6 @@
 ﻿<!doctype html>
 {% load static %}
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,7 +34,7 @@
       .bg-gradient-to-r:hover { transform: translateY(-2px); box-shadow: 0 18px 44px rgba(99,102,241,0.26); }
     </style>
   </head>
-  <body class="bg-slate-50 text-slate-900 font-sans">
+  <body class="bg-slate-50 text-slate-900 font-sans" id="top">
    <!-- Navbar (exactly as about.html) -->
     <nav class="fixed top-0 inset-x-0 z-50 bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-md transition-all duration-300" id="navbar">
       <div class="mx-auto max-w-7xl px-4">
@@ -333,6 +333,9 @@
       </div>
       <div class="mt-10 border-t border-slate-800 pt-4 text-center text-sm text-slate-500">
         © 2026 ScholarHub. All rights reserved.
+      </div>
+      <div class="pt-3 text-center text-sm">
+        <a href="#top" class="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-200 transition-colors">Back to top ↑</a>
       </div>
     </footer>
 
