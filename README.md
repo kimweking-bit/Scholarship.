@@ -57,7 +57,41 @@ If you want the email to include a real dashboard link for an existing account, 
 python manage.py send_test_email --to you@example.com --user your_username
 ```
 
-## Render deployment
+## Hosting (important)
+
+**GitHub Pages cannot run this project.**  
+GitHub Pages only serves static HTML/CSS/JS. This app is **Django** (Python, database, login, forms, uploads), so it needs a real web host.
+
+Use this flow instead:
+
+1. **Push the code to GitHub** (source control / backup)
+2. **Deploy from that GitHub repo to [Render](https://render.com)** (runs Django live)
+
+The live site URL will look like `https://your-service.onrender.com`, not `*.github.io`.
+
+## Push to GitHub
+
+Do **not** commit secrets. `.env`, `.venv/`, and `*.sqlite3` are gitignored.
+
+```bash
+# from the project root
+git add -A
+git status   # confirm .env and .venv are NOT listed
+git commit -m "Initial ScholarHub Django app"
+
+# create an empty repo on GitHub, then:
+git branch -M main
+git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
+git push -u origin main
+```
+
+Or with GitHub CLI:
+
+```bash
+gh repo create scholar-hub --public --source=. --remote=origin --push
+```
+
+## Render deployment (live site)
 
 This repo includes a [render.yaml](./render.yaml) Blueprint for a Python web service plus a managed Postgres database.
 
@@ -70,17 +104,19 @@ This repo includes a [render.yaml](./render.yaml) Blueprint for a Python web ser
 
 ### Deploy steps
 
-1. Push this repo to GitHub.
-2. In Render, click `New` -> `Blueprint`.
-3. Select this repository and apply the Blueprint.
-4. The Blueprint build runs migrations and collects static files automatically.
-5. After the first deploy, create a superuser from the Render shell:
+1. Push this repo to GitHub (see above).
+2. Sign up / log in at [https://render.com](https://render.com) (GitHub login works).
+3. Click **New** → **Blueprint**.
+4. Select this repository and apply the Blueprint.
+5. Wait for the first deploy (build runs `migrate` + `collectstatic`).
+6. Open the Render service URL to use the live site.
+7. Create a superuser from the Render **Shell** tab:
 
 ```bash
 python manage.py createsuperuser
 ```
 
-6. If you want seed data, run your preferred management commands from the Render shell, for example:
+8. Optional seed data from the same shell:
 
 ```bash
 python manage.py seed_scholarships
@@ -93,8 +129,9 @@ python manage.py seed_scholarships
 - `ALLOWED_HOSTS` automatically includes Render's hostname when `RENDER_EXTERNAL_HOSTNAME` is present.
 - `CSRF_TRUSTED_ORIGINS` automatically includes Render's external URL when `RENDER_EXTERNAL_URL` is present.
 - Configure the email variables above in Render as well if you want newsletter welcome emails to reach real inboxes.
+- Free Render web services may sleep after idle time; the first request can be slow to wake up.
 
 ## Notes
 
-- The repository still has a stale `Dashboard/db.sqlite3` file locked by another process. The live app now uses the root-level `db.sqlite3`.
+- Local SQLite (`db.sqlite3`) is for development only and is not pushed to GitHub.
 - Uploaded files need the persistent disk to survive redeploys on Render.
